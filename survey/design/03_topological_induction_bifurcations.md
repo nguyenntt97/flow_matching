@@ -65,3 +65,4 @@ Under the continuum limit of hierarchical partitions proved by Ramachandran & Sr
    which serve as positive and negative training classes for the Condition Node classifier.
 2. **To Subsystem 5 (DMP Action Leaves):** Provides the terminal leaf clusters $\Xi_\ell$. Each leaf cluster $\ell$ is guaranteed to be unimodal and low-curvature, providing clean trajectory bundles for fitting individual DMPs.
 3. **To Subsystem 6 (Reactive BT Assembly):** Defines the hierarchical parent-child relationships and identifies alternative branches for Fallback ($?$) node composition.
+

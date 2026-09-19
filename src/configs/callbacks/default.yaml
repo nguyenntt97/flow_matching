@@ -1,0 +1,16 @@
+model_checkpoint:
+  _target_: pytorch_lightning.callbacks.ModelCheckpoint
+  dirpath: ${run_dir}/checkpoints
+  # Upstream saves every epoch unconditionally and never gates on min_val_loss,
+  # so "the upstream checkpoint" is the LAST epoch. save_last gives the
+  # comparable artifact; save_top_k gives the one you actually want.
+  monitor: val/fde
+  mode: min
+  save_top_k: 1
+  save_last: true
+  auto_insert_metric_name: false
+  filename: "epoch{epoch:03d}-fde{val/fde:.4f}"
+
+lr_monitor:
+  _target_: pytorch_lightning.callbacks.LearningRateMonitor
+  logging_interval: step

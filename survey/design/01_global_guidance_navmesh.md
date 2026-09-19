@@ -67,3 +67,4 @@ Subsystem 1 exposes a clean functional interface to the rest of the Learnable Be
 3. **To Subsystem 5 (DMP Action Leaves):** Directly sets the attractor goal position:
    $$\mathbf{g}_\ell = \mathbf{c}_{t, \text{nav}}$$
    allowing the DMP second-order dynamics to pull the pedestrian smoothly toward the NavMesh polyline.
+

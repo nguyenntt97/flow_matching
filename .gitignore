@@ -71,3 +71,7 @@ output_dir/
 *mixture_uniform_step=320001/
 *.out
 *.err
+# CrowdES parity stack (src/)
+checkpoints/
+cache/
+*.ckpt

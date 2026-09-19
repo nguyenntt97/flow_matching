@@ -1,0 +1,23 @@
+# Full CrowdES scene-level benchmark (utils/metrics.py::compute_metrics).
+#
+# Requires all three checkpoints -- emitter_pre, emitter and simulator --
+# because CrowdESFramework.__init__ loads them unconditionally. Download the
+# emitter pair from the upstream release tag v1.0-model:
+#   https://github.com/InhwanBae/Crowd-Behavior-Generation/releases
+# into checkpoints/<dataset>/emitter_pre/ and checkpoints/<dataset>/emitter/,
+# and train or export the simulator into checkpoints/<dataset>/dynamics/
+# (src/train.py with export.mirror_upstream=true does that for you).
+defaults:
+  - _self_
+  - data: eth
+
+name: eval_scene_${data.dataset.dataset_name}
+seed: 0
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: false

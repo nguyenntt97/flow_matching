@@ -67,3 +67,4 @@ where $y_i = +1$ for trajectories taking the left branch and $y_i = -1$ for traj
 
 1. **To Subsystem 6 (Reactive BT Assembly):** Instantiates the terminal Condition leaves ($C \in V_T$) placed as guards inside Sequence and Fallback subtrees.
 2. **To Subsystem 7 (Formal Verification):** The linear hyperplane $\mathbf{w}_k^\top \phi(\mathbf{s}) + b_k = 0$ translates into linear constraints easily ingested by SMT solvers (Z3 / MathSAT) and the BehaVerify model checker.
+

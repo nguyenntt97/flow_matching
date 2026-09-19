@@ -105,3 +105,4 @@ def tick(self, state: PedestrianState) -> NodeStatus:
 1. **To Subsystem 6 (Reactive BT Assembly):** DMPs instantiate the terminal Action leaves ($A \in V_T$) that return `RUNNING`, `SUCCESS`, or `FAILURE`.
 2. **To Subsystem 7 (Safety & Verification):** The DMP commanded acceleration $\mathbf{a}_{\text{DMP}}$ is fed directly into the Control Barrier Function Quadratic Program (CBF-QP) as the reference nominal control input:
    $$\mathbf{u}^\star = \arg\min_{\mathbf{u}} \|\mathbf{u} - \mathbf{u}_{\text{DMP}}\|^2 \quad \text{s.t.} \quad \dot{h}(\mathbf{s}, \mathbf{u}) + \alpha(h(\mathbf{s})) \ge 0$$
+

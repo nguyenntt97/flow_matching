@@ -1,0 +1,7 @@
+defaults:
+  - default
+  - _self_
+
+max_epochs: 2
+limit_train_batches: 5
+limit_val_batches: 5

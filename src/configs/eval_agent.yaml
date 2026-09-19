@@ -1,0 +1,21 @@
+defaults:
+  - _self_
+  - data: eth
+  - system: parity
+
+name: eval_agent_${data.dataset.dataset_name}
+seed: 0
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+ckpt: ???                    # path to a Lightning .ckpt
+split: test                  # 'test' opts into allow_test_split
+batch_size: 2048
+num_samples: 20              # K for minADE_K / minFDE_K
+device: cuda
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: false

@@ -1,0 +1,3 @@
+[submodule "third_party/crowdes"]
+	path = third_party/crowdes
+	url = https://github.com/InhwanBae/Crowd-Behavior-Generation

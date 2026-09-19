@@ -1,0 +1,29 @@
+# Transcribed from upstream's three-way yaml split:
+#   third_party/crowdes/configs/dataset/univ.yaml
+#   third_party/crowdes/configs/model/CrowdES_univ.yaml
+#   third_party/crowdes/configs/trainer/CrowdES_trainer_*.yaml
+# Verify with: python -m src.tools.diff_config univ
+defaults:
+  - base
+  - _self_
+
+dataset:
+  dataset_name: univ
+  dataset_family: ethucy
+  dataset_path: ${repo:datasets/ETH-UCY}/
+  dataset_preprocessed_path: ${repo:datasets/preprocessed/univ}/
+  dataset_fps: 25
+  dataset_preprocessor: ETHUCYPreprocessor
+  dataset_augmentation: [hflip, vflip, tp, rev]
+
+crowd_emitter:
+  emitter_pre:
+    max_population: 128
+    population_multiplier: 2.0
+  emitter:
+    max_num_agents_pad: 64
+    window_stride: 0.2
+
+crowd_simulator:
+  simulator:
+    num_train_epochs: 64

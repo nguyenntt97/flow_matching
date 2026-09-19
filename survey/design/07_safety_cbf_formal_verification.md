@@ -135,3 +135,4 @@ Following [Serbinowska et al. (2025)](file:///home/nguyen/projects/flow_matching
 
 1. **Input from Subsystem 6:** Receives nominal action acceleration $\mathbf{u}_{\text{nominal}} = \mathbf{a}_{\text{DMP}}$ and discrete tree topology $\mathcal{T}$.
 2. **Integration into Subsystem 8 (End-to-End Walkthrough):** Emits verified, safe control commands $\mathbf{u}^\star$ to the robot/pedestrian locomotion simulator at $100\,\text{Hz}$, achieving zero collisions ($C_R = 0.0\%$) and verified destination arrival.
+

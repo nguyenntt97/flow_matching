@@ -109,3 +109,4 @@ This formulation allows gradient $\nabla_{\mathbf{w}} \mathcal{L}_{\text{task}}$
 2. **Output to Subsystem 7 (Safety & Formal Verification):** The assembled tree structure $\mathcal{T}$ and its nominal control commands $\mathbf{u}_{\text{nominal}}$ are passed to:
    - The Control Barrier Function Quadratic Program (CBF-QP) for hard collision-free filtering.
    - The BehaVerify / nuXmv pipeline for formal model checking of safety invariants.
+

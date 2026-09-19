@@ -1,0 +1,32 @@
+defaults:
+  - _self_
+  - data: eth
+  - system: parity
+  - trainer: default
+  - logger: tensorboard
+  - callbacks: default
+  - experiment: null
+
+name: crowdes_parity_${data.dataset.dataset_name}
+seed: ${data.crowd_simulator.simulator.seed}
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+export:
+  dir: ${run_dir}/hf_export
+  every_n_epochs: 1          # upstream's cadence
+  # Also write to crowd_simulator.simulator.checkpoint_dir so
+  # CrowdESFramework picks the model up with no submodule edits. Required for
+  # src/evaluate_scene.py.
+  mirror_upstream: false
+
+ckpt_path: null              # resume from a Lightning .ckpt
+build_cache_only: false      # build the dataset cache and exit
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    # Never chdir: every path in this config is already absolute via ${repo:...},
+    # and upstream's CWD-relative assumptions must not be reintroduced.
+    chdir: false

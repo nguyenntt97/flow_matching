@@ -1,0 +1,2 @@
+# Sentinel: src/train.py maps a null logger config to Trainer(logger=False).
+_target_: null

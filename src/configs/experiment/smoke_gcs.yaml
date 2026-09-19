@@ -1,0 +1,17 @@
+# @package _global_
+# Fastest path to a running trainer: gcs has 2 train scenes, so the first
+# cache build is minutes rather than tens of minutes.
+defaults:
+  - override /data: gcs
+  - override /trainer: smoke
+  - override /logger: none
+
+name: smoke_gcs
+
+data:
+  crowd_simulator:
+    simulator:
+      train_batch_size: 64
+      eval_batch_size: 64
+  loader:
+    num_workers: 2

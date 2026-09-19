@@ -62,3 +62,4 @@ This generates a rich bundle of continuous trajectories capturing all navigation
 
 1. **To Subsystem 3 (Topological Induction):** Outputs the trajectory bundle $\Xi = \{\xi_i(\tau)\}_{i=1}^M$ whose phase-space geometry contains the bifurcations.
 2. **To Subsystem 5 (DMP Action Leaves):** Provides the training data for fitting Dynamical Movement Primitive shape weights $\mathbf{w}_{\text{DMP}}$ and attractor velocities.
+

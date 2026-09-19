@@ -1,0 +1,31 @@
+# Transcribed from upstream's three-way yaml split:
+#   third_party/crowdes/configs/dataset/sdd.yaml
+#   third_party/crowdes/configs/model/CrowdES_sdd.yaml
+#   third_party/crowdes/configs/trainer/CrowdES_trainer_*.yaml
+# Verify with: python -m src.tools.diff_config sdd
+defaults:
+  - base
+  - _self_
+
+dataset:
+  dataset_name: sdd
+  dataset_family: sdd
+  dataset_path: ${repo:datasets/SDD}/
+  dataset_preprocessed_path: ${repo:datasets/preprocessed/sdd}/
+  dataset_fps: 30
+  dataset_preprocessor: SDDPreprocessor
+  dataset_augmentation: [hflip, vflip, tp, rev]
+
+crowd_emitter:
+  emitter_pre:
+    blur_sigma: 20
+    num_train_epochs: 64
+    max_population: 128
+    population_multiplier: 1
+  emitter:
+    max_num_agents_pad: 128
+    window_stride: 1
+
+crowd_simulator:
+  simulator:
+    num_train_epochs: 16

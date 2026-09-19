@@ -1,0 +1,51 @@
+# Environment for the CrowdES parity stack (src/).
+#
+#   conda env create -f src/environment.yml && conda activate flowbt
+#
+# Two constraints are not negotiable:
+#
+# 1. torch must be a cu128 (or newer) build. The target GPU is an RTX 5090
+#    (sm_120, Blackwell); upstream's pinned torch==2.2.2/cu121 has no kernels
+#    for it. This is why bit-exact agreement with an upstream run is not a
+#    goal -- see src/README.md.
+#
+# 2. pandas < 2.2. utils/trajectory.py::sliding_window uses
+#    `gb.apply(...)` with as_index=False, and groupby_sliding_window assigns
+#    into an `.iloc[]` slice. pandas 2.2 changed how grouping columns are
+#    passed to apply; a silent change in `meta_id` would change which windows
+#    become samples and destroy parity invisibly, with nothing raising.
+#
+# pynavmesh installs under the module name `pathfinder`.
+# numpy is unpinned: the submodule has no numpy-2-breaking idioms (checked).
+
+name: flowbt
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu128
+      - torch
+      - torchvision
+      - "pandas<2.2"
+      - "transformers>=4.44,<4.50"
+      - diffusers==0.30.3
+      - "pytorch-lightning==2.1.*"
+      - hydra-core==1.3.2
+      - "omegaconf>=2.3"
+      - torchmetrics
+      - scikit-learn
+      - joblib
+      - opencv-python
+      - pillow
+      - scipy
+      - scikit-image
+      - POT
+      - dtaidistance
+      - pykalman
+      - pynavmesh
+      - PyYAML
+      - tqdm
+      - tensorboard
+      - pytest

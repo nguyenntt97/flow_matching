@@ -1,0 +1,9 @@
+# @package _global_
+# The parity target: 64 epochs, batch 2048, eth.
+defaults:
+  - override /data: eth
+
+name: parity_eth
+
+export:
+  mirror_upstream: true

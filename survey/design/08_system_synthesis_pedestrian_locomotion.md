@@ -156,3 +156,4 @@ The table below contrasts the Flow2BT architecture against the continuous crowd 
 | **06: Reactive BT Assembly**| Conditions (04) + DMPs (05) | Subsystem 7 | Guarded Fallback Assembly $\to 100\,\text{Hz}$ Preemptive Behavior Tree $\mathcal{T}$ |
 | **07: Safety & Verification**| BT command $\mathbf{u}_{\text{nominal}}$ + Tree $\mathcal{T}$ | Actuators / Simulator | Online CBF-QP filter ($C_R = 0.0\%$) + Offline BehaVerify/nuXmv SMT proofs |
 | **08: System Synthesis** | Subsystems 1 through 7 | Benchmark Environment | Complete closed-loop continuous crowd locomotion |
+

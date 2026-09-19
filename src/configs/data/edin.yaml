@@ -1,0 +1,39 @@
+# Transcribed from upstream's three-way yaml split:
+#   third_party/crowdes/configs/dataset/edin.yaml
+#   third_party/crowdes/configs/model/CrowdES_edin.yaml
+#   third_party/crowdes/configs/trainer/CrowdES_trainer_*.yaml
+# Verify with: python -m src.tools.diff_config edin
+defaults:
+  - base
+  - _self_
+
+dataset:
+  dataset_name: edin
+  dataset_family: edinburgh
+  dataset_path: ${repo:datasets/EDIN}/
+  dataset_preprocessed_path: ${repo:datasets/preprocessed/edin}/
+  dataset_fps: 10
+  dataset_preprocessor: EDINPreprocessor
+  dataset_augmentation: [rev]
+
+crowd_emitter:
+  emitter_pre:
+    augmentation: [rev]
+    blur_sigma: 12
+    max_population: 64
+    population_multiplier: 0.4
+  emitter:
+    num_train_epochs: 16
+    max_num_agents_pad: 64
+    window_stride: 5
+
+crowd_simulator:
+  simulator:
+    num_train_epochs: 64
+
+# NOTE: upstream's configs/model/CrowdES_edin.yaml sets
+#   dataset_config: ./configs/dataset/hotel.yaml
+# so a plain upstream edin run silently trains on the *hotel* dataset. That
+# looks like a copy-paste slip, not intent. We point edin at edin. If you are
+# comparing against an upstream edin baseline, reproduce their mistake first
+# or the two runs are not measuring the same thing.

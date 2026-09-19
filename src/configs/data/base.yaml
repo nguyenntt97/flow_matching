@@ -1,0 +1,117 @@
+# Upstream-shaped config, authored as the single merged node.
+#
+# Upstream splits this across three files (model / dataset / trainer) and
+# deep-merges them, with the trainer yaml winning on collisions, so
+# `crowd_simulator.simulator` ends up holding model *and* training
+# hyperparameters in one namespace. We author that merged result directly.
+#
+# The `dataset`, `crowd_simulator` and `crowd_emitter` subtrees are handed to
+# upstream verbatim by src/data/dotdict_bridge.py, so their key names and
+# nesting must match upstream exactly. The `loader` block at the bottom is ours
+# and is stripped before the bridge.
+
+dataset:
+  dataset_name: ???
+  dataset_family: ???
+  # Only ever used for the textual join `<dataset_path>/../segmentation_classes.json`
+  # in BaseDataset. The directory itself does not need to exist.
+  dataset_path: ???
+  dataset_preprocessed_path: ???
+  dataset_fps: ???
+  # Consumed only by utils/preprocess_dataset.py, which we never run
+  # (datasets/preprocessed/ is already built). Kept for provenance.
+  dataset_preprocessor: ???
+  dataset_augmentation: ???
+
+crowd_emitter:
+  type: CrowdES
+  emitter_pre:
+    input_types: [scene_seg]
+    output_types: [scene_appearance, scene_population]
+    max_population: 128
+    population_density_temperature: 0.5
+    population_probability_threshold: 0.01
+    population_multiplier: 2.0
+    image_size: [1024, 1024]
+    augmentation: [hflip, vflip, tp, rev]
+    cache_dir: "${repo:cache}/"
+    checkpoint_dir: "${repo:checkpoints}/{}/emitter_pre/"
+    model_pretrained: "${repo:checkpoints}/pretrained/segformer-b0-finetuned-cityscapes-1024-1024/"
+    blur_sigma: 15
+    train_batch_size: 8
+    eval_batch_size: 8
+    gradient_accumulation_steps: 1
+    num_train_epochs: 128
+    lr_scheduler_type: polynomial
+    learning_rate: 0.0001
+    num_warmup_steps: 0
+    seed: 0
+  emitter:
+    input_types: [scene_seg, scene_population, scene_appearance]
+    output_types: [agent_type, frame_origin, agent_velocity, origin_x, origin_y, goal_x, goal_y]
+    window_size: 10
+    window_stride: 0.2
+    max_num_agents_pad: 64
+    vae_latent_dim: 32
+    vae_hidden_dim: 2048
+    vae_learning_rate: 0.0001
+    vae_num_train_epochs: 32
+    latent_len_multiplier: 64
+    image_size: [128, 128]
+    diffusion_steps: 50
+    leapfrog_steps: 5
+    unguidance_prob: 0
+    guidance_scale: 5.0
+    ddim_eta: 0.0
+    checkpoint_dir: "${repo:checkpoints}/{}/emitter/"
+    train_batch_size: 512
+    eval_batch_size: 10
+    gradient_accumulation_steps: 1
+    num_train_epochs: 256
+    lr_scheduler_type: polynomial
+    learning_rate: 0.0001
+    num_warmup_steps: 0
+    seed: 0
+
+crowd_simulator:
+  type: CrowdES
+  locomotion:
+    walkable_class: [tree, sidewalk, road]
+  simulator:
+    # --- model / data hyperparameters (upstream model yaml) ---
+    environment_types: [scene_seg, scene_population]
+    environment_size: [64, 64]
+    environment_pixel_meter: 0.25
+    simulator_fps: 5
+    history_length: 10          # 2 s at simulator_fps 5
+    future_length: 10           # 2 s
+    window_stride: 1
+    interaction_range: 4.0      # metres
+    interaction_max_num_agents: 4
+    control_time_offset: 2      # seconds along the navmesh path
+    latent_dim: 8               # B = 8 behaviour modes
+    hidden_dim: 2048
+    latent_temperature: 1.0
+    latent_mixup_alpha: 1.0
+    # --- training hyperparameters (upstream trainer yaml) ---
+    # NOTE the directory upstream reads the simulator from is 'dynamics'.
+    # The '{}' is a .format() placeholder upstream fills with dataset_name.
+    checkpoint_dir: "${repo:checkpoints}/{}/dynamics/"
+    train_batch_size: 2048
+    eval_batch_size: 2048
+    gradient_accumulation_steps: 1
+    num_train_epochs: 64
+    lr_scheduler_type: polynomial
+    learning_rate: 0.0001
+    num_warmup_steps: 0
+    seed: 0
+
+# ---- ours; stripped before the DotDict bridge ----
+loader:
+  num_workers: 8
+  pin_memory: true
+  persistent_workers: true
+  # Upstream validates on the train split and never touches test. Both objects
+  # would come from the same cache and be value-identical, so share one.
+  val_split: train_same_object   # or 'train_copy'
+  build_n_jobs: null             # null -> min(256, cpu_count())

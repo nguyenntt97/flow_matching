@@ -1,0 +1,37 @@
+# Transcribed from upstream's three-way yaml split:
+#   third_party/crowdes/configs/dataset/gcs.yaml
+#   third_party/crowdes/configs/model/CrowdES_gcs.yaml
+#   third_party/crowdes/configs/trainer/CrowdES_trainer_*.yaml
+# Verify with: python -m src.tools.diff_config gcs
+defaults:
+  - base
+  - _self_
+
+dataset:
+  dataset_name: gcs
+  dataset_family: gcs
+  dataset_path: ${repo:datasets/GCS}/
+  dataset_preprocessed_path: ${repo:datasets/preprocessed/gcs}/
+  dataset_fps: 25
+  dataset_preprocessor: GCSPreprocessor
+  dataset_augmentation: [rev]
+
+crowd_emitter:
+  emitter_pre:
+    augmentation: [rev]
+    blur_sigma: 20
+    num_train_epochs: 1024
+    max_population: 384
+    population_multiplier: 4
+  emitter:
+    num_train_epochs: 16
+    train_batch_size: 256
+    max_num_agents_pad: 384
+    window_stride: 0.2
+
+crowd_simulator:
+  simulator:
+    num_train_epochs: 32
+    # gcs is the one dataset with a longer horizon upstream
+    future_length: 50         # 10 s
+    control_time_offset: 10   # 10 s
