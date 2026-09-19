@@ -645,3 +645,108 @@ While modern robotic systems increasingly deploy deep neural networks for percep
 - **Scalability & Gradient Stability:** Over-approximation wrapping conservatism: polyhedral and interval abstractions of deep neural networks grow loose across multiple layers, leading to spurious counterexamples if the neural network is deep ($> 5$ layers) or poorly regularized during training.
 - **Unaddressed Gaps:** Offline verification: verification is conducted statically prior to deployment; the system cannot perform online reachability updates or dynamic continuous-time adaptation in response to unforeseen environment dynamics without re-running the model checker.
 
+---
+
+## Dossier 13: Automatic Behavior Tree Generation for Enhanced Human–Robot Collaborative Task Planning in Industry 5.0: A Systematic Review
+
+- **Authors:** Pierre Hémono, Ahmed Nait Chabane, M’hammed Sahnoun, Martin Choux
+- **Year / Venue:** 2027 (Available online 2026) / *Robotics and Computer-Integrated Manufacturing* (Elsevier, Vol. 103, Article 103358)
+- **Paper Link / Identifier:** [DOI: 10.1016/j.rcim.2026.103358](https://doi.org/10.1016/j.rcim.2026.103358) / [HAL open archive: hal-05662686](https://hal.science/hal-05662686)
+- **Primary Category:** Automatic BT Generation & Industrial HRC Survey (Automated Planning, Evolutionary Search, LLMs & Hybrids)
+
+### 1. Executive Summary & Core Hypothesis
+In the transition toward Industry 5.0, manufacturing paradigms shift from pure automated efficiency to human-centric, resilient, and sustainable production. Scheduling and coordinating heterogeneous resources—human operators working alongside industrial cobots—demands task allocation frameworks that balance human ergonomics, physical comfort, mental workload, and mutual trust with cycle-time throughput. The authors hypothesize that Behavior Trees (BTs) provide the optimal modular, reactive control architecture for executing complex collaborative action plans, overcoming the structural fragility of Finite State Machines (FSMs) and the static execution limits of Hierarchical Task Networks (HTNs). This systematic review synthesizes recent breakthroughs in the automated generation of BTs, categorizing synthesis methodologies across classical automated planning, evolutionary metaheuristics, reinforcement learning, and emerging Large Language Model (LLM) agents within collaborative industrial assembly and scheduling.
+
+### 2. Theoretical Framework & Mathematical Formulation
+- **Node Mechanics & Return Status Handling:** Classical reactive Behavior Tree execution semantics propagating $S \in \{\text{SUCCESS}, \text{FAILURE}, \text{RUNNING}\}$. Leaf nodes are categorized into: (1) condition nodes inspecting workspace state, human safety zones, and part readiness; (2) robotic action nodes commanding cobot manipulators; and (3) collaborative interaction nodes coordinating handovers and shared workstation access. The reactive tick frequency ($10 - 100\,\text{Hz}$) ensures real-time preemption when human operators enter safety-monitored envelopes.
+- **Execution / Control Flow:** The survey categorizes task representations used across industrial scheduling into:
+  1. *Production Problem Formulations:* Job Shop Scheduling Problem (JSSP) and Assembly Line Balancing Problem (ALBP) adapted for human-robot shared cells:
+     $$\min \quad \alpha \cdot C_{\max} + \beta \cdot \sum_{i} \text{ErgoScore}(i) + \gamma \cdot \text{IdleTime}$$
+     where $C_{\max}$ is the makespan and $\text{ErgoScore}$ penalizes poor human postures and repetitive fatigue.
+  2. *Control Architecture Trade-Offs:*
+     - *FSMs:* State-space explosion $\mathcal{O}(2^{|S|})$ and tight coupling between states prevent dynamic insertion of collaborative recovery routines.
+     - *HTNs:* Strong hierarchical decomposition but historically lack fast reactive preemption when humans deviate from nominal assembly sequences.
+     - *BTs:* Decoupled modular subtrees; Sequence $(\to)$ handles multi-step assembly, Fallback $(?)$ handles human task assistance or emergency halts, and Parallel $(\rightrightarrows)$ coordinates concurrent human-cobot tasks.
+- **Optimization & Generation Taxonomy:** The authors systematize automatic BT generation techniques into five core paradigms:
+  1. *Automated Planning to BT (Model-Based):* Converting PDDL / STRIPS domain formulations into BTs via backward-chaining (e.g. expanding preconditions and effects into Fallback-Sequence branches).
+  2. *Evolutionary & Metaheuristic Algorithms:* Genetic Programming (GP) and Grammatical Evolution (GE) searching syntax trees against multi-objective fitness functions balancing makespan, ergonomics, and tree complexity.
+  3. *Reinforcement & Imitation Learning:* Discovering subtrees from human demonstration logs or RL policies, mapping Options to reactive subtrees.
+  4. *Large Language Models (LLMs) & Foundation Models:* Translating natural language instructions and procedural assembly manuals into executable BT domain-specific languages (e.g., XML/BehaviorTree.CPP) via in-context learning and retrieval-augmented verification.
+  5. *Hybrid Methods:* Combining high-level symbolic planners for global constraint satisfaction with reactive BT generation for local disturbance management.
+
+### 3. Architecture & Neural Integration
+- **Neural Role:** In modern AI-driven BT generation pipelines, neural networks operate across two distinct tiers:
+  1. *Generative Synthesis Tier:* Pretrained LLMs and vision-language models (VLMs) acting as high-level planners that parse multi-modal human intent, assembly work instructions, and scene descriptions into candidate Behavior Tree topologies.
+  2. *Low-Level Execution & Perception Tier:* Vision models estimating human 3D skeleton poses, tracking part locations, and computing real-time ergonomic risk scores (e.g., REBA/RULA), directly informing BT condition leaves.
+- **Interface / Boundary:** Separation of planning time and execution time: high-level neural/symbolic generators emit structured BT graphs (JSON, XML, or py_trees code) that are validated through syntax linters or model checkers before being passed to deterministic, reactive execution engines.
+
+### 4. Empirical Evaluation & Industrial Applications
+- **Environments / Tasks:** 
+  - Collaborative robotic assembly lines (automotive sub-assemblies, aerospace riveting, electronics packaging).
+  - Human-robot cooperative kitting, bin picking, and shared workstation part feeding.
+  - Multi-objective Job Shop Scheduling (JSSP) and Assembly Line Balancing (ALBP) benchmarks.
+- **Comparative Findings on Generation Methodologies:**
+  - *Planning-based (PDDL $\to$ BT):* Guarantees logical correctness and goal reachability if the domain is accurately modeled, but suffers in unstructured or partially observable environments.
+  - *Evolutionary (GP / GE):* Excellent at discovering unexpected fault-recovery behaviors, but sample complexity and high simulation overhead limit online re-synthesis during live shifts.
+  - *LLM-Assisted Generation:* Radically lowers engineering barriers by enabling operators to prompt cobots with natural language; however, hallucinations, lack of formal safety proofs, and prompt sensitivity necessitate deterministic grammar wrappers and syntax filters.
+- **Human-Centric Factors in Industry 5.0:**
+  - *Ergonomics & Workload:* Incorporating physical load monitoring directly into task allocation trees improves worker satisfaction and reduces musculoskeletal injuries.
+  - *Operator Trust & Legibility:* The modular, human-interpretable nature of Behavior Trees enables operators to comprehend cobot intentions and intervene safely, unlike opaque end-to-end black-box controllers.
+
+### 5. Failure Modes, Trade-offs & Limitations
+- **Interpretability vs. Expressivity:** While hand-crafted or grammar-constrained BTs maintain transparent readability, automatically synthesized trees (especially from evolutionary search or unconstrained LLMs) can suffer from structural bloat, redundant condition checks, and obscure nesting that diminish human auditability.
+- **Online Adaptation Latency:** When human operators exhibit non-deterministic deviations from planned workflows, full tree re-synthesis can cause unacceptable delays on live production lines. Localized reactive fallback subtrees and parameterized execution nodes are necessary to maintain continuous throughput.
+- **Formal Verification Gap in Generative Methods:** Data-driven and LLM-generated Behavior Trees lack formal correctness guarantees. Integrating automatic BT synthesis with symbolic model checkers (such as nuXmv / BehaVerify) and Control Barrier Functions is identified as a vital prerequisite for safety-critical industrial deployment.
+
+---
+
+## Dossier 14: Continuous Locomotive Crowd Behavior Generation (CrowdES)
+
+- **Authors:** Inhwan Bae, Junoh Lee, Hae-Gon Jeon
+- **Year / Venue:** 2025 / arXiv preprint (arXiv:2504.04756 [cs.CV, cs.LG, cs.RO])
+- **Paper Link / Identifier:** [arXiv:2504.04756](https://arxiv.org/abs/2504.04756) / [Project Website](https://ihbae.com/publication/crowdes/) / [Code: GitHub InhwanBae/CrowdES](https://github.com/InhwanBae/CrowdES)
+- **Primary Category:** Task Anchor: Continuous Pedestrian Locomotion & Generative Crowd Modeling (Diffusion Emitter + Switching Dynamical Simulator)
+
+### 1. Executive Summary & Core Hypothesis
+Synthesizing long-term, realistic crowd behaviors across complex real-world terrains is a foundational challenge in autonomous robotics, virtual environments, and transport engineering. Prior generative trajectory models focus on momentary scene snapshots or fixed short-term horizons ($3 - 8$ seconds), failing to capture the continuous, evolving nature of lifelong crowd flows. The authors introduce **CrowdES**, a user-controllable framework that populates scenes with continuous, heterogeneous crowd trajectories from single overhead/perspective images. CrowdES decouples crowd generation into two alternating models: (1) a **Crowd Emitter** using a conditional diffusion model to dynamically place agents along a timeline with assigned attributes (origin, destination, walking pace, agent type), and (2) a **Crowd Simulator** that executes long-term locomotion trajectories using a Switching Dynamical System (SDS) guided by a navigation mesh and Markov chain behavior state transitions.
+
+### 2. Theoretical Framework & Mathematical Formulation
+- **Problem Formulation:** Given a single scene image $\mathcal{I}$, generate a crowd scenario $\mathcal{V}$ containing $N$ agents over an extended horizon $T_{\mathcal{V}}$. Each agent $A = \{\kappa, \mathcal{T}\}$ has an agent category $\kappa$ and continuous trajectory $\mathcal{T} = [\mathbf{c}_{T_s}, \dots, \mathbf{c}_{T_d}]$, where $\mathbf{c}_t = (x, y) \in \mathbb{R}^2$, and $T_s, T_d$ are arrival and departure times.
+- **Scene Layout & Terrain Parsing:** Using Grounded-SAM and SegFormer, the model extracts four structural maps:
+  1. Semantic segmentation map $\mathcal{M}_S$ (buildings, roads, sidewalks, vegetation).
+  2. Appearance map $\mathcal{M}_A$ (entry/exit gates where people emerge).
+  3. Population density map $\mathcal{M}_P$ and discrete population count distribution $\mathcal{P}$.
+  4. Binary traversable map $\mathcal{M}_W$ converted into a navigation mesh (NavMesh via Recast) for polyline waypoint search.
+- **Crowd Emitter Model (Diffusion Process):** To continually generate new agents entering the scene in window $[t, t + T_w]$, agent parameters $\boldsymbol{\alpha} = \{\kappa, \nu, T_s, \mathbf{c}_{T_s}, \mathbf{c}_{T_d}\}$ (type, pace $\nu$, start/end coordinates, entry time) are denoised from Gaussian noise $\boldsymbol{\alpha}^M \sim \mathcal{N}(0, \mathbf{I})$ via reverse diffusion:
+  $$\boldsymbol{\alpha}^{m-1} = \frac{1}{\sqrt{\alpha_m}} \left( \boldsymbol{\alpha}^m - \frac{\beta_m}{\sqrt{1 - \bar{\alpha}_m}} \boldsymbol{\epsilon}_\theta(\boldsymbol{\alpha}^m, m, \mathbf{C}_e) \right) + \sigma_m \mathbf{z}$$
+  conditioned on spatial layout maps $\mathbf{C}_e = \{\mathcal{M}_S, \mathcal{M}_A, \mathcal{M}_P, \mathcal{M}_D\}$. A Transformer backbone with cross-attention models inter-agent grouping and collective departure.
+- **Crowd Simulator Model (Switching Dynamical System):** Once emitted, an agent navigates toward $\mathbf{c}_{T_d}$. To prevent rigid straight-line motion, long-term locomotion is modeled as a Switching Dynamical System (SDS) with $B = 8$ discrete behavior states (discovered via K-means on trajectory segments):
+  1. At intervals of $T_f = 20$ frames ($4\,\text{s}$ at $5\,\text{fps}$), transition probabilities between behavior modes $b_f$ are predicted by network $\mu_\phi$:
+     $$b_f \sim P(b_f \mid b_h, \mathcal{T}_{t-T_h:t}, \mathcal{H}_{\text{neighbors}}, \mathbf{C}_s)$$
+  2. The sampled behavioral state $b_f$ conditions a recurrent trajectory predictor $\mu_\varphi$ that outputs the next footsteps:
+     $$\mathcal{T}_{t:t+T_f} = \mu_\varphi(b_f, \mathbf{c}_{t, \text{nav}}, \mathbf{C}_s)$$
+     where $\mathbf{c}_{t, \text{nav}}$ is the intermediate NavMesh guidance point.
+
+### 3. Architecture & Neural Integration
+- **Generative Diffusion Tier:** Operates at the macro-population scale. DDIM diffusion steps sample agent identity, speed, and spatial boundary coordinates, handling the multimodal choice of *where* and *when* people enter the environment.
+- **Continuous Locomotion & Discrete Switching Tier:** The simulator combines global pathfinding (NavMesh A* polylines) with local multi-agent interaction features (social graph pooling over neighboring pedestrian trajectories $\mathcal{H}$). Discrete behavioral modes $b_f$ act as the switching mechanism governing whether an agent walks briskly, swerves to avoid collision, slows down, or stops.
+- **Interface / Boundary:** Separation of emitter frequency and simulator frequency: the diffusion emitter runs periodically every $T_w = 50$ frames ($10\,\text{s}$), whereas the trajectory simulator runs at frame rate ($5\,\text{fps}$), passing emitted agent queues into active simulation buffers.
+
+### 4. Empirical Evaluation & Benchmarks
+- **Environments / Datasets:**
+  - Standard pedestrian trajectory benchmarks: ETH, UCY (Zara01, Zara02, Univ), Stanford Drone Dataset (SDD), and GC (Grand Central Station).
+  - Evaluated on long-term crowd video streams (up to 10 hours of continuous activity).
+- **Evaluation Metrics:**
+  - *Scene-Level Realism:* Population Distribution Difference (PDD), Density Distribution Error (DDE).
+  - *Individual-Level Accuracy:* Average Displacement Error (ADE), Final Displacement Error (FDE), Collision Rate ($C_R$).
+- **Key Quantitative Results:**
+  - Successfully generates hours of continuous crowd behaviors without population collapse or empty-scene artifacts.
+  - Generates realistic group flocking, bidirectional stream formation in hallways, and collision-free bottleneck traversal across complex real-world layouts.
+
+### 5. Relevance & Assumptions Verification for Flow-to-Behavior-Tree Distillation
+- **Direct Validation of Discrete-Continuous Hybrid Need:** Bae et al. demonstrate that pure continuous trajectory generation is inadequate for realistic pedestrian locomotion. To capture real-world locomotion, they were forced to introduce an explicit **Switching Dynamical System with $B=8$ discrete states** governing actions like stopping, yielding, and swerving.
+- **The Remaining Behavior Tree Gap in CrowdES:**
+  1. *Heuristic Markov Transitions vs. Deterministic Preconditions:* CrowdES samples behavioral states stochastically from a learned transition distribution $P(b_f \mid \cdot)$. It lacks explicit **Sequence preconditions** (e.g. `IfPathObstructed -> Yield`) and **Fallback recovery logic** (e.g. `AttemptStep -> OnCollisionTrip -> EvadeLeft`).
+  2. *Safety & Collision Invariance:* CrowdES occasionally produces inter-agent penetrations and near-collisions because it lacks hard barrier guarantees. Wrapping the continuous locomotion field in **Control Barrier Functions (CBFs)** resolves this.
+  3. *Inference Latency:* Denoising agents via 50-step diffusion and recurrent neural network forward passes for every pedestrian in a crowd of $N=100$ agents is computationally expensive. Distilling these unimodal switching states into **Dynamical Movement Primitives (DMPs)** organized under a **reactive Behavior Tree** reduces latency to sub-millisecond execution.
+

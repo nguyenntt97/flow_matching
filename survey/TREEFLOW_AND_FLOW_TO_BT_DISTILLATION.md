@@ -88,7 +88,7 @@ Continuous Flow Space (SDE / ODE)               Symbolic Behavior Tree Logic
 • High-Entropy Root Distribution                ==> Root Execution Node
 • Flow Bifurcations (Separating Hyperplanes)   ==> Fallback (?) / Sequence (->) Condition Nodes
 • Localized Attractor Basins / Streamlines      ==> Action Execution Leaves (DMPs / Linear Policies)
-• Boundary Invariant Surfaces                   ==> Preconditions / Control Barrier Guards
+• Boundary Invariant Surfaces                   ==> Preconditions Zk/ Control Barrier Guards
 ```
 
 ---

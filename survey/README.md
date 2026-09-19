@@ -63,6 +63,7 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 - [08_iovino2021_gp_bt_unpredictable.md](file:///home/nguyen/projects/flow_matching/survey/08_iovino2021_gp_bt_unpredictable.md): Genetic Programming evolving reactive Behavior Trees under stochastic environmental perturbations and parsimony pressure.
 - [09_scheide2021_mcdags_grammar_bt.md](file:///home/nguyen/projects/flow_matching/survey/09_scheide2021_mcdags_grammar_bt.md): Synthesizing Behavior Trees through Monte Carlo Directed Acyclic Graph Search over formal grammars with simulated annealing.
 - [10_anne2023_game_map_elites_bt.md](file:///home/nguyen/projects/flow_matching/survey/10_anne2023_game_map_elites_bt.md): Generational Adversarial MAP-Elites co-evolving diverse competitive Behavior Trees using deep vision embedding models.
+- [13_hemono2026_automatic_bt_generation_hrc.md](file:///home/nguyen/projects/flow_matching/survey/13_hemono2026_automatic_bt_generation_hrc.md): Systematic review of automatic BT generation across classical planning, evolutionary metaheuristics, and LLMs for collaborative task planning in Industry 5.0.
 
 ### Pillar 4: Verifiable & Safe Neural BTs
 *Focus: Control Barrier Functions (CBFs), Quadratic Programming safety filters, and formal verification of neural Behavior Trees using symbolic model checkers.*
@@ -87,6 +88,8 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 | **Anne et al. (2023)**<br>*GAME MAP-Elites for BTs* | Evolutionary Structure Search | **No** (Quality-Diversity co-evolution) | Learned (Evolutionary mutation/crossover) | Steering/aiming primitives, deep vision embedding descriptors | Parabellum 2D shooter, EvoGym soft-robot wrestling, competitive games |
 | **Özkahraman & Ögren (2020)**<br>*CBF Behavior Trees* | Safe / Verifiable BT | **Partial** (Continuous QP filter inside discrete tree) | Fixed (Hierarchical priority composition) | CBF-QP continuous safety filters, nominal coverage vector fields | Multi-agent AUV persistent coverage, underwater docking and recharging |
 | **Serbinowska et al. (2025)**<br>*Neuro-Symbolic BT Verification* | Safe / Verifiable BT | **No** (Symbolic model checking via nuXmv) | Fixed (Verified DSL model) | Deep neural perceptual classifiers, deep RL action policies | ACAS Xu aircraft collision avoidance, rover waypoint tracking, gridworld |
+| **Hémono et al. (2026/2027)**<br>*Auto BT Generation in Industry 5.0* | Survey / Automatic BT Synthesis | **Hybrid / Varies** (Planning, Evolutionary, LLMs) | Learned / Generated (PDDL, GP, LLM prompt-to-BT) | Collaborative action primitives, cobot commands, safety condition leaves | Human-robot collaborative assembly, JSSP/ALBP scheduling, ergonomics |
+| **Bae et al. (2025)**<br>*CrowdES: Continuous Crowd Locomotion* | Task Anchor: Pedestrian Locomotion | **Partial** (Diffusion Emitter + Markov Chain SDS) | Learned (Diffusion denoising + SDS state switching) | 2D Footstep coordinates $\mathbf{c}_t$, NavMesh polyline guidance | Multi-agent crowd locomotion (ETH, UCY, SDD, Grand Central) |
 
 ---
 
@@ -116,8 +119,12 @@ Third, **bidirectional neural-symbolic distillation under non-stationary reactiv
 - [10_anne2023_game_map_elites_bt.md](file:///home/nguyen/projects/flow_matching/survey/10_anne2023_game_map_elites_bt.md) — *GAME: Generational Adversarial MAP-Elites for Co-evolving Behavior Trees*
 - [11_ozkahraman2020_cbf_bt.md](file:///home/nguyen/projects/flow_matching/survey/11_ozkahraman2020_cbf_bt.md) — *Combining Control Barrier Functions and Behavior Trees for Multi-Agent Underwater Coverage Missions*
 - [12_serbinowska2025_nsbt_verification.md](file:///home/nguyen/projects/flow_matching/survey/12_serbinowska2025_nsbt_verification.md) — *Neuro-Symbolic Behavior Trees (NSBTs) and Their Verification*
+- [13_hemono2026_automatic_bt_generation_hrc.md](file:///home/nguyen/projects/flow_matching/survey/13_hemono2026_automatic_bt_generation_hrc.md) — *Automatic Behavior Tree Generation for Enhanced Human–Robot Collaborative Task Planning in Industry 5.0: A Systematic Review*
+- [14_bae2025_continuous_crowd_locomotion_crowdes.md](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md) — *Continuous Locomotive Crowd Behavior Generation*
 
 ### Technical Reports & Deep Dives
+- [design/README.md](file:///home/nguyen/projects/flow_matching/survey/design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
 - [TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md](file:///home/nguyen/projects/flow_matching/survey/TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md) — *Deep Dive: TreeFlow and the Distillation of Continuous Flows into Learnable Behavior Trees*
 - [SURVEY_SYNTHESIS_AND_COMPENDIUM.md](file:///home/nguyen/projects/flow_matching/survey/SURVEY_SYNTHESIS_AND_COMPENDIUM.md) — *Comprehensive Monolithic Compendium of All Survey Dossiers & Matrices*
+
 
