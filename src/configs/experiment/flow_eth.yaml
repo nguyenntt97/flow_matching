@@ -1,0 +1,27 @@
+# @package _global_
+# The Subsystem 2 target: flow-matching teacher on eth, same budget as parity_eth.
+defaults:
+  - override /data: eth
+  - override /system: flow_teacher
+
+name: flow_eth
+
+# A flow head samples; ADE/FDE scores one sample and is not the right selection
+# criterion. Select on minFDE_K instead.
+callbacks:
+  model_checkpoint:
+    monitor: val/min_fde
+    filename: "epoch{epoch:03d}-minfde{val/min_fde:.4f}"
+
+export:
+  # A flow export is NOT loadable by CrowdESFramework -- see FLOW2BT_HEAD.json
+  # in the export dir. src/evaluate_scene.py refuses it on purpose.
+  mirror_upstream: false
+
+trainer:
+  # A sampled validation costs 1 deterministic + K ODE solves per batch, i.e.
+  # 1 + 8*5 = 41 network evaluations where the parity run does 1. On the full
+  # 2.2M-sample split that would dominate the run. Upstream validates on the
+  # *train* split anyway, so a fixed 10% subsample is the same kind of
+  # statistic, just cheaper -- and it is a subsample, not a different split.
+  limit_val_batches: 0.1

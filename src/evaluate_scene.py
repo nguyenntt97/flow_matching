@@ -1,12 +1,15 @@
-"""Scene-level CrowdES benchmark via upstream's own evaluation loop.
+"""Scene-level CrowdES benchmark.
 
     python -m src.evaluate_scene data=eth
 
-Runs ``CrowdES/evaluate.py::main`` unchanged (TRIALS=20 per scene), which
-drives ``CrowdESFramework`` end to end and scores with
+TRIALS=20 per scene, driving ``CrowdESFramework`` end to end and scoring with
 ``utils/metrics.py::compute_metrics``: quadrat / population / density EMDs,
 travel distance-velocity-acceleration-time, DTW diversity, collision rate and
 origin-goal JDE.
+
+The loop itself lives in ``src/eval_loop.py`` because upstream's
+``CrowdES/evaluate.py`` does not import on Python 3.11 -- see the docstring
+there.
 
 ``CrowdESFramework.__init__`` loads emitter_pre, emitter *and* simulator
 unconditionally, so all three must be present. The emitter pair comes from the
@@ -48,6 +51,13 @@ def check_checkpoints(crowdes_cfg) -> None:
         path = Path(resolve_mirror_dir(template, dataset_name))
         if not (path / "config.json").is_file():
             missing.append(f"  {label}: {path}")
+        elif (path / "FLOW2BT_HEAD.json").is_file():
+            raise ValueError(
+                f"{path} is a Flow2BT head export, not a CrowdES simulator.\n"
+                "Its net.* weights still carry upstream's UNUSED regression decoder, so "
+                "CrowdESFramework would load and run that decoder and report a plausible "
+                "but meaningless baseline. Evaluate it with src/evaluate_flow2bt.py."
+            )
     if missing:
         raise FileNotFoundError(
             "CrowdESFramework needs all three checkpoints; these are absent:\n"
@@ -67,11 +77,18 @@ def main(cfg: DictConfig) -> None:
     check_checkpoints(crowdes_cfg)
 
     # Lazy: this pulls POT, dtaidistance, diffusers and pathfinder.pyrvo.
-    from CrowdES.evaluate import main as upstream_evaluate
+    from src.eval_loop import TRIALS, evaluate_scenes, print_summary, write_summary
 
-    logger.info("running upstream CrowdES.evaluate (TRIALS=20 per scene)")
-    metrics = upstream_evaluate(crowdes_cfg, seed=int(cfg.seed))
-    logger.info("scene-level metrics: %s", metrics)
+    logger.info("running scene-level evaluation (TRIALS=%d per scene)", TRIALS)
+    summary = evaluate_scenes(
+        crowdes_cfg,
+        seed=int(cfg.seed),
+        trials=int(cfg.get("trials", TRIALS)),
+        scene_limit=cfg.get("scene_limit"),
+        label=str(cfg.get("label", "CrowdES")),
+    )
+    print_summary(summary)
+    logger.info("wrote %s", write_summary(summary, Path(cfg.run_dir)))
 
 
 if __name__ == "__main__":

@@ -11,16 +11,30 @@ trustworthy baseline and a clean place to plug in. The flow-matching head is
 
 ## Setup
 
+The existing `ai_riser` env already satisfies everything except pandas, so
+cloning it is the fast path:
+
 ```bash
-conda env create -f src/environment.yml && conda activate flowbt
+conda create -n flowbt --clone ai_riser && conda activate flowbt
+pip install "pandas>=2,<3" pytest
 python -c "import torch; print(torch.cuda.get_device_capability())"   # expect (12, 0)
 ```
 
-Two pins matter and both are explained in `src/environment.yml`: torch must be
-a **cu128+** build (the RTX 5090 is sm_120, so upstream's `torch==2.2.2`/cu121
-has no kernels for it), and **`pandas<2.2`** (pandas 2.2 changed how grouping
-columns reach `groupby.apply`, which would silently change which trajectory
-windows become samples).
+Or from scratch: `conda env create -f src/environment.yml`.
+
+**One hard pin: `pandas>=2,<3`.** `utils/trajectory.py::groupby_sliding_window`
+reads `x.agent_id` inside a `gb.apply(...)` where `agent_id` is the grouping
+key. pandas 3.0 stopped passing grouping columns into `apply`, so the group has
+no such column. Measured on this machine: **2.3.3 produces correct output**
+(windows and `meta_id`s verified) with a `FutureWarning`; **3.0.3 raises
+`AttributeError: 'DataFrame' object has no attribute 'agent_id'`**. It fails
+loudly rather than corrupting the dataset silently — but it fails, and only
+once the build is already under way.
+
+torch must also be a **cu128+** build: the RTX 5090 is sm_120, so upstream's
+pinned `torch==2.2.2`/cu121 has no kernels for it. `src/environment.yml`
+records the versions actually verified here (torch 2.10.0+cu128,
+transformers 4.57.3, pytorch-lightning 2.6.1).
 
 ## Running
 
@@ -115,6 +129,15 @@ with `export.mirror_upstream=true`.
 upstream never ran on. The acceptance criterion is final `val_fde` within
 ~1–2% of upstream, not equality.
 
+**Already verified** (torch 2.10.0+cu128, transformers 4.57.3, PL 2.6.1):
+config transcription for all 8 datasets; parameter count and state-dict keys
+against upstream; a bit-identical training loss and `preds` for a fixed batch;
+the `save_pretrained` → `from_pretrained` round-trip with an identical key set
+and `endpoint_cluster_centers is None`; the cluster buffers surviving a
+state-dict round-trip without mutating their `control` argument; and that
+Lightning restores buffers *before* `on_fit_start`, which is what makes the
+no-refit-on-resume guard correct.
+
 The upstream baseline, run around two upstream bugs — `trainval.py` declares
 `--model_config` as `type=int` against a string default so every CLI
 invocation dies, and the submodule's own CWD cannot see the data:
@@ -137,6 +160,27 @@ pytest tests/parity -m "not slow"   # shim, config bridge, model parity, cluster
 pytest tests/parity                 # adds dataset parity (builds the gcs cache)
 python -m src.tools.diff_config     # config transcription vs upstream
 ```
+
+## Three things the submodule assumes that we have to arrange
+
+1. **`dataset_path` must be a real directory.** `BaseDataset` opens
+   `join(dataset_path, '..', 'segmentation_classes.json')`, and `open()`
+   resolves `..` through the filesystem, so every component has to be
+   traversable. Upstream's raw-data dirs (`datasets/ETH-UCY`, `datasets/GCS`, …)
+   are not present here, so `dataset_path` points at `datasets/preprocessed`,
+   whose parent holds the JSON. `to_crowdes_config` preflights this.
+2. **Worker processes need the submodule on `sys.path`.** `sys.modules` is
+   process-local, and the build farms `process_scene` out to loky workers that
+   import `utils.dataloader.simulator_dataloader` and unpickle a `DotDict`
+   defined in `utils.config`. loky copies the parent's `sys.path` but not its
+   `sys.modules`, so `_upstream.py` appends the root as well. Without it the
+   build dies with `BrokenProcessPool: A task has failed to un-serialize`.
+3. **The build worker count has to be overridden, not configured.**
+   `SimulatorDataset.__init__` hardcodes `Parallel(n_jobs=256)`, and an
+   explicit `n_jobs` beats `joblib.parallel_backend(...)` — verified, so the
+   usual context manager does nothing. `capped_build_workers` rebinds
+   `Parallel` inside the upstream module for the duration of the build.
+   `process_scene` is independent per scene, so this cannot change the result.
 
 ## Known upstream issues, worked around rather than patched
 

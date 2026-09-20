@@ -28,8 +28,17 @@ logger = logging.getLogger(__name__)
 
 
 def build_callbacks(cfg: DictConfig) -> list:
+    # LearningRateMonitor has nothing to write to without a logger and Lightning
+    # raises MisconfigurationException rather than degrading. Every smoke
+    # experiment sets logger=none, so leaving this to the config would make the
+    # fast path the one that cannot run.
+    has_logger = bool((cfg.logger or {}).get("_target_"))
+
     callbacks = []
     for name, node in (cfg.callbacks or {}).items():
+        if name == "lr_monitor" and not has_logger:
+            logger.info("callback: %s -- skipped, no logger configured", name)
+            continue
         logger.info("callback: %s", name)
         callbacks.append(hydra.utils.instantiate(node))
 

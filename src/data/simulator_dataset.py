@@ -11,14 +11,49 @@ numbers means reproducing that, so the crop stays exactly as inherited.
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import pickle
 import shutil
 
+import utils.dataloader.simulator_dataloader as upstream_module
 from src._upstream import BaseDataset, SimulatorDataset
+from src.util.compat import check_pandas
 
 logger = logging.getLogger(__name__)
+
+
+@contextlib.contextmanager
+def capped_build_workers(n_jobs: int | None):
+    """Temporarily cap the worker count upstream's dataset builder uses.
+
+    ``SimulatorDataset.__init__`` hardcodes ``Parallel(n_jobs=256)``. An
+    explicit ``n_jobs`` beats ``joblib.parallel_backend(...)``, so the usual
+    context manager does nothing here -- verified. On a 32-core box that means
+    256 processes, each unpickling its own copy of the scene DataFrames.
+
+    Results are unaffected: ``process_scene`` is independent per scene, so the
+    worker count cannot change what is built. This rebinds ``Parallel`` inside
+    the upstream module for the duration of the build rather than editing the
+    submodule.
+    """
+    if n_jobs is None:
+        yield
+        return
+
+    original = upstream_module.Parallel
+
+    class _CappedParallel(original):
+        def __init__(self, *args, **kwargs):
+            kwargs["n_jobs"] = n_jobs
+            super().__init__(*args, **kwargs)
+
+    upstream_module.Parallel = _CappedParallel
+    try:
+        yield
+    finally:
+        upstream_module.Parallel = original
 
 
 class ParitySimulatorDataset(SimulatorDataset):
@@ -37,6 +72,8 @@ class ParitySimulatorDataset(SimulatorDataset):
     """
 
     def __init__(self, config, phase, allow_test_split: bool = False, cache_path: str | None = None):
+        check_pandas()
+
         # Consumed by _check_phase, which super().__init__ calls before
         # returning, so it has to be set first.
         self._allow_test_split = bool(allow_test_split)

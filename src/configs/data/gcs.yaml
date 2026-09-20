@@ -10,7 +10,8 @@ defaults:
 dataset:
   dataset_name: gcs
   dataset_family: gcs
-  dataset_path: ${repo:datasets/GCS}/
+  # upstream raw dir for this dataset is datasets/GCS/ (absent here, and
+  # unused -- see the dataset_path comment in base.yaml)
   dataset_preprocessed_path: ${repo:datasets/preprocessed/gcs}/
   dataset_fps: 25
   dataset_preprocessor: GCSPreprocessor

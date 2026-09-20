@@ -10,10 +10,23 @@ the path beats the namespace portion, and the submodule's sibling directories
 importable top-level names that could shadow real packages -- ``import
 datasets`` resolving to a data folder, for instance.
 
-So we do not touch ``sys.path`` at all. We bind exactly the two packages we
-need straight into ``sys.modules`` with an explicit search location. Submodule
-resolution then walks ``__path__``, ``sys.modules`` is consulted before any
-finder, and nothing else in the submodule becomes importable.
+So we bind exactly the two packages we need straight into ``sys.modules`` with
+an explicit search location. Submodule resolution then walks ``__path__``, and
+``sys.modules`` is consulted before any finder, so in *this* process the
+binding is authoritative and cannot be shadowed.
+
+``sys.modules`` is process-local, though, and the dataset build farms
+``process_scene`` out to ``joblib``/loky worker processes that need to import
+``utils.dataloader.simulator_dataloader`` (and ``utils.config``, to unpickle
+the config in the task arguments). loky propagates the parent's ``sys.path``
+to its workers but obviously not its ``sys.modules``, so the submodule root is
+*appended* to ``sys.path`` as well. Without it the build dies with
+``BrokenProcessPool: A task has failed to un-serialize``.
+
+Appending rather than prepending is mostly cosmetic: under PEP 420 a regular
+package found at any entry beats a namespace portion found at any other, so an
+installed ``datasets`` still wins over the submodule's data folder either way.
+The guard below is what actually protects us.
 
 Not covered, deliberately: ``utils/preprocessor/*.py`` does ``from homography
 import ...``, which only resolves when ``utils/`` itself is on ``sys.path``.
@@ -75,12 +88,17 @@ def install() -> None:
     for name in _BOUND:
         _bind(name)
 
+    # For worker processes -- see the module docstring.
+    root = str(CROWDES_ROOT)
+    if root not in sys.path:
+        sys.path.append(root)
+
 
 install()
 
 # Curated re-exports. Every upstream symbol src/ uses is listed here, so the
 # dependency surface on the submodule is one auditable block.
-from utils.config import DotDict, get_config  # noqa: E402
+from utils.config import DotDict, get_config, load_config  # noqa: E402
 from utils.dataloader.base_dataloader import BaseDataset  # noqa: E402
 from utils.dataloader.evaluation_dataloader import EvaluationDataset  # noqa: E402
 from utils.dataloader.simulator_dataloader import SimulatorDataset  # noqa: E402
@@ -102,6 +120,7 @@ __all__ = [
     "CROWDES_ROOT",
     "DotDict",
     "get_config",
+    "load_config",
     "BaseDataset",
     "EvaluationDataset",
     "SimulatorDataset",

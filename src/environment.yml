@@ -2,36 +2,62 @@
 #
 #   conda env create -f src/environment.yml && conda activate flowbt
 #
-# Two constraints are not negotiable:
+# FAST PATH: the existing `ai_riser` env already satisfies everything except
+# pandas, so cloning it is much quicker than resolving this from scratch:
 #
-# 1. torch must be a cu128 (or newer) build. The target GPU is an RTX 5090
-#    (sm_120, Blackwell); upstream's pinned torch==2.2.2/cu121 has no kernels
-#    for it. This is why bit-exact agreement with an upstream run is not a
-#    goal -- see src/README.md.
+#   conda create -n flowbt --clone ai_riser
+#   conda activate flowbt
+#   pip install "pandas>=2,<3" pytest
 #
-# 2. pandas < 2.2. utils/trajectory.py::sliding_window uses
-#    `gb.apply(...)` with as_index=False, and groupby_sliding_window assigns
-#    into an `.iloc[]` slice. pandas 2.2 changed how grouping columns are
-#    passed to apply; a silent change in `meta_id` would change which windows
-#    become samples and destroy parity invisibly, with nothing raising.
+# ---------------------------------------------------------------------------
+# Version constraints, and what was actually measured on this machine
+# ---------------------------------------------------------------------------
+#
+# torch: must be a cu128+ build. The GPU is an RTX 5090 (sm_120, Blackwell);
+#   upstream's pinned torch==2.2.2/cu121 has no kernels for it. Verified
+#   working: torch 2.10.0+cu128. Because this is not upstream's torch, the
+#   parity target is final val_fde within ~1-2%, not bit-equality.
+#
+# pandas: >=2, <3. This is the one hard pin.
+#   utils/trajectory.py::groupby_sliding_window reads `x.agent_id` inside a
+#   `gb.apply(...)`, where agent_id is the grouping key. pandas 3.0 stopped
+#   passing grouping columns into apply, so the group has no agent_id column.
+#   Measured:
+#     pandas 2.3.3 -> correct output (windows and meta_ids verified), one
+#                     FutureWarning about the deprecated behaviour
+#     pandas 3.0.3 -> AttributeError: 'DataFrame' object has no attribute
+#                     'agent_id'
+#   So this fails loudly rather than silently corrupting the dataset -- but it
+#   fails, and only after the dataset build has already started.
+#
+# transformers: unpinned. 4.57.3 verified, including the
+#   save_pretrained(safe_serialization=False) -> from_pretrained round-trip
+#   that upstream's CrowdESFramework depends on (writes config.json +
+#   pytorch_model.bin, reloads with an identical key set).
+#
+# pytorch-lightning: unpinned. 2.6.1 verified, including that module buffers
+#   are restored before on_fit_start -- which is what lets the endpoint cluster
+#   centres survive a resume without being refitted.
+#
+# numpy: unpinned. The submodule has no numpy-2-breaking idioms (checked for
+#   np.float/np.int/np.bool/np.alltrue/np.NaN/np.in1d and DataFrame.append).
 #
 # pynavmesh installs under the module name `pathfinder`.
-# numpy is unpinned: the submodule has no numpy-2-breaking idioms (checked).
 
 name: flowbt
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.11
   - pip
   - pip:
       - --extra-index-url https://download.pytorch.org/whl/cu128
       - torch
       - torchvision
-      - "pandas<2.2"
-      - "transformers>=4.44,<4.50"
-      - diffusers==0.30.3
-      - "pytorch-lightning==2.1.*"
+      - "pandas>=2,<3"        # see above -- the one hard pin
+      - transformers
+      - diffusers==0.30.3     # upstream's pin; only the emitter path needs it
+      - pytorch-lightning
       - hydra-core==1.3.2
       - "omegaconf>=2.3"
       - torchmetrics

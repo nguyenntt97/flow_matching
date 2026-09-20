@@ -32,6 +32,7 @@ class SimulatorLitModule(pl.LightningModule):
         hist_dropout_full_p: float = 0.1,
         hist_dropout_prefix_p: float = 0.1,
         assert_scheduler_horizon: bool = True,
+        val_num_samples: int = 0,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -39,6 +40,14 @@ class SimulatorLitModule(pl.LightningModule):
 
         self.val_ade = MeanMetric()
         self.val_fde = MeanMetric()
+
+        # minADE_K / minFDE_K, off by default so the parity path is untouched.
+        # A generative head (the flow teacher) samples, so ADE/FDE scores one
+        # draw against the ground truth and is worse than an L1 regression by
+        # construction. These are the statistic to select such a head on.
+        if val_num_samples > 0:
+            self.val_min_ade = MeanMetric()
+            self.val_min_fde = MeanMetric()
 
         self._restored_from_ckpt = False
 
@@ -210,11 +219,40 @@ class SimulatorLitModule(pl.LightningModule):
         self.val_ade.update(distance.mean(dim=-1))
         self.val_fde.update(distance[:, -1])
 
+        num_samples = self.hparams.val_num_samples
+        if num_samples > 0:
+            # Same arithmetic as src/evaluate_agent.py::evaluate_split, so the
+            # per-epoch number and the final evaluation are the same statistic.
+            best_ade = best_fde = None
+            for _ in range(num_samples):
+                sampled = self.model(
+                    batch["traj_hist"],
+                    None,
+                    batch["goal"],
+                    batch["attr"],
+                    batch["control"].clone(),
+                    batch["neighbor"],
+                    batch["environment"],
+                    sampling=True,
+                )
+                d = torch.linalg.norm(sampled.preds - batch["traj_fut"], dim=-1)
+                ade, fde = d.mean(dim=-1), d[:, -1]
+                best_ade = ade if best_ade is None else torch.minimum(best_ade, ade)
+                best_fde = fde if best_fde is None else torch.minimum(best_fde, fde)
+            self.val_min_ade.update(best_ade)
+            self.val_min_fde.update(best_fde)
+
     def on_validation_epoch_end(self) -> None:
         self.log("val/ade", self.val_ade.compute(), prog_bar=True, sync_dist=True)
         self.log("val/fde", self.val_fde.compute(), prog_bar=True, sync_dist=True)
         self.val_ade.reset()
         self.val_fde.reset()
+
+        if self.hparams.val_num_samples > 0:
+            self.log("val/min_ade", self.val_min_ade.compute(), prog_bar=True, sync_dist=True)
+            self.log("val/min_fde", self.val_min_fde.compute(), prog_bar=True, sync_dist=True)
+            self.val_min_ade.reset()
+            self.val_min_fde.reset()
 
     # ------------------------------------------------------------ optimisers
     def configure_optimizers(self):

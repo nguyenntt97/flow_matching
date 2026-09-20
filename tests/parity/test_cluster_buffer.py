@@ -5,9 +5,9 @@ state dict and ``from_pretrained`` hands back ``None``. Our wrapper puts them
 in a buffer -- on the wrapper, not on ``net``, so ``save_pretrained`` still
 emits exactly upstream's key set.
 
-The one thing worth pinning against the installed Lightning is the ordering
-question: are buffers restored before ``on_fit_start``? ``test_buffers_restore``
-answers it directly rather than trusting the docs.
+``test_buffers_restore_before_on_fit_start`` pins the hook ordering the
+no-refit-on-resume guard depends on. Measured true on pytorch-lightning 2.6.1;
+the test keeps it true.
 """
 
 from __future__ import annotations

@@ -1,0 +1,18 @@
+# @package _global_
+# An eth-SHAPED smoke test. smoke_gcs is faster to build but gcs has
+# future_length=50 (10 s), so passing there does not exercise the 10-frame /
+# 2 s horizon every other dataset uses.
+defaults:
+  - override /data: eth
+  - override /trainer: smoke
+  - override /logger: none
+
+name: smoke_eth
+
+data:
+  crowd_simulator:
+    simulator:
+      train_batch_size: 64
+      eval_batch_size: 64
+  loader:
+    num_workers: 2

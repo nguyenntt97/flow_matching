@@ -16,6 +16,7 @@ them absolute and repo-anchored on purpose, plus upstream's edin/hotel mixup.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import src._upstream as up
 from src.util.paths import register_resolvers
@@ -59,11 +60,26 @@ def flatten(node, prefix=""):
 
 
 def upstream_config(dataset: str):
+    """Load upstream's merged config without relying on the CWD.
+
+    ``get_config`` resolves whatever ``dataset_config`` / ``trainer_config``
+    the model yaml declares, and those are written ``./configs/...`` --
+    relative to a CWD upstream assumes is the submodule root. We never chdir,
+    so both have to be passed in absolute. The trainer file differs per
+    dataset, so read the name the model yaml declares rather than guessing it.
+    """
     root = up.CROWDES_ROOT
+    model_path = root / "configs" / "model" / f"CrowdES_{dataset}.yaml"
+
+    declared = up.load_config(str(model_path))
+    trainer_name = Path(declared.trainer_config).name
+
     return up.get_config(
-        str(root / "configs" / "model" / f"CrowdES_{dataset}.yaml"),
+        str(model_path),
+        # Upstream's CrowdES_edin.yaml declares hotel.yaml here, which looks
+        # like a copy-paste slip. We compare against the dataset the name says.
         dataset_config=str(root / "configs" / "dataset" / f"{dataset}.yaml"),
-        trainer_config=None,
+        trainer_config=str(root / "configs" / "trainer" / trainer_name),
     )
 
 

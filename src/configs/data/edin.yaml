@@ -10,7 +10,8 @@ defaults:
 dataset:
   dataset_name: edin
   dataset_family: edinburgh
-  dataset_path: ${repo:datasets/EDIN}/
+  # upstream raw dir for this dataset is datasets/EDIN/ (absent here, and
+  # unused -- see the dataset_path comment in base.yaml)
   dataset_preprocessed_path: ${repo:datasets/preprocessed/edin}/
   dataset_fps: 10
   dataset_preprocessor: EDINPreprocessor

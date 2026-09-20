@@ -10,7 +10,8 @@ defaults:
 dataset:
   dataset_name: sdd
   dataset_family: sdd
-  dataset_path: ${repo:datasets/SDD}/
+  # upstream raw dir for this dataset is datasets/SDD/ (absent here, and
+  # unused -- see the dataset_path comment in base.yaml)
   dataset_preprocessed_path: ${repo:datasets/preprocessed/sdd}/
   dataset_fps: 30
   dataset_preprocessor: SDDPreprocessor

@@ -21,3 +21,7 @@ hydra:
     dir: ${run_dir}
   job:
     chdir: false
+
+trials: 20                   # upstream's TRIALS; lower it only for smoke runs
+scene_limit: null            # cap the number of test scenes (smoke runs)
+label: CrowdES               # shows up in logs and the summary json

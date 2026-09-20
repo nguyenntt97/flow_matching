@@ -13,6 +13,12 @@ Two metric families, and they are not the same kind of claim:
   upstream number to match; this is our own baseline.
 
 This is the only place ``allow_test_split=True`` is set.
+
+``ckpt`` may be either a Lightning ``.ckpt`` or a directory holding an HF export
+(``config.json`` + ``pytorch_model.bin``). The directory form is what upstream's
+released model zoo ships, so it is how the *published* CrowdES simulator gets
+scored on exactly the same code path as ours -- no retraining needed to have a
+baseline, and no separate scoring script to drift.
 """
 
 from __future__ import annotations
@@ -39,6 +45,42 @@ from src.util.fingerprint import build_fingerprint  # noqa: E402
 from src.util.seeding import seed_everything  # noqa: E402
 
 logger = logging.getLogger(__name__)
+
+
+def load_model(checkpoint: str, device):
+    """Load either a Lightning ``.ckpt`` or an HF export directory.
+
+    The HF path exists so upstream's released model zoo is scored by the same
+    code as ours. It refuses a Flow2BT export for the same reason
+    ``src/evaluate_scene.py`` does: those directories carry an unused regression
+    decoder that would load silently and produce a meaningless number.
+    """
+    path = Path(checkpoint)
+    if path.is_dir():
+        if (path / "FLOW2BT_HEAD.json").is_file():
+            raise ValueError(
+                f"{path} is a Flow2BT head export; its net.* decoder is unused and "
+                "untrained. Load it with FlowMatchingSimulator.load_flow_head instead."
+            )
+        from src._upstream import CrowdESSimulatorModel
+        from src.models.crowdes_parity import ParityCrowdESSimulator
+
+        released = CrowdESSimulatorModel.from_pretrained(str(path))
+        wrapper = ParityCrowdESSimulator(
+            history_length=released.config.history_length,
+            future_length=released.config.future_length,
+            env_size=released.config.env_size,
+            env_dim=released.config.env_dim,
+            neighbor_max_num=released.config.neighbor_max_num,
+            latent_dim=released.config.latent_dim,
+            hidden_dim=released.config.hidden_dim,
+        )
+        wrapper.net.load_state_dict(released.state_dict())
+        logger.info("loaded HF export %s (%s)", path, released.config.model_type)
+        return wrapper.eval().to(device)
+
+    system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device)
+    return system.eval().to(device).model
 
 
 def _batches(dataset, indices, batch_size):
@@ -113,11 +155,11 @@ def main(cfg: DictConfig) -> None:
     )
 
     device = torch.device(cfg.device if torch.cuda.is_available() or cfg.device == "cpu" else "cpu")
-    system = SimulatorLitModule.load_from_checkpoint(cfg.ckpt, map_location=device)
-    system.eval().to(device)
-    model = system.model
+    model = load_model(str(cfg.ckpt), device)
 
-    if getattr(model, "needs_endpoint_clusters", False) and not bool(model.centers_fitted):
+    if getattr(model, "needs_endpoint_clusters", False) and not bool(
+        getattr(model, "centers_fitted", torch.tensor(False))
+    ):
         # Inference only uses the centres in the training branch, so this is
         # survivable -- but it means the checkpoint predates the buffer fix.
         logger.warning("checkpoint carries no fitted endpoint cluster centres")

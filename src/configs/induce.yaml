@@ -1,0 +1,46 @@
+# Offline compilation: trajectory ensemble -> bifurcations -> guards + DMPs -> tree.
+defaults:
+  - _self_
+  - data: eth
+
+name: induce_${source}_${data.dataset.dataset_name}
+seed: 0
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+# ground_truth | parity | flow   -- see the docstring; this is the key ablation
+source: ground_truth
+ckpt: null                   # required for source=parity (HF dir) or flow (.ckpt)
+split: train
+device: cuda
+
+num_states: 4096             # conditioning states drawn from the split
+rollouts_per_state: 16       # ignored for ground_truth, which has exactly one
+
+# Subsystem 3
+# Rotate futures so the navmesh waypoint lies along +x before clustering and
+# fitting. Without it, leaves encode world direction rather than behaviour --
+# measured: three of eight leaves came out as "backstep" purely because those
+# agents walked toward world -x.
+nav_frame: true
+
+num_leaves: 8                # CrowdES's B=8; the elbow is reported alongside
+lambda_term: 1.0
+lambda_vel: 1.0
+min_branch: 8
+compare_to_crowdes_modes: true
+
+# Subsystem 5
+dmp_basis: 20
+dmp_alpha_s: 4.0
+dmp_stiffness: 100.0
+
+# Subsystem 4
+svm_C: 1.0
+svm_penalty: l2
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: false

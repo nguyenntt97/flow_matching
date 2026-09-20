@@ -1,0 +1,46 @@
+# Flow2BT reactive runtime on the CrowdES scene-level benchmark.
+#
+# Needs the same three checkpoints as eval_scene (CrowdESFramework loads them
+# unconditionally); the simulator one is only loaded, never used, when the
+# nominal controller is the behavior tree.
+defaults:
+  - _self_
+  - data: eth
+
+name: eval_flow2bt_${data.dataset.dataset_name}
+seed: 0
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+trials: 20
+scene_limit: null
+
+runtime:
+  controller: waypoint       # waypoint | bt
+  substeps: 4                # ticks per simulator frame -> dt = 1/(5*substeps)
+  use_cbf: true
+  dense_output: false        # measured: bypasses Kalman smoothing, costs 2x Kinematics
+  agent_radius: 0.2
+  bt_bundle: null            # path to an induced tree+primitives bundle (controller=bt)
+
+cbf:
+  d_min: 0.45
+  alpha_1: 2.0
+  alpha_2: 2.0
+  a_max: 3.0
+  accel_facets: 8
+  responsibility: 0.5
+  slack_weight: 1.0e4
+  iterations: 60
+
+# Each entry becomes a separate run. The plan's frontier: the benchmark scores
+# collisions at 0.2 m and ground truth is ~collision-free there, while real
+# pedestrians are within 0.7 m on 8.7% of agent-frames -- so large d_min buys a
+# number at the cost of realism. Sweeping is the point.
+d_min_sweep: [0.2, 0.3, 0.45, 0.6]
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: false

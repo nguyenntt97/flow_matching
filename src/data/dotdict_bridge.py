@@ -80,6 +80,35 @@ def validate_required(config: DotDict, keys: tuple[str, ...] = REQUIRED_KEYS) ->
         )
 
 
+def validate_paths(config: DotDict) -> None:
+    """Fail early, and in terms of our config, on paths upstream will open.
+
+    Without this the first failure is a bare FileNotFoundError raised inside
+    ``BaseDataset.__init__``, several frames deep and naming a path with a
+    ``..`` in it that nobody wrote.
+    """
+    import os
+
+    preprocessed = config.dataset.dataset_preprocessed_path
+    if not os.path.isdir(preprocessed):
+        raise FileNotFoundError(
+            f"dataset.dataset_preprocessed_path does not exist: {preprocessed}"
+        )
+
+    # BaseDataset does open(join(dataset_path, '..', 'segmentation_classes.json')).
+    # open() walks '..' through the filesystem, so dataset_path itself has to be
+    # a real, traversable directory -- a textually correct path is not enough.
+    classes = os.path.join(config.dataset.dataset_path, "..", "segmentation_classes.json")
+    if not os.path.isfile(classes):
+        raise FileNotFoundError(
+            f"BaseDataset will fail to load segmentation classes from {classes!r}.\n"
+            f"dataset.dataset_path is {config.dataset.dataset_path!r}; it must be an "
+            "EXISTING directory whose parent holds segmentation_classes.json, because "
+            "open() resolves '..' through the filesystem. See the dataset_path comment "
+            "in src/configs/data/base.yaml."
+        )
+
+
 def to_crowdes_config(data_cfg: DictConfig, validate: bool = True) -> DotDict:
     """Build the merged ``DotDict`` upstream's dataset and model classes expect."""
     plain = OmegaConf.to_container(data_cfg, resolve=True, throw_on_missing=True)
@@ -89,4 +118,5 @@ def to_crowdes_config(data_cfg: DictConfig, validate: bool = True) -> DotDict:
     config = _dotify({k: plain[k] for k in UPSTREAM_SUBTREES if k in plain})
     if validate:
         validate_required(config)
+        validate_paths(config)
     return config

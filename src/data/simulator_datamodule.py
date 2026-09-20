@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
 from src._upstream import DotDict
-from src.data.simulator_dataset import ParitySimulatorDataset
+from src.data.simulator_dataset import ParitySimulatorDataset, capped_build_workers
 from src.util.fingerprint import build_fingerprint
 
 logger = logging.getLogger(__name__)
@@ -62,21 +62,18 @@ class CrowdESSimulatorDataModule(pl.LightningDataModule):
         """Build the cache once per node. Must not assign to ``self.*``.
 
         This is the slow part: one A* navmesh search per sample via
-        ``get_control_point``, farmed out by upstream with
-        ``joblib.Parallel(n_jobs=256)``. ``parallel_backend`` caps that from the
-        outside without editing the submodule -- ``process_scene`` results are
-        per-scene independent, so the worker count cannot change the output.
+        ``get_control_point``, farmed out by upstream with a hardcoded
+        ``joblib.Parallel(n_jobs=256)``. See ``capped_build_workers`` for why
+        that needs overriding and why doing so cannot change the result.
         """
         path = self.cache_path("train")
         if os.path.exists(path):
             logger.info("dataset cache present: %s", path)
             return
 
-        import joblib
-
-        n_jobs = self.build_n_jobs or min(256, os.cpu_count() or 1)
+        n_jobs = self.build_n_jobs or (os.cpu_count() or 1)
         logger.info("building dataset cache at %s (n_jobs=%d); this can take a while", path, n_jobs)
-        with joblib.parallel_backend("loky", n_jobs=n_jobs):
+        with capped_build_workers(n_jobs):
             ParitySimulatorDataset(self.cfg, "train", cache_path=path)
 
     def setup(self, stage: str | None = None) -> None:

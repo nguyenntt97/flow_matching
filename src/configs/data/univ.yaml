@@ -10,7 +10,8 @@ defaults:
 dataset:
   dataset_name: univ
   dataset_family: ethucy
-  dataset_path: ${repo:datasets/ETH-UCY}/
+  # upstream raw dir for this dataset is datasets/ETH-UCY/ (absent here, and
+  # unused -- see the dataset_path comment in base.yaml)
   dataset_preprocessed_path: ${repo:datasets/preprocessed/univ}/
   dataset_fps: 25
   dataset_preprocessor: ETHUCYPreprocessor

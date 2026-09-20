@@ -1,0 +1,33 @@
+# Subsystem 2: conditional flow-matching teacher.
+#
+# Same LightningModule, same encoder stack, same B=8 latent -- only
+# model_cfg._target_ changes, exactly as system/parity.yaml promised.
+#
+# val_num_samples > 0 turns on minADE_K / minFDE_K during validation. That is
+# the statistic a generative head should be selected on: ADE/FDE scores a single
+# sample against the ground truth and will be worse than the L1-regression
+# baseline by construction, which is not a regression.
+_target_: src.systems.simulator_system.SimulatorLitModule
+
+model_cfg:
+  _target_: src.models.flow_teacher.FlowMatchingSimulator
+  history_length: ${data.crowd_simulator.simulator.history_length}
+  future_length: ${data.crowd_simulator.simulator.future_length}
+  env_size: ${data.crowd_simulator.simulator.environment_size}
+  env_dim: 8
+  neighbor_max_num: ${data.crowd_simulator.simulator.interaction_max_num_agents}
+  latent_dim: ${data.crowd_simulator.simulator.latent_dim}
+  hidden_dim: ${data.crowd_simulator.simulator.hidden_dim}
+  velocity_hidden_dims: [256, 512, 512, 256]
+  time_embed_dim: 128
+  ode_steps: 5
+  ode_method: midpoint
+  eval_seed: 0
+
+learning_rate: ${data.crowd_simulator.simulator.learning_rate}
+lr_scheduler_type: ${data.crowd_simulator.simulator.lr_scheduler_type}
+num_warmup_steps: ${data.crowd_simulator.simulator.num_warmup_steps}
+hist_dropout_full_p: 0.1
+hist_dropout_prefix_p: 0.1
+assert_scheduler_horizon: true
+val_num_samples: 8

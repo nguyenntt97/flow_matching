@@ -13,9 +13,20 @@
 dataset:
   dataset_name: ???
   dataset_family: ???
-  # Only ever used for the textual join `<dataset_path>/../segmentation_classes.json`
-  # in BaseDataset. The directory itself does not need to exist.
-  dataset_path: ???
+  # Used at runtime in exactly ONE place: BaseDataset does
+  #   open(os.path.join(dataset_path, '..', 'segmentation_classes.json'))
+  # Everything else reads self.dataset_path, which comes from
+  # dataset_preprocessed_path. (config.dataset.dataset_path is also used by
+  # utils/preprocessor/*, which we never run -- the data is already built.)
+  #
+  # So this must be a directory that EXISTS directly under datasets/, because
+  # open() resolves '..' through the filesystem: every component on the way has
+  # to be traversable. Upstream's raw-data names (datasets/ETH-UCY, datasets/GCS,
+  # ...) are not present here, and pointing at one gives
+  #   FileNotFoundError: .../datasets/GCS/../segmentation_classes.json
+  # datasets/preprocessed exists, and '..' from it lands on datasets/, which is
+  # where segmentation_classes.json lives.
+  dataset_path: ${repo:datasets/preprocessed}/
   dataset_preprocessed_path: ???
   dataset_fps: ???
   # Consumed only by utils/preprocess_dataset.py, which we never run

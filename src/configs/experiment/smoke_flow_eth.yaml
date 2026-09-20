@@ -1,0 +1,25 @@
+# @package _global_
+# eth-shaped smoke test for the flow-matching head.
+defaults:
+  - override /data: eth
+  - override /system: flow_teacher
+  - override /trainer: smoke
+  - override /logger: none
+
+name: smoke_flow_eth
+
+data:
+  crowd_simulator:
+    simulator:
+      train_batch_size: 64
+      eval_batch_size: 64
+  loader:
+    num_workers: 2
+
+system:
+  val_num_samples: 4
+
+callbacks:
+  model_checkpoint:
+    monitor: val/min_fde
+    filename: "epoch{epoch:03d}-minfde{val/min_fde:.4f}"
