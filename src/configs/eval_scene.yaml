@@ -25,3 +25,9 @@ hydra:
 trials: 20                   # upstream's TRIALS; lower it only for smoke runs
 scene_limit: null            # cap the number of test scenes (smoke runs)
 label: CrowdES               # shows up in logs and the summary json
+
+viz: false                   # whether to export scene simulation videos (.m4v)
+viz_trials: 1                # number of trials to visualize per scene (e.g. 1)
+viz_fps: 5                   # playback frame rate for output videos
+viz_max_seconds: null        # cap output video duration in simulated seconds (null for full)
+

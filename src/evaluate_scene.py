@@ -86,8 +86,14 @@ def main(cfg: DictConfig) -> None:
         trials=int(cfg.get("trials", TRIALS)),
         scene_limit=cfg.get("scene_limit"),
         label=str(cfg.get("label", "CrowdES")),
+        viz=bool(cfg.get("viz", False)),
+        viz_trials=int(cfg.get("viz_trials", 1)),
+        viz_fps=int(cfg.get("viz_fps", 5)),
+        viz_max_seconds=cfg.get("viz_max_seconds"),
+        out_dir=Path(cfg.run_dir),
     )
     print_summary(summary)
+
     logger.info("wrote %s", write_summary(summary, Path(cfg.run_dir)))
 
 

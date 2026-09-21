@@ -14,8 +14,14 @@ batch_size: 2048
 num_samples: 20              # K for minADE_K / minFDE_K
 device: cuda
 
+viz: false                   # whether to export trajectory videos (.m4v)
+viz_limit: 50                # max trajectories per scene (null for all)
+viz_fps: 5                   # frames per second for output videos
+viz_dir: null                # optional subfolder inside run_dir (e.g. 'viz')
+
 hydra:
   run:
     dir: ${run_dir}
   job:
     chdir: false
+

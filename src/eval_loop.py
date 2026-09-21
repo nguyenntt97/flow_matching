@@ -59,6 +59,11 @@ def evaluate_scenes(
     framework_factory: Optional[Callable] = None,
     scene_limit: Optional[int] = None,
     label: str = "CrowdES",
+    viz: bool = False,
+    viz_trials: int = 1,
+    viz_fps: int = 5,
+    viz_max_seconds: Optional[float] = None,
+    out_dir: Optional[Path] = None,
 ) -> dict:
     """Drive a framework over every test scene and score it. Returns a summary dict."""
     from utils.dataloader.evaluation_dataloader import EvaluationDataset
@@ -108,6 +113,28 @@ def evaluate_scenes(
                 if k.endswith(("Collision", "Density", "Kineamtics", "DTW", "Diversity"))
             }
             logger.info("[%s]   %s agents=%d", label, headline, flat["_agents"])
+
+            # Optional scene trajectory & crowd visualization
+            if viz and out_dir is not None and trial < viz_trials:
+                from src.util.video import render_scene_video
+
+                scene_dir = out_dir / scene
+                scene_dir.mkdir(parents=True, exist_ok=True)
+                video_path = scene_dir / f"scenario_trial_{trial:02d}.m4v"
+                logger.info("[%s] rendering scene video to %s", label, video_path)
+                render_scene_video(
+                    video_path=video_path,
+                    scene_bg=data.get("bg", data["img"]),
+                    generated_scenario=generated,
+                    scenario_length=int(data["size"]["length"]),
+                    scene=scene,
+                    trial=trial,
+                    dataset_fps=int(crowdes_cfg["dataset"]["dataset_fps"]),
+                    simulator_fps=int(crowdes_cfg["crowd_simulator"]["simulator"]["simulator_fps"]),
+                    max_seconds=viz_max_seconds,
+                )
+                logger.info("[%s] rendered %s", label, video_path)
+
 
     keys = [k for k in records[0] if not k.startswith("_")]
     summary = {
