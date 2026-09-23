@@ -9,7 +9,7 @@
 
 In complex continuous control, running a multi-million parameter neural network (e.g. UNet, Transformer, or numerical ODE solver) at every control tick incurs high computational latency ($> 20 - 100\,\text{ms}$) and consumes heavy GPU resources.
 
-Subsystem 5 solves this by exploiting the theoretical guarantee of **TreeFlow** ([Ramachandran & Sra, 2026](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md)): once conditioned on a specific tree leaf partition $\ell$, the trajectory distribution $\Xi_\ell$ is **unimodal and low-curvature**. Each leaf can therefore be distilled into a **Dynamical Movement Primitive (DMP)**:
+Subsystem 5 solves this by exploiting the theoretical guarantee of **TreeFlow** ([Ramachandran & Sra, 2026](../01_ramachandran2026_trees_to_flows.md)): once conditioned on a specific tree leaf partition $\ell$, the trajectory distribution $\Xi_\ell$ is **unimodal and low-curvature**. Each leaf can therefore be distilled into a **Dynamical Movement Primitive (DMP)**:
 
 ```
 [ Unimodal Trajectory Cluster Xi_ell from Subsystem 3 ]
@@ -52,7 +52,7 @@ A discrete DMP consists of two coupled systems:
    where $\psi_i(s)$ are Gaussian basis functions spaced along the phase trajectory. The shape weights $\mathbf{W}_\ell = [\mathbf{w}_1, \dots, \mathbf{w}_P] \in \mathbb{R}^{2 \times P}$ are fit to the demonstration trajectories $\Xi_\ell$ via closed-form linear ridge regression.
 
 ### 1.2 Mapping to the $B=8$ Behavioral Modes of Pedestrian Locomotion
-Following the empirical discovery in [Bae et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md), pedestrian locomotion decomposes into 8 discrete action primitives:
+Following the empirical discovery in [Bae et al. (2025)](../14_bae2025_continuous_crowd_locomotion_crowdes.md), pedestrian locomotion decomposes into 8 discrete action primitives:
 
 | Behavioral Mode | DMP Goal Setting ($\mathbf{g}_\ell$) | Forcing Term $\mathbf{f}_\ell(s)$ | Execution Characteristics |
 | :--- | :--- | :--- | :--- |
@@ -93,10 +93,10 @@ def tick(self, state: PedestrianState) -> NodeStatus:
 
 | Approach | Action Primitive Representation | Latency | Guarantees | Why Chosen / Adapted in Flow2BT |
 | :--- | :--- | :--- | :--- | :--- |
-| **Recurrent Trajectory Predictor $\mu_\varphi$** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural network with cross-attention | $\approx 20 - 40\,\text{ms}$ per agent | No stability proofs; outputs can diverge | Replaced by DMPs: neural prediction is too slow for 100+ agents |
-| **SMDP Options with Q-Learning** ([Pereira & Engel, 2015](file:///home/nguyen/projects/flow_matching/survey/07_pereira2015_options_learning_nodes_bt.md)) | Discrete/continuous action Q-learners | Low | Empirical convergence; lacks smooth trajectory shapes | Concept of options as subtrees is retained, but parameterized by DMPs |
-| **Dynamical Movement Primitives in BTs** ([Chatzilygeroudis et al., 2021](file:///home/nguyen/projects/flow_matching/survey/06_chatzilygeroudis2021_bt_movement_skills.md)) | Spring-damper ODE with learned forcing terms | **$< 0.1\,\text{ms}$** | **Provably stable**: asymptotically converges to $\mathbf{g}_\ell$ | **Adopted as Subsystem 5**: Provides guaranteed convergence and sub-millisecond execution |
-| **Linear Feedback / LQR Leaves** ([Sprague & Ögren, 2022](file:///home/nguyen/projects/flow_matching/survey/05_sprague2022_neural_controllers_bt.md)) | Gain matrix $\mathbf{u} = -\mathbf{K} (\mathbf{x} - \mathbf{x}^\star)$ | Ultra-fast | Requires known linear dynamics | Complementary: DMPs generalize LQR by allowing non-linear forcing shapes |
+| **Recurrent Trajectory Predictor $\mu_\varphi$** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural network with cross-attention | $\approx 20 - 40\,\text{ms}$ per agent | No stability proofs; outputs can diverge | Replaced by DMPs: neural prediction is too slow for 100+ agents |
+| **SMDP Options with Q-Learning** ([Pereira & Engel, 2015](../07_pereira2015_options_learning_nodes_bt.md)) | Discrete/continuous action Q-learners | Low | Empirical convergence; lacks smooth trajectory shapes | Concept of options as subtrees is retained, but parameterized by DMPs |
+| **Dynamical Movement Primitives in BTs** ([Chatzilygeroudis et al., 2021](../06_chatzilygeroudis2021_bt_movement_skills.md)) | Spring-damper ODE with learned forcing terms | **$< 0.1\,\text{ms}$** | **Provably stable**: asymptotically converges to $\mathbf{g}_\ell$ | **Adopted as Subsystem 5**: Provides guaranteed convergence and sub-millisecond execution |
+| **Linear Feedback / LQR Leaves** ([Sprague & Ögren, 2022](../05_sprague2022_neural_controllers_bt.md)) | Gain matrix $\mathbf{u} = -\mathbf{K} (\mathbf{x} - \mathbf{x}^\star)$ | Ultra-fast | Requires known linear dynamics | Complementary: DMPs generalize LQR by allowing non-linear forcing shapes |
 
 ---
 

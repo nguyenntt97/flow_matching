@@ -98,7 +98,7 @@ The design synthesizes findings from all 13 papers in the survey:
 ```
 
 ### Tier 1: Continuous Teacher Flow Generation
-1. Train a Flow Matching model $v_\theta(\mathbf{x}, t)$ using [`AffineProbPath`](file:///home/nguyen/projects/flow_matching/flow_matching/path/affine.py#L15-L261) and [`CondOTScheduler`](file:///home/nguyen/projects/flow_matching/flow_matching/path/scheduler/scheduler.py#L104) on expert demonstrations.
+1. Train a Flow Matching model $v_\theta(\mathbf{x}, t)$ using [`AffineProbPath`](../../flow_matching/path/affine.py#L15-L261) and [`CondOTScheduler`](../../flow_matching/path/scheduler/scheduler.py#L104) on expert demonstrations.
 2. Roll out an ensemble of $M$ phase-space trajectories across diverse initial states $s_0 \sim \mathcal{S}_0$:
    $$\Xi = \{\xi_i(t)\}_{i=1}^M, \quad \dot{\xi}_i(t) = v_\theta(\xi_i(t), t, s_0)$$
 
@@ -179,7 +179,7 @@ ClearPath?      FollowNavMeshDMP   PedestrianImpending? EvadeRightDMP (CBF Guard
 
 ## 6. Implementation Roadmap for the Codebase
 
-- [ ] **Module 1 (`flow2bt/rollout.py`):** Trajectory ensemble generator integrating [`ODESolver`](file:///home/nguyen/projects/flow_matching/flow_matching/solver/ode_solver.py#L17-L204) across initial condition grids.
+- [ ] **Module 1 (`flow2bt/rollout.py`):** Trajectory ensemble generator integrating [`ODESolver`](../../flow_matching/solver/ode_solver.py#L17-L204) across initial condition grids.
 - [ ] **Module 2 (`flow2bt/clustering.py`):** Spectral trajectory metric and reverse-time hierarchical dendrogram induction.
 - [ ] **Module 3 (`flow2bt/conditions.py`):** Differentiable hyperplane and logistic condition induction at bifurcation nodes.
 - [ ] **Module 4 (`flow2bt/primitives.py`):** Ridge regression DMP parameterizer fitting attractor goals and forcing functions.

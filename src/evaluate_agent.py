@@ -89,7 +89,10 @@ def load_model(checkpoint: str, device):
         logger.info("loaded HF export %s (%s)", path, released.config.model_type)
         return wrapper.eval().to(device)
 
-    system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device)
+    try:
+        system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device, weights_only=False)
+    except TypeError:
+        system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device)
     return system.eval().to(device).model
 
 

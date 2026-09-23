@@ -25,7 +25,7 @@ In the Flow2BT architecture, the **Teacher Flow Policy** acts as an exploratory 
 ```
 
 ### 1.1 Flow Matching Formulation for Locomotion
-Using the core library's [`AffineProbPath`](file:///home/nguyen/projects/flow_matching/flow_matching/path/affine.py#L15-L261) and [`CondOTScheduler`](file:///home/nguyen/projects/flow_matching/flow_matching/path/scheduler/scheduler.py#L104):
+Using the core library's [`AffineProbPath`](../../flow_matching/path/affine.py#L15-L261) and [`CondOTScheduler`](../../flow_matching/path/scheduler/scheduler.py#L104):
 1. **Target Distribution ($p_1$):** Ground-truth pedestrian velocities $\mathbf{v}_1 = \dot{\mathbf{c}} \in \mathbb{R}^2$ or footstep displacements over horizon $T_f$.
 2. **Prior Distribution ($p_0$):** Standard Gaussian noise $\mathbf{v}_0 \sim \mathcal{N}(0, \mathbf{I})$.
 3. **Conditional Linear Trajectory:**
@@ -34,14 +34,14 @@ Using the core library's [`AffineProbPath`](file:///home/nguyen/projects/flow_ma
    $$\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \mathcal{U}[0, 1], \, \mathbf{v}_1 \sim p_{\text{data}}, \, \mathbf{v}_0 \sim p_0, \, \mathbf{C}_s} \left[ \left\| v_\theta(\mathbf{v}_t, t, \mathbf{C}_s) - (\mathbf{v}_1 - \mathbf{v}_0) \right\|_2^2 \right]$$
 
 ### 1.2 Conditioning Context ($\mathbf{C}_s$)
-Following the locomotion simulator inputs from [Bae et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md):
+Following the locomotion simulator inputs from [Bae et al. (2025)](../14_bae2025_continuous_crowd_locomotion_crowdes.md):
 $$\mathbf{C}_s = \left[ \mathbf{c}_{t, \text{nav}} - \mathbf{c}_t, \, \nu, \, \text{SocialGraph}(\mathcal{H}_{\text{neighbors}}), \, \text{CNN}(\mathcal{M}_W) \right]$$
 * **NavMesh Relative Goal Vector:** $\mathbf{c}_{t, \text{nav}} - \mathbf{c}_t$ guides nominal heading.
 * **Social Graph Attention:** Graph Neural Network or Transformer attention pooling over the relative displacement and velocity vectors of all pedestrians within a $16 \times 16\,\text{m}$ perceptual window:
   $$\mathbf{h}_{\text{social}} = \sum_{j \in \mathcal{N}(i)} \text{Softmax}\left(\frac{\mathbf{q}_i^\top \mathbf{k}_j}{\sqrt{d}}\right) \mathbf{v}_j$$
 
 ### 1.3 Trajectory Ensemble Rollouts
-To prepare the dataset for topological tree extraction (Subsystem 3), the teacher model is rolled out across an ensemble of $M$ diverse initializations using [`ODESolver`](file:///home/nguyen/projects/flow_matching/flow_matching/solver/ode_solver.py#L17-L204):
+To prepare the dataset for topological tree extraction (Subsystem 3), the teacher model is rolled out across an ensemble of $M$ diverse initializations using [`ODESolver`](../../flow_matching/solver/ode_solver.py#L17-L204):
 $$\Xi = \{\xi_i(\tau)\}_{i=1}^M, \quad \dot{\xi}_i(\tau) = v_\theta(\xi_i(\tau), \tau, \mathbf{C}_s^{(i)}), \quad \tau \in [0, T_f]$$
 This generates a rich bundle of continuous trajectories capturing all navigation strategies (e.g. diverging left around an obstacle vs. swerving right vs. slowing down).
 
@@ -52,9 +52,9 @@ This generates a rich bundle of continuous trajectories capturing all navigation
 | Approach | Model Type | Inference Latency | Handling of Multimodality | Why Chosen / Adapted in Flow2BT |
 | :--- | :--- | :--- | :--- | :--- |
 | **Deterministic Regression** (Social-LSTM, GCNs) | Single forward-pass MLP/GRU | Ultra-fast ($< 2\,\text{ms}$) | **Fails**: Averages conflicting paths (leads to collisions in bottlenecks) | Rejected: cannot capture multimodal branching |
-| **DDIM Diffusion Policy** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Iterative Gaussian denoising (50 steps) | Slow ($\approx 50 - 100\,\text{ms}$ per agent) | High diversity; covers multimodal evasion routes | Valuable as an offline teacher, but too slow for online control |
-| **Conditional Flow Matching (CFM)** ([Lipman et al., 2024](file:///home/nguyen/projects/flow_matching/README.md)) | Straight-path ODE vector field | Medium ($5 - 10$ steps via Heun/Dopri5) | High diversity, lower curvature than diffusion | **Adopted as Teacher**: Fast convergence, straight trajectories facilitate cleaner clustering in Subsystem 3 |
-| **TreeFlow** ([Ramachandran & Sra, 2026](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md)) | Tree-partition conditioned flow field | Fast ($3 - 5$ steps, $2\times$ faster than diffusion) | Disentangles modes into independent tree partition sub-classes | **Adopted for Fine-Tuning**: Eliminates mode crossing along tree branches |
+| **DDIM Diffusion Policy** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Iterative Gaussian denoising (50 steps) | Slow ($\approx 50 - 100\,\text{ms}$ per agent) | High diversity; covers multimodal evasion routes | Valuable as an offline teacher, but too slow for online control |
+| **Conditional Flow Matching (CFM)** ([Lipman et al., 2024](../../README.md)) | Straight-path ODE vector field | Medium ($5 - 10$ steps via Heun/Dopri5) | High diversity, lower curvature than diffusion | **Adopted as Teacher**: Fast convergence, straight trajectories facilitate cleaner clustering in Subsystem 3 |
+| **TreeFlow** ([Ramachandran & Sra, 2026](../01_ramachandran2026_trees_to_flows.md)) | Tree-partition conditioned flow field | Fast ($3 - 5$ steps, $2\times$ faster than diffusion) | Disentangles modes into independent tree partition sub-classes | **Adopted for Fine-Tuning**: Eliminates mode crossing along tree branches |
 
 ---
 

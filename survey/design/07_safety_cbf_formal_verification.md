@@ -7,7 +7,7 @@
 
 ## 1. Mathematical Mechanics & Functional Role
 
-Pure machine learning policies—including continuous flow models ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)), diffusion models, and neural RL—provide only statistical guarantees. In dense pedestrian crowds, even state-of-the-art flow policies incur non-zero collision rates ($C_R \approx 1.5 - 3.2\%$). Furthermore, deep models cannot be formally audited or certified against safety regulations (e.g., ISO 13482 for mobile robotics, Industry 5.0 human-robot safety standards [Hémono et al., 2026](file:///home/nguyen/projects/flow_matching/survey/13_hemono2026_automatic_bt_generation_hrc.md)).
+Pure machine learning policies—including continuous flow models ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)), diffusion models, and neural RL—provide only statistical guarantees. In dense pedestrian crowds, even state-of-the-art flow policies incur non-zero collision rates ($C_R \approx 1.5 - 3.2\%$). Furthermore, deep models cannot be formally audited or certified against safety regulations (e.g., ISO 13482 for mobile robotics, Industry 5.0 human-robot safety standards [Hémono et al., 2026](../13_hemono2026_automatic_bt_generation_hrc.md)).
 
 Subsystem 7 provides a **dual-layer safety guarantee**:
 1. **Online Runtime Shielding:** A high-speed ($> 500\,\text{Hz}$) Control Barrier Function Quadratic Program (CBF-QP) that filters nominal Behavior Tree actions to guarantee forward invariance of the collision-free set.
@@ -54,7 +54,7 @@ Subsystem 7 provides a **dual-layer safety guarantee**:
 
 ### 1.1 Online Runtime Safety: Control Barrier Functions (CBF-QP)
 
-Following the control-theoretic foundation of [Özkahraman & Ögren (2020)](file:///home/nguyen/projects/flow_matching/survey/08_ozkahraman2020_cbf_reinforcement_learning_bt.md) and Ames et al. (2019), we define the continuous pedestrian dynamics as an affine control system:
+Following the control-theoretic foundation of [Özkahraman & Ögren (2020)](../11_ozkahraman2020_cbf_bt.md) and Ames et al. (2019), we define the continuous pedestrian dynamics as an affine control system:
 $$\dot{\mathbf{s}}_i = \mathbf{f}(\mathbf{s}_i) + \mathbf{g}(\mathbf{s}_i) \mathbf{u}_i, \quad \mathbf{s}_i = [\mathbf{p}_i^\top, \mathbf{v}_i^\top]^\top \in \mathbb{R}^4$$
 where $\mathbf{p}_i \in \mathbb{R}^2$ is position, $\mathbf{v}_i \in \mathbb{R}^2$ is velocity, and $\mathbf{u}_i \in \mathbb{R}^2$ is commanded acceleration.
 
@@ -92,7 +92,7 @@ Because the objective is strictly convex quadratic and constraints are linear in
 
 While CBF-QP provides real-time collision filtering, it does not prevent higher-level logical failures such as **deadlocks**, **infinite livelock loops**, or **goal unreachability**. 
 
-Following [Serbinowska et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/09_serbinowska2025_behavior_tree_synthesizer.md), the synthesized Behavior Tree is compiled into a formal finite-state model using **BehaVerify**:
+Following [Serbinowska et al. (2025)](../12_serbinowska2025_nsbt_verification.md), the synthesized Behavior Tree is compiled into a formal finite-state model using **BehaVerify**:
 
 1. **BehaVerify DSL Translation:**
    Each node type in the Behavior Tree (Guarded Fallbacks, Sequences, Condition checks, and DMP execution states) maps to a transition system in the BehaVerify domain-specific language:
@@ -122,11 +122,11 @@ Following [Serbinowska et al. (2025)](file:///home/nguyen/projects/flow_matching
 
 | Approach | Collision Avoidance Mechanism | Collision Rate $C_R$ | Latency | Formal Verification |
 | :--- | :--- | :--- | :--- | :--- |
-| **CrowdES Locomotion Simulator** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural cross-attention + 4s chunking | **$2.5 - 3.2\%$** | $20 - 40\,\text{ms}$ | Impossible (black-box neural ODE) |
-| **Unconstrained Flow Matching** ([Ramachandran & Sra, 2026](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md)) | Vector field integration | Variable ($> 1\%$) | $15 - 50\,\text{ms}$ | None |
-| **RL-Trained BTs** ([Pereira & Engel, 2015](file:///home/nguyen/projects/flow_matching/survey/07_pereira2015_options_learning_nodes_bt.md)) | Soft penalty rewards in MDP | $1.0 - 5.0\%$ | $< 1\,\text{ms}$ | None |
-| **CBF-Augmented BTs** ([Özkahraman & Ögren, 2020](file:///home/nguyen/projects/flow_matching/survey/08_ozkahraman2020_cbf_reinforcement_learning_bt.md)) | Online CBF-QP safety filter | **$0.0\%$** (provably safe) | $< 0.1\,\text{ms}$ | Control-theoretic forward invariance |
-| **BehaVerify Synthesis** ([Serbinowska et al., 2025](file:///home/nguyen/projects/flow_matching/survey/09_serbinowska2025_behavior_tree_synthesizer.md)) | SMT symbolic model checking (nuXmv) | Offline proven | Offline (compilation) | Full LTL/CTL specification proofs |
+| **CrowdES Locomotion Simulator** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural cross-attention + 4s chunking | **$2.5 - 3.2\%$** | $20 - 40\,\text{ms}$ | Impossible (black-box neural ODE) |
+| **Unconstrained Flow Matching** ([Ramachandran & Sra, 2026](../01_ramachandran2026_trees_to_flows.md)) | Vector field integration | Variable ($> 1\%$) | $15 - 50\,\text{ms}$ | None |
+| **RL-Trained BTs** ([Pereira & Engel, 2015](../07_pereira2015_options_learning_nodes_bt.md)) | Soft penalty rewards in MDP | $1.0 - 5.0\%$ | $< 1\,\text{ms}$ | None |
+| **CBF-Augmented BTs** ([Özkahraman & Ögren, 2020](../11_ozkahraman2020_cbf_bt.md)) | Online CBF-QP safety filter | **$0.0\%$** (provably safe) | $< 0.1\,\text{ms}$ | Control-theoretic forward invariance |
+| **BehaVerify Synthesis** ([Serbinowska et al., 2025](../12_serbinowska2025_nsbt_verification.md)) | SMT symbolic model checking (nuXmv) | Offline proven | Offline (compilation) | Full LTL/CTL specification proofs |
 | **Subsystem 7: Dual-Layer Safety (Our Design)** | **Online CBF-QP + Offline BehaVerify / nuXmv** | **$\mathbf{0.0\%}$** | **$< 0.05\,\text{ms}$** | **Full control-theoretic invariance + symbolic LTL model checking** |
 
 ---

@@ -47,28 +47,28 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 
 ### Pillar 1: Differentiable & Gradient-Optimized BTs
 *Focus: Continuous relaxations of BT control nodes (Sequence, Fallback, Parallel), end-to-end backpropagation via Gumbel-Softmax, soft logic, and neural decision forests.*
-- [01_ramachandran2026_trees_to_flows.md](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md): Mathematical foundations of tree-flow duality, continuous-time SDE limits, and Global Trajectory Score Matching.
-- [02_huang2025_differentiable_bt_synthesis.md](file:///home/nguyen/projects/flow_matching/survey/02_huang2025_differentiable_bt_synthesis.md): Continuous relaxation of formal grammar derivation graphs and tri-state execution status vectors via smooth t-norms and Gumbel-Softmax routing.
-- [03_kontschieder2015_deep_neural_decision_forests.md](file:///home/nguyen/projects/flow_matching/survey/03_kontschieder2015_deep_neural_decision_forests.md): Foundational antecedent unifying deep CNN feature representations with stochastic tree routing functions.
-- [04_frosst2017_soft_decision_trees.md](file:///home/nguyen/projects/flow_matching/survey/04_frosst2017_soft_decision_trees.md): Distilling continuous neural networks into soft, differentiable hierarchical decision trees.
+- [01_ramachandran2026_trees_to_flows.md](./01_ramachandran2026_trees_to_flows.md): Mathematical foundations of tree-flow duality, continuous-time SDE limits, and Global Trajectory Score Matching.
+- [02_huang2025_differentiable_bt_synthesis.md](./02_huang2025_differentiable_bt_synthesis.md): Continuous relaxation of formal grammar derivation graphs and tri-state execution status vectors via smooth t-norms and Gumbel-Softmax routing.
+- [03_kontschieder2015_deep_neural_decision_forests.md](./03_kontschieder2015_deep_neural_decision_forests.md): Foundational antecedent unifying deep CNN feature representations with stochastic tree routing functions.
+- [04_frosst2017_soft_decision_trees.md](./04_frosst2017_soft_decision_trees.md): Distilling continuous neural networks into soft, differentiable hierarchical decision trees.
 
 ### Pillar 2: Neuro-Symbolic BT Architectures
 *Focus: Symbolic tree topologies with neural network leaf nodes (action policies and perceptual condition evaluators), HRL Options framework mapped to BT semantics, and guarded execution.*
-- [05_sprague2022_neural_controllers_bt.md](file:///home/nguyen/projects/flow_matching/survey/05_sprague2022_neural_controllers_bt.md): Fallback composition embedding black-box continuous deep RL controllers under formal region-of-attraction invariant sets.
-- [06_chatzilygeroudis2021_bt_movement_skills.md](file:///home/nguyen/projects/flow_matching/survey/06_chatzilygeroudis2021_bt_movement_skills.md): Parameterized Behavior Trees wrapping Dynamical Movement Primitives (DMPs) optimized via constrained policy search for physical robot assembly.
-- [07_pereira2015_options_learning_nodes_bt.md](file:///home/nguyen/projects/flow_matching/survey/07_pereira2015_options_learning_nodes_bt.md): Formal mapping establishing equivalence between Behavior Tree subtrees and SMDP Options, introducing adaptive Learning Nodes with internal Q-learning.
+- [05_sprague2022_neural_controllers_bt.md](./05_sprague2022_neural_controllers_bt.md): Fallback composition embedding black-box continuous deep RL controllers under formal region-of-attraction invariant sets.
+- [06_chatzilygeroudis2021_bt_movement_skills.md](./06_chatzilygeroudis2021_bt_movement_skills.md): Parameterized Behavior Trees wrapping Dynamical Movement Primitives (DMPs) optimized via constrained policy search for physical robot assembly.
+- [07_pereira2015_options_learning_nodes_bt.md](./07_pereira2015_options_learning_nodes_bt.md): Formal mapping establishing equivalence between Behavior Tree subtrees and SMDP Options, introducing adaptive Learning Nodes with internal Q-learning.
 
 ### Pillar 3: Evolutionary & Hybrid Structure Learning
 *Focus: Genetic Programming (GP), Monte Carlo DAG Search (MCDAGS), and Quality-Diversity (MAP-Elites) searching for BT topology while optimizing execution primitives.*
-- [08_iovino2021_gp_bt_unpredictable.md](file:///home/nguyen/projects/flow_matching/survey/08_iovino2021_gp_bt_unpredictable.md): Genetic Programming evolving reactive Behavior Trees under stochastic environmental perturbations and parsimony pressure.
-- [09_scheide2021_mcdags_grammar_bt.md](file:///home/nguyen/projects/flow_matching/survey/09_scheide2021_mcdags_grammar_bt.md): Synthesizing Behavior Trees through Monte Carlo Directed Acyclic Graph Search over formal grammars with simulated annealing.
-- [10_anne2023_game_map_elites_bt.md](file:///home/nguyen/projects/flow_matching/survey/10_anne2023_game_map_elites_bt.md): Generational Adversarial MAP-Elites co-evolving diverse competitive Behavior Trees using deep vision embedding models.
-- [13_hemono2026_automatic_bt_generation_hrc.md](file:///home/nguyen/projects/flow_matching/survey/13_hemono2026_automatic_bt_generation_hrc.md): Systematic review of automatic BT generation across classical planning, evolutionary metaheuristics, and LLMs for collaborative task planning in Industry 5.0.
+- [08_iovino2021_gp_bt_unpredictable.md](./08_iovino2021_gp_bt_unpredictable.md): Genetic Programming evolving reactive Behavior Trees under stochastic environmental perturbations and parsimony pressure.
+- [09_scheide2021_mcdags_grammar_bt.md](./09_scheide2021_mcdags_grammar_bt.md): Synthesizing Behavior Trees through Monte Carlo Directed Acyclic Graph Search over formal grammars with simulated annealing.
+- [10_anne2023_game_map_elites_bt.md](./10_anne2023_game_map_elites_bt.md): Generational Adversarial MAP-Elites co-evolving diverse competitive Behavior Trees using deep vision embedding models.
+- [13_hemono2026_automatic_bt_generation_hrc.md](./13_hemono2026_automatic_bt_generation_hrc.md): Systematic review of automatic BT generation across classical planning, evolutionary metaheuristics, and LLMs for collaborative task planning in Industry 5.0.
 
 ### Pillar 4: Verifiable & Safe Neural BTs
 *Focus: Control Barrier Functions (CBFs), Quadratic Programming safety filters, and formal verification of neural Behavior Trees using symbolic model checkers.*
-- [11_ozkahraman2020_cbf_bt.md](file:///home/nguyen/projects/flow_matching/survey/11_ozkahraman2020_cbf_bt.md): Control Barrier Function Behavior Trees (CBF-BT) resolving conflicting multi-agent mission objectives while guaranteeing forward invariance.
-- [12_serbinowska2025_nsbt_verification.md](file:///home/nguyen/projects/flow_matching/survey/12_serbinowska2025_nsbt_verification.md): BehaVerify framework for formal verification of Neuro-Symbolic Behavior Trees with deep neural network leaves using nuXmv and SMT solvers.
+- [11_ozkahraman2020_cbf_bt.md](./11_ozkahraman2020_cbf_bt.md): Control Barrier Function Behavior Trees (CBF-BT) resolving conflicting multi-agent mission objectives while guaranteeing forward invariance.
+- [12_serbinowska2025_nsbt_verification.md](./12_serbinowska2025_nsbt_verification.md): BehaVerify framework for formal verification of Neuro-Symbolic Behavior Trees with deep neural network leaves using nuXmv and SMT solvers.
 
 ---
 
@@ -107,24 +107,24 @@ Third, **bidirectional neural-symbolic distillation under non-stationary reactiv
 
 ## 5. Directory Contents & Links to Individual Paper Dossiers
 
-- [01_ramachandran2026_trees_to_flows.md](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md) — *Trees to Flows and Back: Unifying Decision Trees and Diffusion Models*
-- [02_huang2025_differentiable_bt_synthesis.md](file:///home/nguyen/projects/flow_matching/survey/02_huang2025_differentiable_bt_synthesis.md) — *Differentiable Synthesis of Behavior Tree Architectures and Execution Nodes*
-- [03_kontschieder2015_deep_neural_decision_forests.md](file:///home/nguyen/projects/flow_matching/survey/03_kontschieder2015_deep_neural_decision_forests.md) — *Deep Neural Decision Forests*
-- [04_frosst2017_soft_decision_trees.md](file:///home/nguyen/projects/flow_matching/survey/04_frosst2017_soft_decision_trees.md) — *Distilling a Neural Network Into a Soft Decision Tree*
-- [05_sprague2022_neural_controllers_bt.md](file:///home/nguyen/projects/flow_matching/survey/05_sprague2022_neural_controllers_bt.md) — *Adding Neural Network Controllers to Behavior Trees without Destroying Performance Guarantees*
-- [06_chatzilygeroudis2021_bt_movement_skills.md](file:///home/nguyen/projects/flow_matching/survey/06_chatzilygeroudis2021_bt_movement_skills.md) — *Learning of Parameters in Behavior Trees for Movement Skills*
-- [07_pereira2015_options_learning_nodes_bt.md](file:///home/nguyen/projects/flow_matching/survey/07_pereira2015_options_learning_nodes_bt.md) — *A Framework for Constrained and Adaptive Behavior-Based Agents*
-- [08_iovino2021_gp_bt_unpredictable.md](file:///home/nguyen/projects/flow_matching/survey/08_iovino2021_gp_bt_unpredictable.md) — *Learning Behavior Trees with Genetic Programming in Unpredictable Environments*
-- [09_scheide2021_mcdags_grammar_bt.md](file:///home/nguyen/projects/flow_matching/survey/09_scheide2021_mcdags_grammar_bt.md) — *Behavior Tree Learning for Robotic Task Planning through Monte Carlo DAG Search over a Formal Grammar*
-- [10_anne2023_game_map_elites_bt.md](file:///home/nguyen/projects/flow_matching/survey/10_anne2023_game_map_elites_bt.md) — *GAME: Generational Adversarial MAP-Elites for Co-evolving Behavior Trees*
-- [11_ozkahraman2020_cbf_bt.md](file:///home/nguyen/projects/flow_matching/survey/11_ozkahraman2020_cbf_bt.md) — *Combining Control Barrier Functions and Behavior Trees for Multi-Agent Underwater Coverage Missions*
-- [12_serbinowska2025_nsbt_verification.md](file:///home/nguyen/projects/flow_matching/survey/12_serbinowska2025_nsbt_verification.md) — *Neuro-Symbolic Behavior Trees (NSBTs) and Their Verification*
-- [13_hemono2026_automatic_bt_generation_hrc.md](file:///home/nguyen/projects/flow_matching/survey/13_hemono2026_automatic_bt_generation_hrc.md) — *Automatic Behavior Tree Generation for Enhanced Human–Robot Collaborative Task Planning in Industry 5.0: A Systematic Review*
-- [14_bae2025_continuous_crowd_locomotion_crowdes.md](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md) — *Continuous Locomotive Crowd Behavior Generation*
+- [01_ramachandran2026_trees_to_flows.md](./01_ramachandran2026_trees_to_flows.md) — *Trees to Flows and Back: Unifying Decision Trees and Diffusion Models*
+- [02_huang2025_differentiable_bt_synthesis.md](./02_huang2025_differentiable_bt_synthesis.md) — *Differentiable Synthesis of Behavior Tree Architectures and Execution Nodes*
+- [03_kontschieder2015_deep_neural_decision_forests.md](./03_kontschieder2015_deep_neural_decision_forests.md) — *Deep Neural Decision Forests*
+- [04_frosst2017_soft_decision_trees.md](./04_frosst2017_soft_decision_trees.md) — *Distilling a Neural Network Into a Soft Decision Tree*
+- [05_sprague2022_neural_controllers_bt.md](./05_sprague2022_neural_controllers_bt.md) — *Adding Neural Network Controllers to Behavior Trees without Destroying Performance Guarantees*
+- [06_chatzilygeroudis2021_bt_movement_skills.md](./06_chatzilygeroudis2021_bt_movement_skills.md) — *Learning of Parameters in Behavior Trees for Movement Skills*
+- [07_pereira2015_options_learning_nodes_bt.md](./07_pereira2015_options_learning_nodes_bt.md) — *A Framework for Constrained and Adaptive Behavior-Based Agents*
+- [08_iovino2021_gp_bt_unpredictable.md](./08_iovino2021_gp_bt_unpredictable.md) — *Learning Behavior Trees with Genetic Programming in Unpredictable Environments*
+- [09_scheide2021_mcdags_grammar_bt.md](./09_scheide2021_mcdags_grammar_bt.md) — *Behavior Tree Learning for Robotic Task Planning through Monte Carlo DAG Search over a Formal Grammar*
+- [10_anne2023_game_map_elites_bt.md](./10_anne2023_game_map_elites_bt.md) — *GAME: Generational Adversarial MAP-Elites for Co-evolving Behavior Trees*
+- [11_ozkahraman2020_cbf_bt.md](./11_ozkahraman2020_cbf_bt.md) — *Combining Control Barrier Functions and Behavior Trees for Multi-Agent Underwater Coverage Missions*
+- [12_serbinowska2025_nsbt_verification.md](./12_serbinowska2025_nsbt_verification.md) — *Neuro-Symbolic Behavior Trees (NSBTs) and Their Verification*
+- [13_hemono2026_automatic_bt_generation_hrc.md](./13_hemono2026_automatic_bt_generation_hrc.md) — *Automatic Behavior Tree Generation for Enhanced Human–Robot Collaborative Task Planning in Industry 5.0: A Systematic Review*
+- [14_bae2025_continuous_crowd_locomotion_crowdes.md](./14_bae2025_continuous_crowd_locomotion_crowdes.md) — *Continuous Locomotive Crowd Behavior Generation*
 
 ### Technical Reports & Deep Dives
-- [design/README.md](file:///home/nguyen/projects/flow_matching/survey/design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
-- [TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md](file:///home/nguyen/projects/flow_matching/survey/TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md) — *Deep Dive: TreeFlow and the Distillation of Continuous Flows into Learnable Behavior Trees*
-- [SURVEY_SYNTHESIS_AND_COMPENDIUM.md](file:///home/nguyen/projects/flow_matching/survey/SURVEY_SYNTHESIS_AND_COMPENDIUM.md) — *Comprehensive Monolithic Compendium of All Survey Dossiers & Matrices*
+- [design/README.md](./design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
+- [TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md](./TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md) — *Deep Dive: TreeFlow and the Distillation of Continuous Flows into Learnable Behavior Trees*
+- [SURVEY_SYNTHESIS_AND_COMPENDIUM.md](./SURVEY_SYNTHESIS_AND_COMPENDIUM.md) — *Comprehensive Monolithic Compendium of All Survey Dossiers & Matrices*
 
 

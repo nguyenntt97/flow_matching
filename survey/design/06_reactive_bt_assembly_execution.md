@@ -7,7 +7,7 @@
 
 ## 1. Mathematical Mechanics & Functional Role
 
-In baseline continuous flow matching policies (such as [Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)), locomotion is generated in fixed chunks ($T_f = 20$ frames / $4\,\text{s}$ at $5\,\text{fps}$). Mode selection is governed by a discrete Markov transition network $\mu_\varphi(b_f \mid b_h, \dots)$ evaluated **only once every 4 seconds**. When sudden dynamic obstacles, oncoming pedestrians, or velocity changes occur within a chunk, the policy is unable to switch behavioral modes, leading to collisions ($C_R > 2.5\%$) or jerky corrective nudges.
+In baseline continuous flow matching policies (such as [Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)), locomotion is generated in fixed chunks ($T_f = 20$ frames / $4\,\text{s}$ at $5\,\text{fps}$). Mode selection is governed by a discrete Markov transition network $\mu_\varphi(b_f \mid b_h, \dots)$ evaluated **only once every 4 seconds**. When sudden dynamic obstacles, oncoming pedestrians, or velocity changes occur within a chunk, the policy is unable to switch behavioral modes, leading to collisions ($C_R > 2.5\%$) or jerky corrective nudges.
 
 Subsystem 6 bridges the bifurcation tree structure (from Subsystems 3 and 4) and the fast DMP action leaves (from Subsystem 5) into a **Reactive Behavior Tree (RBT)** executing at **$100\,\text{Hz}$** ($10\,\text{ms}$ tick interval).
 
@@ -54,9 +54,9 @@ $$\mathcal{S} = \{\text{SUCCESS}, \text{FAILURE}, \text{RUNNING}\}$$
 
 ### 1.2 Overcoming the 4-Second Markov Bottleneck via $100\,\text{Hz}$ Preemption
 
-The key reactivity difference between baseline continuous flow models ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) and our Flow2BT framework is summarized below:
+The key reactivity difference between baseline continuous flow models ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) and our Flow2BT framework is summarized below:
 
-| Dimension | CrowdES Locomotion Simulator ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flow2BT Reactive Subsystem 6 |
+| Dimension | CrowdES Locomotion Simulator ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flow2BT Reactive Subsystem 6 |
 | :--- | :--- | :--- |
 | **Control Cycle Period** | $T_{\text{chunk}} = 4.0\,\text{s}$ ($5\,\text{fps}$, 20 frames) | $\Delta t = 0.01\,\text{s}$ ($100\,\text{Hz}$) |
 | **Mode Switching Latency** | Up to **$4000\,\text{ms}$** (locked in chunk until boundary) | **$\le 10\,\text{ms}$** (instantaneous preemption) |
@@ -66,7 +66,7 @@ The key reactivity difference between baseline continuous flow models ([Bae et a
 
 ### 1.3 Guarded Fallback Invariants & Regions of Attraction (ROA)
 
-Following the formal stability framework of [Sprague & Ögren (2022)](file:///home/nguyen/projects/flow_matching/survey/05_sprague2022_neural_controllers_bt.md) and [Ögren (2012)](file:///home/nguyen/projects/flow_matching/survey/02_iovino2022_survey_learning_bts.md), we structure fallback hierarchies using **Guarded Fallbacks**:
+Following the formal stability framework of [Sprague & Ögren (2022)](../05_sprague2022_neural_controllers_bt.md) and [Ögren (2012)](../08_iovino2021_gp_bt_unpredictable.md), we structure fallback hierarchies using **Guarded Fallbacks**:
 
 $$\mathcal{T}_{\text{guarded}} = \text{Fallback}\Big(\text{Sequence}(C_1, A_1), \, \text{Sequence}(C_2, A_2), \, \dots, \, A_{\text{default}}\Big)$$
 
@@ -76,7 +76,7 @@ Condition $C_i$ acts as a guard verifying $\mathbf{x} \in \mathcal{D}_i$. If sta
 
 ### 1.4 Differentiable Soft-Relaxation for End-to-End Tuning
 
-To enable continuous end-to-end refinement of condition boundaries and DMP parameters, we incorporate the soft-relaxation framework of [Huang et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/04_huang2025_differentiable_behavior_trees.md).
+To enable continuous end-to-end refinement of condition boundaries and DMP parameters, we incorporate the soft-relaxation framework of [Huang et al. (2025)](../02_huang2025_differentiable_bt_synthesis.md).
 
 Each node $k$ outputs a tri-state probability vector:
 $$\mathbf{z}_k = [p_{\text{succ}}, p_{\text{fail}}, p_{\text{run}}]^\top \in \Delta^2, \quad \sum_{s \in \mathcal{S}} p_s = 1$$
@@ -95,10 +95,10 @@ This formulation allows gradient $\nabla_{\mathbf{w}} \mathcal{L}_{\text{task}}$
 
 | Architecture / Framework | Tree Topology Construction | Execution Frequency | Reaction Latency | Theoretical Guarantees |
 | :--- | :--- | :--- | :--- | :--- |
-| **CrowdES Locomotion Simulator** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Fixed Markov Transition Network ($B=8$) | $0.25\,\text{Hz}$ (every $4\,\text{s}$) | $\le 4000\,\text{ms}$ | None (pure statistical sampling) |
-| **TreeFlow Dendrogram** ([Ramachandran & Sra, 2026](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md)) | Static spatial bifurcation partitioning | Non-executable (static tree) | N/A | Duality with continuous flows, but lacks runtime tick |
-| **Guarded Neural BTs** ([Sprague & Ögren, 2022](file:///home/nguyen/projects/flow_matching/survey/05_sprague2022_neural_controllers_bt.md)) | Guarded Fallback with ROA certification | $100\,\text{Hz}$ | $\le 10\,\text{ms}$ | ROA Lyapunov stability proofs |
-| **Diff-BT** ([Huang et al., 2025](file:///home/nguyen/projects/flow_matching/survey/04_huang2025_differentiable_behavior_trees.md)) | Differentiable soft-relaxed operators | Continuous / Differentiable | Instantaneous | End-to-end gradient flow; no hard switching |
+| **CrowdES Locomotion Simulator** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Fixed Markov Transition Network ($B=8$) | $0.25\,\text{Hz}$ (every $4\,\text{s}$) | $\le 4000\,\text{ms}$ | None (pure statistical sampling) |
+| **TreeFlow Dendrogram** ([Ramachandran & Sra, 2026](../01_ramachandran2026_trees_to_flows.md)) | Static spatial bifurcation partitioning | Non-executable (static tree) | N/A | Duality with continuous flows, but lacks runtime tick |
+| **Guarded Neural BTs** ([Sprague & Ögren, 2022](../05_sprague2022_neural_controllers_bt.md)) | Guarded Fallback with ROA certification | $100\,\text{Hz}$ | $\le 10\,\text{ms}$ | ROA Lyapunov stability proofs |
+| **Diff-BT** ([Huang et al., 2025](../02_huang2025_differentiable_bt_synthesis.md)) | Differentiable soft-relaxed operators | Continuous / Differentiable | Instantaneous | End-to-end gradient flow; no hard switching |
 | **Subsystem 6: Reactive Flow2BT (Our Design)** | **Bifurcation induction + Guarded Fallbacks + Diff-BT** | **$100\,\text{Hz}$ CPU runtime** | **$< 10\,\text{ms}$** | **Asymptotic stability via ROA + $100\,\text{Hz}$ preemption** |
 
 ---

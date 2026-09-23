@@ -1,7 +1,7 @@
 # Subsystem 8: End-to-End System Synthesis & Continuous Locomotion Walkthrough
 
 **File Location:** `/home/nguyen/projects/flow_matching/survey/design/08_system_synthesis_pedestrian_locomotion.md`  
-**Subsystem Role:** Integrating Subsystems 1 through 7 into a complete end-to-end execution pipeline on the continuous pedestrian crowd benchmark ([Bae et al., 2025, CrowdES](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)), providing an empirical and formal execution trace.
+**Subsystem Role:** Integrating Subsystems 1 through 7 into a complete end-to-end execution pipeline on the continuous pedestrian crowd benchmark ([Bae et al., 2025, CrowdES](../14_bae2025_continuous_crowd_locomotion_crowdes.md)), providing an empirical and formal execution trace.
 
 ---
 
@@ -52,7 +52,7 @@ The Flow2BT framework operates in two distinct phases: **Offline Discovery & Com
 
 ## 2. Concrete Walkthrough Scenario: Counter-Flow Corridor Crossing
 
-To demonstrate the concrete mechanics across all subsystems, we trace a benchmark challenge from [Bae et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md): **Two pedestrians ($A$ and $B$) walking toward each other in a $2.5\,\text{m}$ corridor with an obstacle on one side.**
+To demonstrate the concrete mechanics across all subsystems, we trace a benchmark challenge from [Bae et al. (2025)](../14_bae2025_continuous_crowd_locomotion_crowdes.md): **Two pedestrians ($A$ and $B$) walking toward each other in a $2.5\,\text{m}$ corridor with an obstacle on one side.**
 
 ```
 Corridor Boundary (Wall)
@@ -130,9 +130,9 @@ Corridor Boundary (Wall)
 
 ## 3. Quantitative Comparison: Flow2BT vs. CrowdES Baseline
 
-The table below contrasts the Flow2BT architecture against the continuous crowd locomotion simulator ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)):
+The table below contrasts the Flow2BT architecture against the continuous crowd locomotion simulator ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)):
 
-| Metric / Capability | CrowdES Locomotion Simulator ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flow2BT Framework (Subsystems 1–7) | Gain / Advantage |
+| Metric / Capability | CrowdES Locomotion Simulator ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flow2BT Framework (Subsystems 1–7) | Gain / Advantage |
 | :--- | :--- | :--- | :--- |
 | **Collision Rate ($C_R$)** | $2.5 - 3.2\%$ (non-zero collisions) | **$0.0\%$ (Strict Zero Collision)** | **$100\%$ collision elimination** via CBF-QP |
 | **Control / Decision Rate** | $0.25\,\text{Hz}$ (mode switches every $4\,\text{s}$) | **$100.0\,\text{Hz}$** | **$400\times$ faster reactivity** |

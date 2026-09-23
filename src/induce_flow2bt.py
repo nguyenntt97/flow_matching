@@ -142,7 +142,10 @@ def load_teacher(source: str, checkpoint: str, device):
     if source == "flow":
         from src.systems.simulator_system import SimulatorLitModule
 
-        system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device)
+        try:
+            system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device, weights_only=False)
+        except TypeError:
+            system = SimulatorLitModule.load_from_checkpoint(checkpoint, map_location=device)
         return system.eval().to(device).model
     if source == "parity":
         from src.evaluate_agent import load_model

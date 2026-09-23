@@ -46,7 +46,7 @@ where $y_i = +1$ for trajectories taking the left branch and $y_i = -1$ for traj
    $$C_k(\mathbf{s}) = \begin{cases} \text{SUCCESS} & \text{if } \mathbf{w}_k^\top \phi(\mathbf{s}) + b_k \ge 0 \\ \text{FAILURE} & \text{otherwise} \end{cases}$$
    *Computational complexity:* A single dot product of dimension $d \approx 10$. Evaluation takes less than $1\,\mu\text{s}$, allowing BT ticks at $> 1000\,\text{Hz}$.
 2. **Soft Differentiable Routing (Training / Fine-Tuning):**
-   Following [Frosst & Hinton (2017)](file:///home/nguyen/projects/flow_matching/survey/04_frosst2017_soft_decision_trees.md) and [Huang et al. (2025)](file:///home/nguyen/projects/flow_matching/survey/02_huang2025_differentiable_bt_synthesis.md):
+   Following [Frosst & Hinton (2017)](../04_frosst2017_soft_decision_trees.md) and [Huang et al. (2025)](../02_huang2025_differentiable_bt_synthesis.md):
    $$p_k(\mathbf{s}) = \sigma\left(\beta (\mathbf{w}_k^\top \phi(\mathbf{s}) + b_k)\right) \in [0, 1]$$
    where $\beta$ is an inverse temperature parameter annealed toward infinity ($\beta \to \infty$) during hardening.
 
@@ -56,10 +56,10 @@ where $y_i = +1$ for trajectories taking the left branch and $y_i = -1$ for traj
 
 | Approach | Routing Mechanism | Computational Cost | Failure Handling | Why Chosen / Adapted in Flow2BT |
 | :--- | :--- | :--- | :--- | :--- |
-| **Markov Transition Matrix** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural network $\mu_\phi$ sampling $b_f \sim P(b_f \mid \cdot)$ every $4\,\text{s}$ | Moderate ($\approx 10\,\text{ms}$) | **Stochastic**: may fail to trigger evasion when an obstacle appears | Rejected for online control: 4-second delay causes crashes |
-| **Deep Neural Condition Leaves** ([Serbinowska et al., 2025](file:///home/nguyen/projects/flow_matching/survey/12_serbinowska2025_nsbt_verification.md)) | Deep MLP evaluating raw camera/occupancy grids | High ($\approx 15 - 30\,\text{ms}$) | Requires polyhedral over-approximations for verification | Supported for high-dimensional vision, but linear hyperplanes preferred for locomotion |
-| **Soft Decision Tree Gating** ([Frosst & Hinton, 2017](file:///home/nguyen/projects/flow_matching/survey/04_frosst2017_soft_decision_trees.md)) | Logistic sigmoid gates $\sigma(\mathbf{w}^\top \mathbf{x} + b)$ | Ultra-fast ($< 1\,\mu\text{s}$) | Soft co-activation during training | **Adapted as Subsystem 4**: Linear hyperplanes provide mathematical interpretability and instant evaluation |
-| **Gumbel-Softmax Grammar Logits** ([Huang et al., 2025](file:///home/nguyen/projects/flow_matching/survey/02_huang2025_differentiable_bt_synthesis.md)) | Categorical distribution over grammar choices | Low | Suffers from discretization gap upon hardening | **Adapted for Fine-Tuning**: Used only for local boundary calibration |
+| **Markov Transition Matrix** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Neural network $\mu_\phi$ sampling $b_f \sim P(b_f \mid \cdot)$ every $4\,\text{s}$ | Moderate ($\approx 10\,\text{ms}$) | **Stochastic**: may fail to trigger evasion when an obstacle appears | Rejected for online control: 4-second delay causes crashes |
+| **Deep Neural Condition Leaves** ([Serbinowska et al., 2025](../12_serbinowska2025_nsbt_verification.md)) | Deep MLP evaluating raw camera/occupancy grids | High ($\approx 15 - 30\,\text{ms}$) | Requires polyhedral over-approximations for verification | Supported for high-dimensional vision, but linear hyperplanes preferred for locomotion |
+| **Soft Decision Tree Gating** ([Frosst & Hinton, 2017](../04_frosst2017_soft_decision_trees.md)) | Logistic sigmoid gates $\sigma(\mathbf{w}^\top \mathbf{x} + b)$ | Ultra-fast ($< 1\,\mu\text{s}$) | Soft co-activation during training | **Adapted as Subsystem 4**: Linear hyperplanes provide mathematical interpretability and instant evaluation |
+| **Gumbel-Softmax Grammar Logits** ([Huang et al., 2025](../02_huang2025_differentiable_bt_synthesis.md)) | Categorical distribution over grammar choices | Low | Suffers from discretization gap upon hardening | **Adapted for Fine-Tuning**: Used only for local boundary calibration |
 
 ---
 

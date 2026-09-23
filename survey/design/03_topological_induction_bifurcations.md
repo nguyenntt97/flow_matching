@@ -9,7 +9,7 @@
 
 A central bottleneck in Behavior Tree synthesis has historically been **topology discovery**: how to structure the hierarchy of Sequence and Fallback control nodes without testing millions of random candidate trees.
 
-Subsystem 3 leverages the **Tree-Flow Duality** established by [Ramachandran & Sra (2026)](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md): running continuous flow trajectories backward in time mathematically reverses the entropy production of decision-making, merging localized multimodal streamlines into hierarchical bifurcation trees (dendrograms).
+Subsystem 3 leverages the **Tree-Flow Duality** established by [Ramachandran & Sra (2026)](../01_ramachandran2026_trees_to_flows.md): running continuous flow trajectories backward in time mathematically reverses the entropy production of decision-making, merging localized multimodal streamlines into hierarchical bifurcation trees (dendrograms).
 
 ```
 Continuous Trajectory Bundle Ξ = {ξ_i(t)}
@@ -51,10 +51,10 @@ Under the continuum limit of hierarchical partitions proved by Ramachandran & Sr
 
 | Approach | Topology Discovery Mechanism | Sample Complexity | Tree Quality | Why Chosen / Adapted in Flow2BT |
 | :--- | :--- | :--- | :--- | :--- |
-| **Genetic Programming (GP-BT)** ([Iovino et al., 2021](file:///home/nguyen/projects/flow_matching/survey/08_iovino2021_gp_bt_unpredictable.md)) | Random subtree crossover & mutation over syntax trees | Extremely high ($> 10^5$ rollouts) | Prone to structural bloat and redundant subtrees | Rejected: sample complexity is intractable for complex crowds |
-| **Monte Carlo DAG Search (MCDAGS)** ([Scheide et al., 2021](file:///home/nguyen/projects/flow_matching/survey/09_scheide2021_mcdags_grammar_bt.md)) | MCTS search over formal context-free grammar | High ($> 10^4$ simulation iterations) | Requires hand-crafted grammar rules | Rejected: rigid grammar definitions limit adaptation |
-| **K-Means on Trajectory Chunks** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flat K-means ($B=8$ clusters) on normalized vectors | Very fast ($< 1$ second) | Flat clusters; **no hierarchical tree structure** | **Adapted**: We retain their $B=8$ behavioral concept, but replace flat K-means with hierarchical agglomerative clustering |
-| **Flow-to-Tree Duality (Dendrogram Extraction)** ([Ramachandran & Sra, 2026](file:///home/nguyen/projects/flow_matching/survey/01_ramachandran2026_trees_to_flows.md)) | Reverse-time coarse-graining of flow trajectories | **Zero environment interactions** (uses offline rollouts) | Clean, non-redundant, mathematically grounded hierarchy | **Adopted as Subsystem 3**: Discovers the macro-BT skeleton directly from the continuous flow teacher |
+| **Genetic Programming (GP-BT)** ([Iovino et al., 2021](../08_iovino2021_gp_bt_unpredictable.md)) | Random subtree crossover & mutation over syntax trees | Extremely high ($> 10^5$ rollouts) | Prone to structural bloat and redundant subtrees | Rejected: sample complexity is intractable for complex crowds |
+| **Monte Carlo DAG Search (MCDAGS)** ([Scheide et al., 2021](../09_scheide2021_mcdags_grammar_bt.md)) | MCTS search over formal context-free grammar | High ($> 10^4$ simulation iterations) | Requires hand-crafted grammar rules | Rejected: rigid grammar definitions limit adaptation |
+| **K-Means on Trajectory Chunks** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Flat K-means ($B=8$ clusters) on normalized vectors | Very fast ($< 1$ second) | Flat clusters; **no hierarchical tree structure** | **Adapted**: We retain their $B=8$ behavioral concept, but replace flat K-means with hierarchical agglomerative clustering |
+| **Flow-to-Tree Duality (Dendrogram Extraction)** ([Ramachandran & Sra, 2026](../01_ramachandran2026_trees_to_flows.md)) | Reverse-time coarse-graining of flow trajectories | **Zero environment interactions** (uses offline rollouts) | Clean, non-redundant, mathematically grounded hierarchy | **Adopted as Subsystem 3**: Discovers the macro-BT skeleton directly from the continuous flow teacher |
 
 ---
 

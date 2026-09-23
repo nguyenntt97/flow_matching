@@ -29,7 +29,7 @@ Subsystem 1 provides the **global topological backbone** that seeds continuous f
 
 ### 1.1 Geometry & Traversability Formulation
 1. **Traversable Map Construction:**  
-   Given a top-down aerial or perspective scene $\mathcal{I}$, an environmental segmentation model (e.g. Grounded-SAM / SegFormer as in [Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) identifies non-traversable semantic classes $\mathcal{C}_{\text{obs}} = \{\text{buildings}, \text{structures}, \text{bushes}, \text{water}, \text{fences}\}$. The binary traversable space is:
+   Given a top-down aerial or perspective scene $\mathcal{I}$, an environmental segmentation model (e.g. Grounded-SAM / SegFormer as in [Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) identifies non-traversable semantic classes $\mathcal{C}_{\text{obs}} = \{\text{buildings}, \text{structures}, \text{bushes}, \text{water}, \text{fences}\}$. The binary traversable space is:
    $$\mathcal{M}_W(\mathbf{p}) = \begin{cases} 1 & \text{if } \text{Class}(\mathbf{p}) \notin \mathcal{C}_{\text{obs}} \\ 0 & \text{otherwise} \end{cases}, \quad \mathbf{p} \in \mathbb{R}^2$$
 
 2. **Navigation Mesh (NavMesh) Discretization:**  
@@ -53,7 +53,7 @@ Subsystem 1 provides the **global topological backbone** that seeds continuous f
 | :--- | :--- | :--- | :--- | :--- |
 | **Grid-Based A\* / Dijkstra** (Classical) | 2D Occupancy Grid ($0.1\,\text{m}$ cells) | Exact, easy to implement | High memory footprint; produces jerky, grid-aligned paths | Rejected for global planning; retained only for local laser costmaps |
 | **Pure End-to-End Neural Guidance** (Direct Diffusion / RL) | Monolithic CNN/Transformer mapping images $\to$ actions | Learns visual affordances directly | Gets trapped in non-convex U-shaped dead ends; lacks reachability proofs | Rejected: unsafe and computationally expensive |
-| **NavMesh Polyline Waypoints** ([Bae et al., 2025](file:///home/nguyen/projects/flow_matching/survey/14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Convex polygonal mesh + A* Funnel polyline | Handles arbitrary complex maps; computationally lightweight ($< 1\,\text{ms}$) | Static; does not account for dynamic crowds on its own | **Adopted as Subsystem 1**: Provides the nominal attractor goal $\mathbf{g} = \mathbf{c}_{t, \text{nav}}$ for the continuous flow leaves |
+| **NavMesh Polyline Waypoints** ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)) | Convex polygonal mesh + A* Funnel polyline | Handles arbitrary complex maps; computationally lightweight ($< 1\,\text{ms}$) | Static; does not account for dynamic crowds on its own | **Adopted as Subsystem 1**: Provides the nominal attractor goal $\mathbf{g} = \mathbf{c}_{t, \text{nav}}$ for the continuous flow leaves |
 | **Sampling-Based RRT\*** | Random tree expansion in $\mathbb{R}^2$ | Probabilistically complete | Non-deterministic, path variance across ticks | Rejected: non-repeatable attractor goals destabilize DMP fitting |
 
 ---
