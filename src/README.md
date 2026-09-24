@@ -6,8 +6,10 @@ submodule at `third_party/crowdes` rather than forking it.
 
 The goal here is **parity**: reproduce upstream's simulator numbers with code we
 own, so the later flow-matching work (`survey/design/`, Subsystem 2) has a
-trustworthy baseline and a clean place to plug in. The flow-matching head is
-*not* implemented yet; the seam it will use is `src/models/protocol.py`.
+trustworthy baseline and a clean place to plug in. The flow-matching head
+(`src/models/flow_teacher.py`) plugs in at that seam, `src/models/protocol.py`;
+its agent-level comparison against CrowdES is
+[below](#flow-teacher-vs-crowdes-agent-level-eth-test).
 
 ## Setup
 
@@ -58,6 +60,71 @@ python -m src.evaluate_agent data=eth ckpt=outputs/.../checkpoints/last.ckpt
 # Scene-level benchmark (needs the emitter checkpoints, see below).
 python -m src.evaluate_scene data=eth
 ```
+
+## Flow teacher vs CrowdES, agent level (eth test)
+
+The flow-matching teacher replaces only CrowdES's regression decoder with a
+conditional flow-matching velocity field (`AffineProbPath` + `CondOTScheduler`,
+midpoint ODE, 5 steps). The encoders, cross-attention and the B=8
+endpoint-cluster latent predictor are the same architecture. Here it is compared
+with the **released** CrowdES simulator (`checkpoints/eth/simulator`, release tag
+v1.0-model), with both run through `src/evaluate_agent.py` on the same code
+path.
+
+```bash
+# Train the teacher (64 epochs, batch 2048; checkpoint chosen on val/min_fde).
+python -m src.train experiment=flow_eth
+# Score both models. Sampling runs were repeated with seed=0,1,2.
+python -m src.evaluate_agent data=eth num_samples=20 ckpt=checkpoints/eth/simulator
+python -m src.evaluate_agent data=eth num_samples=20 \
+    ckpt=outputs/flow_eth/20260920-072219/checkpoints/epoch063-minfde0.0529.ckpt
+```
+
+Test split `seq_eth`, 29,275 agent windows (8 obs → 10 future frames at 5 fps,
+i.e. 2 s). Errors are in metres. Sampled rows show mean ± std over 3 seeds.
+
+| Metric | CrowdES (released) | Flow teacher | Δ |
+|---|---|---|---|
+| ADE, argmax latent (`sampling=False`) | 0.2896 | **0.2721** | −6.0% |
+| FDE, argmax latent | 0.5659 | **0.5321** | −6.0% |
+| ADE, one random sample (K=1) | 0.2988 ± 0.0007 | **0.2792 ± 0.0002** | −6.6% |
+| FDE, one random sample (K=1) | 0.5873 ± 0.0017 | **0.5477 ± 0.0001** | −6.7% |
+| minADE₂₀ | 0.2372 ± 0.0006 | **0.1562 ± 0.0003** | −34.1% |
+| minFDE₂₀ | 0.4550 ± 0.0013 | **0.2727 ± 0.0007** | −40.1% |
+| Parameters used at inference | 48.8 M (decoder 8.3 M) | 47.9 M (velocity field 7.4 M) | |
+| Decoder evaluations per sample | 1 | 10 (5 midpoint steps) | |
+
+How to read it:
+
+- **The flow teacher wins on every metric, and the minK gains are the largest.**
+  minK rewards a wider spread of samples, so a model could buy it by sampling
+  far apart. The K=1 rows rule that out as the whole story. A *single* random
+  draw from the flow teacher is also closer to the ground truth, so its samples
+  are better placed, not just more spread.
+- **With `sampling=False` the two models compute different things.** For CrowdES
+  it is a deterministic regression. For the flow teacher it is the argmax latent
+  with a fixed-seed `x_0`. They are comparable as a
+  "single best-guess trajectory" but not identical.
+- **The flow teacher is not more stochastic across seeds.** Its seed-to-seed
+  std is smaller than CrowdES's, because CrowdES's only stochasticity is the
+  8-way latent, while the flow teacher also varies continuously within a mode.
+- **Parameters are comparable.** The flow checkpoint also carries CrowdES's
+  `traj_decoders` (8.3 M), which it never calls, so its file total is 56.2 M.
+  The table counts only the modules each model runs.
+
+Caveats:
+
+- The flow teacher is one training run (one seed). The baseline is upstream's
+  released checkpoint, not our own parity retrain, because that run was
+  OOM-killed.
+- The checkpoint was chosen on `val/min_fde` measured on 10% of the *train*
+  split, which is upstream's convention. The test split was never used for
+  selection.
+- These are agent-level numbers only. Scene-level realism and collisions
+  (`src/evaluate_scene.py`, `src/evaluate_flow2bt.py`) are separate.
+  `src/evaluate_scene.py` deliberately refuses a flow export.
+
+Raw metrics are in `outputs/cmp_agent_eth/*/metrics.json`.
 
 ## Layout
 

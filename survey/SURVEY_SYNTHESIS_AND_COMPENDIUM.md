@@ -22,6 +22,15 @@
    - [Dossier 10: GAME: Generational Adversarial MAP-Elites for Co-evolving Behavior Trees](#dossier-10-game-generational-adversarial-map-elites-for-co-evolving-behavior-trees)
    - [Dossier 11: Combining Control Barrier Functions and Behavior Trees for Multi-Agent Underwater Coverage Missions](#dossier-11-combining-control-barrier-functions-and-behavior-trees-for-multi-agent-underwater-coverage-missions)
    - [Dossier 12: Neuro-Symbolic Behavior Trees (NSBTs) and Their Verification](#dossier-12-neuro-symbolic-behavior-trees-nsbts-and-their-verification)
+   - [Dossier 13: Automatic Behavior Tree Generation for Industry 5.0](#dossier-13-automatic-behavior-tree-generation-for-industry-50)
+   - [Dossier 14: Continuous Locomotive Crowd Behavior Generation (CrowdES)](#dossier-14-continuous-locomotive-crowd-behavior-generation-crowdes)
+   - [Dossier 15: One-Step Flow Matching for Human Trajectory Forecasting (MoFlow, CVPR 2025)](#dossier-15-one-step-flow-matching-for-human-trajectory-forecasting-moflow-cvpr-2025)
+   - [Dossier 16: Goal-Driven Flow Matching for Multimodal Trajectories (GoalFlow, CVPR 2025)](#dossier-16-goal-driven-flow-matching-for-multimodal-trajectories-goalflow-cvpr-2025)
+   - [Dossier 17: Multi-modal Motion Prediction via Flow Matching (TrajFlow, IROS 2025)](#dossier-17-multi-modal-motion-prediction-via-flow-matching-trajflow-iros-2025)
+   - [Dossier 18: Efficient Trajectory Forecasting and Generation with Conditional Flow Matching (T-CFM, IROS 2024)](#dossier-18-efficient-trajectory-forecasting-and-generation-with-conditional-flow-matching-t-cfm-iros-2024)
+   - [Dossier 19: Plausible and Feasible Long-Term Human Trajectory Prediction via Motion Field-Regularized Flow Matching (AAAI 2025)](#dossier-19-plausible-and-feasible-long-term-human-trajectory-prediction-via-motion-field-regularized-flow-matching-aaai-2025)
+   - [Dossier 20: Flow Matching-Based Autonomous Driving Planning (Flow Planner, NeurIPS 2025)](#dossier-20-flow-matching-based-autonomous-driving-planning-flow-planner-neurips-2025)
+   - [Dossier 21: Low-Rank Spectral Flow Matching for Human Trajectory Prediction (LR-SFM, KDD 2026)](#dossier-21-low-rank-spectral-flow-matching-for-human-trajectory-prediction-lr-sfm-kdd-2026)
 
 ---
 
@@ -60,6 +69,14 @@ This mathematical duality provides the unifying missing link for Learnable Behav
 | **Anne et al. (2023)**<br>*GAME MAP-Elites for BTs* | Evolutionary Structure Search | **No** (Quality-Diversity co-evolution) | Learned (Evolutionary mutation/crossover) | Steering/aiming primitives, deep vision embedding descriptors | Parabellum 2D shooter, EvoGym soft-robot wrestling, competitive games |
 | **Özkahraman & Ögren (2020)**<br>*CBF Behavior Trees* | Safe / Verifiable BT | **Partial** (Continuous QP filter inside discrete tree) | Fixed (Hierarchical priority composition) | CBF-QP continuous safety filters, nominal coverage vector fields | Multi-agent AUV persistent coverage, underwater docking and recharging |
 | **Serbinowska et al. (2025)**<br>*Neuro-Symbolic BT Verification* | Safe / Verifiable BT | **No** (Symbolic model checking via nuXmv) | Fixed (Verified DSL model) | Deep neural perceptual classifiers, deep RL action policies | ACAS Xu aircraft collision avoidance, rover waypoint tracking, gridworld |
+| **Bae et al. (2025)**<br>*CrowdES: Continuous Crowd Locomotion* | Task Anchor: Pedestrian Locomotion | **Partial** (Diffusion Emitter + Markov Chain SDS) | Learned (Diffusion denoising + SDS state switching) | 2D Footstep coordinates $\mathbf{c}_t$, NavMesh polyline guidance | Multi-agent crowd locomotion (ETH, UCY, SDD, Grand Central) |
+| **Fu et al. (2025)**<br>*MoFlow (CVPR 2025)* | Flow Matching Trajectory Forecasting | **Yes** (Continuous CFM + 1-step IMLE) | Fixed / Distilled Student | Multi-agent continuous coordinate trajectories | Pedestrian benchmarks (ETH-UCY, SDD, NBA SportVU) |
+| **Xing et al. (2025)**<br>*GoalFlow (CVPR 2025)* | Discrete-Continuous Hybrid Flow | **Yes** (1-step Rectified Flow) | Hybrid (Discrete Goal Vocab + Flow) | Goal-conditioned trajectory generator | Autonomous navigation & planning (Navsim, nuScenes) |
+| **Yan et al. (2025)**<br>*TrajFlow (IROS 2025)* | Multi-Agent Flow Matching | **Yes** (Parallel hBcflow paths) | Fixed (Self-conditioned network) | Multi-modal ranked trajectory heads | Multi-agent motion forecasting (WOMD) |
+| **Ye & Gombolay (2024)**<br>*T-CFM (IROS 2024)* | Foundational Trajectory CFM | **Yes** (Continuous ODE flow) | Fixed (Learned velocity field) | Continuous velocity vector fields | Multi-agent tracking, aircraft flight, long-horizon planning |
+| **Zhu et al. (2025)**<br>*Motion-Reg Flow (AAAI 2025)* | Feasible Flow Matching | **Yes** (Continuous ODE + SDF gradient) | Fixed (Motion field regularized) | Obstacle-avoidant pedestrian paths | Complex human navigation (SDD, Edinburgh Forum) |
+| **Tan et al. (2025)**<br>*Flow Planner (NeurIPS 2025)* | Interactive Guided Flow | **Yes** (CFG velocity blending) | Fixed (Tokenized interactive transformer) | Multi-agent interactive trajectories | Closed-loop autonomous driving (nuPlan) |
+| **Mao et al. (2026)**<br>*LR-SFM (KDD 2026)* | Spectral Flow Matching | **Yes** (Continuous spectral ODE) | Fixed (DCT low-rank projection) | Truncated DCT frequency coefficients | Human trajectory prediction (ETH-UCY, SDD, NBA) |
 
 ---
 

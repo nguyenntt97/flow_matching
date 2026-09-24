@@ -70,6 +70,16 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 - [11_ozkahraman2020_cbf_bt.md](./11_ozkahraman2020_cbf_bt.md): Control Barrier Function Behavior Trees (CBF-BT) resolving conflicting multi-agent mission objectives while guaranteeing forward invariance.
 - [12_serbinowska2025_nsbt_verification.md](./12_serbinowska2025_nsbt_verification.md): BehaVerify framework for formal verification of Neuro-Symbolic Behavior Trees with deep neural network leaves using nuXmv and SMT solvers.
 
+### Pillar 5: Flow Matching & Continuous-Discrete Hybrid Trajectory Forecasting
+*Focus: Conditional flow matching (CFM), optimal transport displacement paths, one-step distillation (IMLE), discrete goal point conditioning, and physical barrier guidance for agent-level trajectory prediction.*
+- [15_fu2025_moflow_onestep_flow_matching.md](./15_fu2025_moflow_onestep_flow_matching.md): One-step flow matching for human trajectory forecasting via Best-of-K CFM loss and IMLE distillation (00	imes$ speedup, SOTA on ETH-UCY and SDD).
+- [16_xing2025_goalflow_multimodal_trajectories.md](./16_xing2025_goalflow_multimodal_trajectories.md): Goal-driven flow matching resolving trajectory divergence by coupling a discrete goal vocabulary (endpoint clusters) with 1-step rectified flow planning (SOTA on Navsim).
+- [17_yan2025_trajflow_motion_prediction.md](./17_yan2025_trajflow_motion_prediction.md): Multi-modal motion prediction generating parallel trajectory modes in a single pass with self-conditioning and Plackett-Luce ranking losses on WOMD.
+- [18_ye2024_tcfm_trajectory_conditional_flow_matching.md](./18_ye2024_tcfm_trajectory_conditional_flow_matching.md): Trajectory Conditional Flow Matching unifying prediction and generation with 00	imes$ speedup and 35% higher accuracy over diffusion models.
+- [19_zhu2025_motion_field_regularized_flow_matching.md](./19_zhu2025_motion_field_regularized_flow_matching.md): Regularizing flow matching with neural implicit motion fields and test-time Signed Distance Function (SDF) gradient guidance to guarantee collision-free pedestrian navigation.
+- [20_tan2025_flow_planner_interactive_behavior.md](./20_tan2025_flow_planner_interactive_behavior.md): Interactive multi-agent planning via fine-grained trajectory tokenization and classifier-free guided flow matching on nuPlan.
+- [21_mao2026_low_rank_spectral_flow_matching.md](./21_mao2026_low_rank_spectral_flow_matching.md): Low-Rank Spectral Flow Matching (LR-SFM) in truncated DCT space, proving human trajectory diversity is sparse and achieving SOTA on ETH-UCY with fewer function evaluations.
+
 ---
 
 ## 3. Comprehensive Comparative Matrix
@@ -90,6 +100,13 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 | **Serbinowska et al. (2025)**<br>*Neuro-Symbolic BT Verification* | Safe / Verifiable BT | **No** (Symbolic model checking via nuXmv) | Fixed (Verified DSL model) | Deep neural perceptual classifiers, deep RL action policies | ACAS Xu aircraft collision avoidance, rover waypoint tracking, gridworld |
 | **Hémono et al. (2026/2027)**<br>*Auto BT Generation in Industry 5.0* | Survey / Automatic BT Synthesis | **Hybrid / Varies** (Planning, Evolutionary, LLMs) | Learned / Generated (PDDL, GP, LLM prompt-to-BT) | Collaborative action primitives, cobot commands, safety condition leaves | Human-robot collaborative assembly, JSSP/ALBP scheduling, ergonomics |
 | **Bae et al. (2025)**<br>*CrowdES: Continuous Crowd Locomotion* | Task Anchor: Pedestrian Locomotion | **Partial** (Diffusion Emitter + Markov Chain SDS) | Learned (Diffusion denoising + SDS state switching) | 2D Footstep coordinates $\mathbf{c}_t$, NavMesh polyline guidance | Multi-agent crowd locomotion (ETH, UCY, SDD, Grand Central) |
+| **Fu et al. (2025)**<br>*MoFlow (CVPR 2025)* | Flow Matching Trajectory Forecasting | **Yes** (Continuous CFM + 1-step IMLE) | Fixed / Distilled Student | Multi-agent continuous coordinate trajectories | Pedestrian benchmarks (ETH-UCY, SDD, NBA SportVU) |
+| **Xing et al. (2025)**<br>*GoalFlow (CVPR 2025)* | Discrete-Continuous Hybrid Flow | **Yes** (1-step Rectified Flow) | Hybrid (Discrete Goal Vocab + Flow) | Goal-conditioned trajectory generator | Autonomous navigation & planning (Navsim, nuScenes) |
+| **Yan et al. (2025)**<br>*TrajFlow (IROS 2025)* | Multi-Agent Flow Matching | **Yes** (Parallel hBcflow paths) | Fixed (Self-conditioned network) | Multi-modal ranked trajectory heads | Multi-agent motion forecasting (WOMD) |
+| **Ye & Gombolay (2024)**<br>*T-CFM (IROS 2024)* | Foundational Trajectory CFM | **Yes** (Continuous ODE flow) | Fixed (Learned velocity field) | Continuous velocity vector fields | Multi-agent tracking, aircraft flight, long-horizon planning |
+| **Zhu et al. (2025)**<br>*Motion-Reg Flow (AAAI 2025)* | Feasible Flow Matching | **Yes** (Continuous ODE + SDF gradient) | Fixed (Motion field regularized) | Obstacle-avoidant pedestrian paths | Complex human navigation (SDD, Edinburgh Forum) |
+| **Tan et al. (2025)**<br>*Flow Planner (NeurIPS 2025)* | Interactive Guided Flow | **Yes** (CFG velocity blending) | Fixed (Tokenized interactive transformer) | Multi-agent interactive trajectories | Closed-loop autonomous driving (nuPlan) |
+| **Mao et al. (2026)**<br>*LR-SFM (KDD 2026)* | Spectral Flow Matching | **Yes** (Continuous spectral ODE) | Fixed (DCT low-rank projection) | Truncated DCT frequency coefficients | Human trajectory prediction (ETH-UCY, SDD, NBA) |
 
 ---
 
@@ -98,6 +115,28 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 The convergence of hierarchical decision architectures with continuous-time dynamical systems—crystallized by Ramachandran & Sra's (2026) proof of the equivalence between hierarchical tree partitioning and drift-diffusion processes—has opened profound theoretical frontiers at the intersection of control theory, generative modeling, and neuro-symbolic robotics. 
 
 First, **resolving the discretization-execution gap in differentiable behavior trees** remains an urgent theoretical open problem. Existing differentiable relaxations (such as Huang et al., 2025) approximate discrete control nodes using soft continuous t-norms (product or Łukasiewicz logic) and Gumbel-Softmax reparameterizations during backpropagation. However, hardening this continuous supernet into a deterministic, tick-based Behavior Tree for physical deployment causes severe performance degradation, as the discrete tree cannot reproduce the fractional co-activation of parallel branches that the neural optimizer exploited. Applying the Fokker-Planck continuum limit reveals that discrete BT execution is an un-annealed, coarse-grained discretization of a continuous probability flow ODE. Developing exact, boundary-preserving flow-matching schemes that guarantee zero loss of reactivity upon hardening represents a paramount mathematical challenge.
+
+### 4.2 Resolving the Flow Matching vs. Discrete State System (CrowdES) Dilemma in Agent Trajectory Prediction
+
+A critical conceptual question in continuous crowd locomotion is the comparative trade-off between **discrete-state systems** (such as CrowdES's =8$ discrete locomotion modes governed by a Markov transition network) and **continuous flow matching models** (such as Conditional Flow Matching policies predicting velocity fields $\mathbf{v}_	heta$). At first glance, practitioners often observe that discrete-state systems appear more robust for long-horizon closed-loop simulation, leading to the perception that flow matching is sub-optimal for agent-level trajectory prediction.
+
+However, a comprehensive investigation across peer-reviewed literature from **CVPR, NeurIPS, IROS, AAAI, and KDD (2024–2026)** reveals the precise mathematical reasons for this phenomenon and establishes how state-of-the-art flow matching architectures resolve it:
+
+1. **The Root of the Dilemma: Why Vanilla Flow Matching Appears Sub-Optimal:**
+   - *Trajectory Divergence over Long Horizons:* As demonstrated by **GoalFlow (Xing et al., CVPR 2025)**, unconstrained flow matching trained to map Gaussian noise directly to future paths suffers from severe spatial divergence: small deviations in early velocity integration cause paths to drift off drivable/walkable geometry, yielding high collision rates ($> 5\%$) in closed-loop navigation despite strong open-loop metrics.
+   - *The Static Obstacle Blindness:* As proved by **Zhu et al. (AAAI 2025)**, standard regression losses do not penalize vector fields that pass through static walls. In their benchmarks, vanilla flow matching suffered an obstacle violation rate of 4.8\%$ (.5	imes$ higher than discrete NavMesh baselines), explaining why discrete polygon pathfinding (like CrowdES's Recast NavMesh) feels superior in complex architectural layouts.
+   - *The Numerical ODE Latency Penalty:* Integrating continuous neural ODEs requires 5–20 evaluation steps per agent per frame ($> 20 - 50\,	ext{ms}$ on GPU), whereas discrete lookup or single-pass regression evaluates in $< 1\,	ext{ms}$.
+
+2. **How Peer-Reviewed Literature Resolves the Dilemma:**
+   - **Discrete Goal / Mode Anchoring (GoalFlow, CVPR 2025):** Rather than treating discrete states and flow matching as mutually exclusive, GoalFlow proves they are fundamentally complementary. By constructing a **discrete goal vocabulary** from clustered trajectory endpoints (analogous to CrowdES's discrete behavioral clusters) and conditioning rectified flow matching on the selected goal point, GoalFlow completely eliminates trajectory divergence, achieving state-of-the-art 0.3$ PDMS on Navsim in a **single step**.
+   - **One-Step Distillation via IMLE (MoFlow, CVPR 2025):** MoFlow establishes that a continuous flow teacher trained on multi-modal human trajectories (ETH-UCY, SDD) can be distilled via Implicit Maximum Likelihood Estimation into a **1-step generator** running at **00	imes$ speedup** ($< 1\,	ext{ms}$ per scene), simultaneously outperforming CrowdES, diffusion models, and CVAEs on minADE/minFDE.
+   - **Test-Time SDF Gradient Steering (Zhu et al., AAAI 2025):** By injecting Signed Distance Function (SDF) barrier gradients directly into the flow matching velocity field ($\dot{	au}_t = v_	heta - lpha 
+abla \mathcal{U}_{	ext{obs}}$), obstacle violation drops from 4.8\%$ to **bash.2\%* without requiring model retraining.
+   - **Low-Rank Spectral Frequency Compression (LR-SFM, KDD 2026):** By performing flow matching in truncated DCT space, LR-SFM proves human trajectory diversity is concentrated in 3–4 spectral modes, reducing integration dimensionality by 6\%$ while enforcing kinematic smoothness.
+   - **Calibrated Multi-Mode Ranking (TrajFlow, IROS 2025):** Uses self-conditioning and Plackett-Luce ranking losses to generate parallel multi-modal trajectories in a single pass with calibrated confidence.
+
+3. **Validation of the Flow2BT Pipeline:**
+   These findings directly validate our Flow2BT framework: Subsystem 1 provides the discrete NavMesh goal anchor $\mathbf{c}_{t, 	ext{nav}}$ (mirroring GoalFlow), Subsystem 2 trains the multi-modal Flow Teacher (mirroring MoFlow/T-CFM), Subsystem 5 distills trajectories into low-rank DMPs (mirroring LR-SFM), Subsystem 6 enforces 00\,	ext{Hz}$ preemption, and Subsystem 7a guarantees collision invariance via CBF-QP filters (mirroring test-time barrier guidance).
 
 Second, the **unification of Control Barrier Functions (CBFs) with continuous-time score fields within dynamic Behavior Trees** offers a transformative path for safety-critical learning. In current CBF-BT architectures (Özkahraman & Ögren, 2020), safety is enforced through local, instantaneous Quadratic Programs that assume known analytical control-affine dynamics and frequently suffer from infeasibility when conflicting objectives arise. By viewing the hierarchy as a continuous vector field $\frac{d\mathbf{x}}{dt} = \mu(\mathbf{x}, t) - \frac{1}{2} \sigma^2 \nabla_{\mathbf{x}} \log p_t(\mathbf{x})$, barrier certificates can be cast directly as functional gradient constraints on the score field itself. This would enable provably forward-invariant continuous-time score matching, ensuring that end-to-end neural policies distilled into or guided by trees cannot penetrate unsafe state-space manifolds even under extreme environmental uncertainty.
 
@@ -121,6 +160,13 @@ Third, **bidirectional neural-symbolic distillation under non-stationary reactiv
 - [12_serbinowska2025_nsbt_verification.md](./12_serbinowska2025_nsbt_verification.md) — *Neuro-Symbolic Behavior Trees (NSBTs) and Their Verification*
 - [13_hemono2026_automatic_bt_generation_hrc.md](./13_hemono2026_automatic_bt_generation_hrc.md) — *Automatic Behavior Tree Generation for Enhanced Human–Robot Collaborative Task Planning in Industry 5.0: A Systematic Review*
 - [14_bae2025_continuous_crowd_locomotion_crowdes.md](./14_bae2025_continuous_crowd_locomotion_crowdes.md) — *Continuous Locomotive Crowd Behavior Generation*
+- [15_fu2025_moflow_onestep_flow_matching.md](./15_fu2025_moflow_onestep_flow_matching.md) — *MoFlow: One-Step Flow Matching for Human Trajectory Forecasting via Implicit Maximum Likelihood Estimation based Distillation (CVPR 2025)*
+- [16_xing2025_goalflow_multimodal_trajectories.md](./16_xing2025_goalflow_multimodal_trajectories.md) — *GoalFlow: Goal-Driven Flow Matching for Multimodal Trajectories Generation in End-to-End Autonomous Driving (CVPR 2025)*
+- [17_yan2025_trajflow_motion_prediction.md](./17_yan2025_trajflow_motion_prediction.md) — *TrajFlow: Multi-modal Motion Prediction via Flow Matching (IROS 2025)*
+- [18_ye2024_tcfm_trajectory_conditional_flow_matching.md](./18_ye2024_tcfm_trajectory_conditional_flow_matching.md) — *Efficient Trajectory Forecasting and Generation with Conditional Flow Matching (IROS 2024)*
+- [19_zhu2025_motion_field_regularized_flow_matching.md](./19_zhu2025_motion_field_regularized_flow_matching.md) — *Plausible and Feasible Long-Term Human Trajectory Prediction via Motion Field-Regularized Flow Matching (AAAI 2025)*
+- [20_tan2025_flow_planner_interactive_behavior.md](./20_tan2025_flow_planner_interactive_behavior.md) — *Flow Matching-Based Autonomous Driving Planning with Advanced Interactive Behavior Modeling (NeurIPS 2025)*
+- [21_mao2026_low_rank_spectral_flow_matching.md](./21_mao2026_low_rank_spectral_flow_matching.md) — *Low-Rank Spectral Flow Matching for Human Trajectory Prediction (KDD 2026)*
 
 ### Technical Reports & Deep Dives
 - [design/README.md](./design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
