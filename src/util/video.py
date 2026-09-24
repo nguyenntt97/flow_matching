@@ -16,6 +16,8 @@ from typing import Optional
 import cv2
 import matplotlib
 
+from src.evaluate_agent import _VideoWriter
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -157,7 +159,7 @@ def render_scene_video(
     if not frames_to_render:
         return
 
-    writer = VideoWriter(video_path, fps=simulator_fps, width=w, height=h)
+    writer = _VideoWriter(video_path, fps=simulator_fps, width=w, height=h)
 
     # Pre-index scenario by frame for fast retrieval
     df = generated_scenario[generated_scenario["frame"].between(0, max_frames)]

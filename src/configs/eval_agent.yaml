@@ -14,10 +14,19 @@ batch_size: 2048
 num_samples: 20              # K for minADE_K / minFDE_K
 device: cuda
 
-viz: false                   # whether to export trajectory videos (.m4v)
+viz: false                   # whether to export trajectory videos (.mp4)
 viz_limit: 50                # max trajectories per scene (null for all)
 viz_fps: 5                   # frames per second for output videos
 viz_dir: null                # optional subfolder inside run_dir (e.g. 'viz')
+
+# Rolling (autoregressive) prediction, as CrowdESFramework.process_simulator
+# runs the simulator in src/evaluate_scene.py: predict future_length, feed it
+# back as history, re-derive control/neighbours/env, carry previous_state.
+rollout:
+  enabled: true
+  rounds: 3                  # recurrent predictions; horizon = rounds * future_length (3 x 2 s = 6 s)
+  window_stride: 10          # steps between rollout start points along a GT track
+  snap_walkable: true        # snap each round onto the walkable mask, as upstream does
 
 hydra:
   run:

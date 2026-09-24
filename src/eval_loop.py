@@ -39,6 +39,8 @@ from typing import Callable, Optional
 
 import numpy as np
 
+import src._upstream  # noqa: F401
+
 logger = logging.getLogger(__name__)
 
 #: Upstream's constant, marked "DO NOT CHANGE THIS!" -- changing it makes the
