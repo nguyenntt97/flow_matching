@@ -258,10 +258,23 @@ def main(cfg: DictConfig) -> None:
     fidelity = float((routed == dendrogram.labels).mean())
     logger.info("tree reproduces %.1f%% of the induced leaf assignment", 100 * fidelity)
 
+    # With several rollouts per state the members of one state share a feature
+    # vector but can land in different leaves, and a tree is a function of the
+    # features. So no tree can exceed the per-state majority share; fidelity
+    # has to be read against that ceiling, not against 100%. With one rollout
+    # per state the ceiling is exactly 1.
+    per_state = dendrogram.labels.reshape(len(indices), rollouts)
+    majority = np.array([np.bincount(row).max() for row in per_state])
+    routing_ceiling = float(majority.sum() / per_state.size)
+    logger.info("routing ceiling (per-state majority leaf): %.1f%%", 100 * routing_ceiling)
+
     out_dir = Path(cfg.run_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     with open(out_dir / "bundle.pkl", "wb") as handle:
-        pickle.dump({"tree": tree, "bank": bank, "feature_names": FEATURE_NAMES}, handle)
+        pickle.dump({
+            "tree": tree, "bank": bank, "feature_names": FEATURE_NAMES,
+            "prototypes": prototypes, "nav_frame": bool(cfg.nav_frame),
+        }, handle)
 
     report = {
         "source": str(cfg.source),
@@ -277,6 +290,7 @@ def main(cfg: DictConfig) -> None:
         "leaf_dispersion_m": {str(k): v for k, v in dispersion.items()},
         "dmp_fit_residual": {p.name: p.fit_residual for p in primitives},
         "tree_routing_fidelity": fidelity,
+        "routing_ceiling": routing_ceiling,
         "agreement_with_crowdes_modes": agreement,
         "guards": [
             {
@@ -298,7 +312,7 @@ def main(cfg: DictConfig) -> None:
     print(f"leaf dispersion (m): { {k: round(v, 3) for k, v in dispersion.items()} }")
     if agreement:
         print(f"agreement with CrowdES B=8 modes: ARI={agreement['adjusted_rand']:.3f}")
-    print(f"tree routing fidelity: {fidelity:.3f}")
+    print(f"tree routing fidelity: {fidelity:.3f} (ceiling {routing_ceiling:.3f})")
     print()
     print(f"wrote {out_dir / 'bundle.pkl'}")
 

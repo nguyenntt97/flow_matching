@@ -67,7 +67,14 @@ def build_controller(cfg, crowdes_cfg):
             )
             return build_features(geometry, state.goal - state.position)
 
-        return BTController(bundle["tree"], bundle["bank"]), feature_fn
+        controller = BTController(
+            bundle["tree"], bundle["bank"],
+            rotate_forcing=bool(cfg.runtime.rotate_forcing),
+            finite_stop=bool(cfg.runtime.finite_stop),
+            stop_duration=cfg.runtime.stop_duration,
+            stop_refractory=cfg.runtime.stop_refractory,
+        )
+        return controller, feature_fn
 
     raise ValueError(f"unknown runtime.controller {kind!r}")
 
@@ -112,6 +119,10 @@ def main(cfg: DictConfig) -> None:
         holder = {}
 
         def factory(config, _holder=holder, _controller=controller, _cbf=cbf_config):
+            # One controller serves every trial, and agent ids restart per trial:
+            # drop per-agent state so trial k's agent 3 does not inherit trial
+            # k-1's agent 3's goal, phase or stop timer.
+            _controller.reset(0)
             framework = framework_class(
                 config,
                 controller=_controller,
@@ -143,6 +154,10 @@ def main(cfg: DictConfig) -> None:
                 for key, value in framework.diagnostics.items()
             },
             "path_planning": dict(framework.follower.stats),
+            "controller": {
+                key: int(getattr(controller, key))
+                for key in ("completions", "stop_yields") if hasattr(controller, key)
+            },
             "raw_collision": framework.raw_collision_rate(0.2),
             "raw_collision_at_dmin": framework.raw_collision_rate(cbf_config.d_min),
         }

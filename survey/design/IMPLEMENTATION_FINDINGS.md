@@ -399,12 +399,165 @@ meaningful.
 
 ## 8. Still open
 
-* Flow teacher (Subsystem 2) is training; induction from `source=flow` is the
-  design's actual proposal and has not yet been compared against
-  `source=ground_truth`.
+* Scene evaluation with the finite stop leaf (§9.6), and the slow-leaf loop it
+  leaves behind. The §6 row predates the fix, is a **single trial**
+  against CrowdES's 20, and depended on the bug.
 * The `d_min` frontier sweep across {0.2, 0.3, 0.45, 0.6}.
 * `BTController` end-to-end in the runtime (the plumbing is tested; the induced
   bundle has not yet been run through a full scene).
 * Subsystem 7b (BehaVerify / nuXmv). Deliberately not gating anything: nuXmv is
   external and licence-gated. The planned substitute is a bounded falsification
   harness against the real runtime.
+
+## 9. Flow teacher -> tree: what the distillation costs
+
+Teacher: `outputs/flow_eth/20260920-072219/checkpoints/epoch063-minfde0.0529.ckpt`.
+All inductions in the navmesh frame, B=8, seed 0, train split.
+
+### 9.1 Induction source ablation (in-sample, train split)
+
+`routing_ceiling` is new: with several rollouts per state, members of one state
+share a feature vector but can fall in different leaves, so no tree can exceed
+the per-state majority share.
+
+| source | trajectories | routing fidelity | ceiling | ARI vs CrowdES B=8 | leaf dispersion (m) | pooled RMS | guard CV acc |
+|---|---|---|---|---|---|---|---|
+| ground truth | 4096 x 1 | 71.9% | 100% | 0.544 | 0.14–0.50 | 0.253 | 0.844–0.912 |
+| flow | 4096 x 1 | 71.9% | 100% | 0.592 | 0.17–0.46 | 0.247 | 0.733–0.922 |
+| flow | 4096 x 4 | 70.7% | 93.2% | 0.565 | 0.17–0.46 | 0.254 | 0.789–0.910 |
+| flow | 1024 x 16 | 73.5% | 93.3% | 0.588 | 0.13–0.42 | 0.232 | 0.804–0.927 |
+
+The teacher's rollouts pick the same leaf ~93% of the time from one state, so
+the teacher's own multimodality is only a ~7% effect at B=8 over 2 s. Induction
+from it agrees somewhat better with CrowdES's modes, and the in-sample numbers
+are otherwise indistinguishable from ground truth.
+
+### 9.2 Open-loop agent-level evaluation (test split, 29,275 windows)
+
+`src/evaluate_bt_openloop.py`. Same windows as `evaluate_agent.py`; no CBF, no
+reacting neighbours. Leaf fixed from the observed window, DMP integrated at the
+runtime's 50 ms tick with its lifecycle. ADE / FDE in metres.
+
+| predictor | GT tree | flow x1 | flow x4 | flow x16 |
+|---|---|---|---|---|
+| oracle prototype (minADE₈ / minFDE₈) | **0.264** / 0.446 | 0.286 / 0.477 | 0.276 / 0.465 | 0.288 / 0.484 |
+| routed prototype | **0.352** / 0.609 | 0.362 / 0.626 | 0.358 / 0.621 | 0.364 / 0.630 |
+| routed DMP (what the runtime executes) | **0.350** / 0.611 | 0.360 / 0.627 | 0.356 / 0.622 | 0.361 / 0.631 |
+| oracle DMP | **0.261** / 0.441 | 0.283 / 0.475 | 0.273 / 0.462 | 0.285 / 0.482 |
+| held-out routing accuracy (nearest prototype) | 66.8% | 69.4% | 70.4% | 72.3% |
+
+References on the same windows: flow teacher 0.2721 / 0.5321 (argmax latent),
+minADE₂₀ 0.1562 / minFDE₂₀ 0.2727; CrowdES 0.2896 / 0.5659; **constant velocity
+0.2159 / 0.4406**.
+
+Read stage by stage:
+
+* **Quantisation** (8 fixed shapes, perfect routing): 0.26–0.29 ADE. Already no
+  better than the teacher's single argmax guess.
+* **Routing** is the dominant loss: +0.07–0.09 m ADE, +0.15 m FDE. The tree ends
+  up ~30% above the teacher on ADE and ~15% on FDE.
+* **Execution** as a DMP costs nothing measurable once §9.4 is fixed.
+* **The flow teacher does not buy a better tree here.** Flow-induced trees route
+  a little more accurately but quantise worse, and the ground-truth tree has the
+  lowest routed and oracle error.
+* **Constant velocity beats every tree and the teacher** at this 2 s horizon on
+  eth. Any open-loop claim for the tree has to be read against that.
+* Held-out routing accuracy (66.8% for the GT tree) sits below the in-sample 71.9%.
+  The labelling rule differs (nearest prototype in L2, not the dendrogram's
+  embedding), so the two are only approximately comparable.
+
+DMP replay error against each leaf's prototype is 0–7 cm at the 50 ms tick. The
+induction report's `dmp_fit_residual` is the forcing-term regression residual in
+forcing units, not a distance.
+
+### 9.3 The runtime ticks at 50 ms, not 10 ms
+
+`substeps: 4` at 5 fps gives `tick_dt = 0.05 s` (`flow2bt_framework.py:101`),
+and the DMPs are stepped at that tick. The 10 ms figure is `rollout_dmp`'s default
+integration step, which the runtime does not use.
+
+### 9.4 Bug: the forcing term was applied on world axes
+
+`BTController` rotated each leaf's *goal* onto the navmesh direction but handed
+`DMPBank.acceleration` world-frame `goal - entry` for the per-dimension forcing
+scale, with forcing weights fitted in the navmesh frame. A straight leaf has a
+near-zero lateral `g - x0`, which the fit clamps to 1.0. Replayed along any
+direction other than world +x, the along-track forcing landed on the wrong axis,
+and the clamp inflated it up to ~100x.
+
+Routed-DMP ADE before -> after the fix: GT tree 0.608 -> 0.350, flow x4
+0.445 -> 0.356, flow x16 0.380 -> 0.361. `DMPBank.acceleration` now takes a
+per-agent `rotation`, and `BTController` fixes one per execution alongside the
+goal. `test_replay_is_rotation_equivariant` pins it. `runtime.rotate_forcing=false`
+reproduces the old behaviour so the closed-loop numbers in §6 can be compared.
+
+### 9.5 Closed loop after the fix: the stop leaf is absorbing
+
+`seq_eth`, 5 trials, CBF@0.45, `rotate_forcing=true`:
+
+| | Collision | raw | Density | Population | Kinematics | DTW | Travel Time | agents / trial |
+|---|---|---|---|---|---|---|---|---|
+| CrowdES (20 trials) | 0.00781 | — | 0.0180 | 0.182 | 0.340 | 1.62 | 0.596 | 277 |
+| BT, GT tree, **pre-fix**, 1 trial (§6) | 0.00249 | 0.00010 | 0.0196 | 0.200 | 0.467 | 2.08 | 0.576 | 282 |
+| BT, GT tree, fixed | 0.00664 ± 0.00834 | 0.0 | 0.0324 | 0.338 | 0.754 | 2.28 | 1.867 | 129 |
+| BT, flow x16 tree, fixed | 0.00112 ± 0.00053 | 0.0 | 0.0513 | 0.549 | 1.487 | 2.58 | 4.616 | 188 |
+
+Fixing §9.4 made every realism metric worse. The cause is structural, not the fix.
+Every guard is dominated by the agent's own `speed`, and at speed ~0 every
+guard on the path to the stop leaf passes. A stopped agent is therefore routed to
+`stop`, which holds it at speed ~0, which routes it to `stop` again. Nothing in
+the tree says "resume". Single agent, empty scene, waypoint 1.56 m ahead, 10 s:
+
+| tree | start speed | progress, fixed | progress, pre-fix |
+|---|---|---|---|
+| GT | 1.3 m/s | 12.3 m (march) | 12.3–13.0 m |
+| GT | 0 | **-0.08 m (stop, all headings)** | -0.08 m heading +x; **12.6 m / 2.7 m** heading +y / (-0.6,-0.8) |
+| flow x16 | 0 | **0.03 m (stop, all headings)** | 0.03–0.34 m |
+
+Before the fix, the mis-scaled forcing kicked stopped agents out of `stop` for
+most headings: it was the resume mechanism, by accident. In a crowd the CBF brakes
+agents to near zero, they latch into `stop`, and they never leave. So fewer
+agents finish, density and population rise, and Travel Time blows up. The flow
+tree latches harder: its stop leaf holds 38% of the induction set against 35%
+for GT. **The §6 BT row, and Table 1's Flow2BT row, depended on this bug.**
+
+A resume path needs a feature that the stop leaf does not drive to a fixed
+point: time-in-leaf, preferred minus current speed, or a finite-duration `stop`
+that returns SUCCESS and falls through.
+
+### 9.6 Finite-duration stop leaf (implemented, not yet scene-evaluated)
+
+`BTController(finite_stop=True)`, the default, and `runtime.finite_stop` in
+`eval_flow2bt.yaml`:
+
+* **Which leaves.** A leaf is *stationary* when its displacement is under
+  `arrival_tolerance`. Such a leaf cannot complete by arrival: it "arrives" on
+  the tick it starts. It is identified by geometry, not by name.
+* **Duration.** The stationary leaf's `bt.Action` gets a terminator. It returns
+  RUNNING for `stop_duration`, then FAILURE, and keeps returning FAILURE for
+  `stop_refractory`. Both default to the leaf's `tau` (1.8 s).
+* **Fall-through.** On FAILURE the guarded Sequence fails and the enclosing
+  Fallback moves to its next child. In all four induced trees that child is a
+  walking subtree. If nothing claims the agent, it is re-ticked with stop
+  allowed, so the tree stays total.
+* **Per-agent state is keyed by agent id.** The framework now passes
+  `TickState.agent_ids`. Before, the controller dropped *every* agent's phase,
+  goal and timers whenever the crowd changed size, which happens on most
+  frames. A stop timer would rarely have expired.
+* **Reset between trials.** `evaluate_flow2bt` resets the controller at the
+  start of each trial, because agent ids restart per trial.
+
+Same single-agent check as §9.5, starting at rest, 10 s:
+
+| tree | finite_stop=false | finite_stop=true |
+|---|---|---|
+| GT | -0.08 m (stop) | 2.23 m: stop 1.8 s, then `swerve_right_2` at 0.52 m/s |
+| flow x4 | -0.02 m | 1.59 m: stop, then `swerve_left_0` at 0.47 m/s |
+| flow x16 | 0.03 m | 3.06 m: stop, then `march_2` at 0.38 m/s |
+
+Identical across headings. The deadlock is gone, but a weaker version of the
+same loop remains. The agent resumes into a *slow* leaf, the slow leaf keeps it
+slow, and the speed-dominated guards keep choosing the slow leaf. It never gets
+back to its 1.3 m/s preferred speed. Expect Travel Time to improve over §9.5 but
+not to reach CrowdES. Closing this last loop needs a guard feature the leaf does
+not control, such as preferred speed minus current speed.

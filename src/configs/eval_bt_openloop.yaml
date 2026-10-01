@@ -1,0 +1,26 @@
+# Open-loop, agent-level evaluation of an induced Behavior Tree bundle.
+defaults:
+  - _self_
+  - data: eth
+
+name: eval_bt_openloop_${data.dataset.dataset_name}
+seed: 0
+exp_root_dir: ${repo:outputs}
+run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
+
+bundle: ???                  # bundle.pkl written by src/induce_flow2bt.py
+split: test                  # 'test' opts into allow_test_split
+batch_size: 4096
+limit: null                  # cap on windows, for smoke runs
+
+# Mirror BTController's defaults, so the DMP rollout replays what the runtime runs.
+integration_dt: 0.05         # the runtime's tick: 1 / (simulator_fps 5 x substeps 4)
+arrival_tolerance: 0.25
+phase_floor: 0.05
+rotate_forcing: true         # false = pre-fix BTController (fitted-frame forcing on world axes)
+
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: false

@@ -346,10 +346,22 @@ class DMPBank:
         start: np.ndarray,
         phase_s: np.ndarray,
         tau: Optional[np.ndarray] = None,
+        rotation: Optional[np.ndarray] = None,
     ) -> np.ndarray:
         """Commanded acceleration for every agent. All arrays are (N, ...).
 
         ``leaf`` (N,) int selects each agent's primitive. Returns ``(N, dim)``.
+
+        ``rotation`` (N, 2, 2) maps the frame the primitives were fitted in onto
+        the frame ``position`` / ``goal`` live in. The spring and damper are
+        isotropic and do not care, but the forcing term is per-dimension: its
+        weights and its ``(g - x0)`` scaling both belong to the fitted frame.
+        Applying them to world-frame axes replays a different shape, and where
+        a world component of ``g - x0`` falls under ``MIN_SPATIAL_SCALE`` the
+        clamp to 1.0 inflates that axis's forcing by up to two orders of
+        magnitude. Measured on eth test windows: this alone moved a leaf's replay
+        0.5 m off its prototype over 2 s. So with a rotation the forcing is
+        evaluated and scaled in the fitted frame, then rotated out.
         """
         leaf = np.asarray(leaf, dtype=int)
         tau_a = self.tau[leaf] if tau is None else np.asarray(tau, dtype=float)
@@ -363,12 +375,18 @@ class DMPBank:
 
         # (N, P) x (N, P, dim) -> (N, dim)
         forcing = np.einsum("np,npd->nd", basis, self.weights[leaf])
-        scale, _ = _spatial_scale(goal, start)
+        if rotation is None:
+            scale, _ = _spatial_scale(goal, start)
+            forcing = forcing * scale
+        else:
+            local = np.einsum("nji,nj->ni", rotation, goal - start)    # R^T (g - x0)
+            scale, _ = _spatial_scale(local, np.zeros_like(local))
+            forcing = np.einsum("nij,nj->ni", rotation, forcing * scale)
 
         return (
             K_a[:, None] * (goal - position)
             - D_a[:, None] * tau_a[:, None] * velocity
-            + forcing * scale
+            + forcing
         ) / tau_a[:, None] ** 2
 
     def step_phase(self, phase_s: np.ndarray, dt: float, tau: np.ndarray) -> np.ndarray:

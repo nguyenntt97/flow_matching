@@ -22,6 +22,13 @@ runtime:
   dense_output: false        # measured: bypasses Kalman smoothing, costs 2x Kinematics
   agent_radius: 0.2
   bt_bundle: null            # path to an induced tree+primitives bundle (controller=bt)
+  rotate_forcing: true       # false = pre-fix behaviour (fitted-frame forcing on world axes)
+  # Stationary leaves (goal within arrival tolerance of entry) end by time, then
+  # fail for a refractory window so the tree falls through to a walking subtree.
+  # null = the leaf's own tau. false reproduces the absorbing stop leaf.
+  finite_stop: true
+  stop_duration: null
+  stop_refractory: null
 
 cbf:
   d_min: 0.45

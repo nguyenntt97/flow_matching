@@ -256,7 +256,7 @@ def make_framework_class():
                 position=position, velocity=velocity, waypoint=waypoint, goal=goal,
                 preferred_speed=speed,
                 neighbor_position=neighbor_position, neighbor_velocity=neighbor_velocity,
-                neighbor_mask=mask, dt=self.tick_dt,
+                neighbor_mask=mask, dt=self.tick_dt, agent_ids=np.asarray(ids),
             )
             if self.feature_fn is not None:
                 state.features = self.feature_fn(state)

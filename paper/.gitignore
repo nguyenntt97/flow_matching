@@ -1,0 +1,81 @@
+# Core TeX / LaTeX auxiliary and build files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.brf
+*.cpt
+*.dpth
+*.dvi
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.idx
+*.ilg
+*.ind
+*.ist
+*.loa
+*.loe
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.ps
+*.run.xml
+*.snm
+*.soc
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.thm
+*.toc
+*.vrb
+missfont.log
+
+# BibLaTeX / Biber
+*-blx.aux
+*-blx.bib
+
+# Glossaries / Nomenclature
+*.acn
+*.acr
+*.alg
+*.nlo
+*.nls
+
+# TikZ externalize
+*.figlist
+*.makefile
+*.auxlock
+
+# Minted / PythonTeX
+_minted*
+*.pyg
+pythontex-files-*
+*.pytxcode
+
+# Generated document PDFs (preserve vector figures and assets)
+*.pdf
+!**/figures/**
+!**/images/**
+!**/img/**
+!**/figs/**
+
+# Archives & compressed template packages
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Backup, editor, and OS files
+*.bak
+*.sav
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

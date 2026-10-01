@@ -297,3 +297,114 @@ def test_goal_is_rotated_onto_the_navmesh_direction():
 
     assert east[0, 0] == pytest.approx(reach, abs=1e-6) and abs(east[0, 1]) < 1e-6
     assert north[0, 1] == pytest.approx(reach, abs=1e-6) and abs(north[0, 0]) < 1e-6
+
+
+def _replay(controller, heading, ticks=36):
+    """Drive one agent through a leaf with the navmesh direction fixed at ``heading``."""
+    position, velocity = np.zeros((1, 2)), np.zeros((1, 2))
+    path = []
+    for _ in range(ticks):
+        tick = state(position, velocity, position + 10.0 * heading, features=np.array([[1.0]]))
+        acceleration = controller.acceleration(tick)
+        velocity = velocity + acceleration * DT
+        position = position + velocity * DT
+        path.append(position[0].copy())
+    return np.array(path)
+
+
+@pytest.mark.parametrize("heading", [[0.0, 1.0], [-1.0, 0.0], [0.6, -0.8]])
+def test_replay_is_rotation_equivariant(heading):
+    """The forcing term must turn with the navmesh direction, not stay on world axes.
+
+    A straight leaf has a degenerate lateral ``g - x0``; applying its fitted-frame
+    weights to world axes puts the along-track forcing on whichever world axis
+    happens to carry little displacement, clamped to scale 1.0. Measured on eth:
+    replays up to 0.5 m off their prototype over 2 s.
+    """
+    heading = np.array(heading)
+    bank = DMPBank([fit_dmp(swerve(0.0), 0.2, num_basis=10, name="march")])
+    east = _replay(BTController(bank=bank, tree=_Tree()), np.array([1.0, 0.0]))
+    turned = _replay(BTController(bank=bank, tree=_Tree()), heading)
+
+    rotation = np.array([[heading[0], -heading[1]], [heading[1], heading[0]]])
+    assert np.allclose(turned, east @ rotation.T, atol=1e-9)
+
+
+# ------------------------------------------------------------- finite stop
+def _stop_tree():
+    """Fallback( Sequence(always, stop), march ): stop wins whenever it is allowed."""
+    from src.flow2bt.assembly import AssembledTree
+    from src.flow2bt.bt import Action, Condition, Fallback, Sequence
+
+    root = Fallback("root", [
+        Sequence("take_stop", [Condition("always", np.zeros(1), 1.0), Action("stop_0", 0)]),
+        Action("march_1", 1),
+    ])
+    return AssembledTree(root=root, feature_names=["x"], leaf_names={}, guards=[])
+
+
+def _stop_bank():
+    standing = np.zeros((11, 2))
+    return DMPBank([
+        fit_dmp(standing, 0.2, num_basis=10, name="stop"),
+        fit_dmp(swerve(0.0), 0.2, num_basis=10, name="march"),
+    ])
+
+
+def _run_leaves(controller, ticks, ids=None):
+    leaves = []
+    for _ in range(ticks):
+        tick = state([0.0, 0.0], [0.0, 0.0], [3.0, 0.0], features=np.array([[0.0]]))
+        tick.agent_ids = ids
+        controller.acceleration(tick)
+        leaves.append(int(controller._leaf[0]))
+    return leaves
+
+
+def test_stationary_leaf_is_detected_by_its_displacement():
+    controller = BTController(_stop_tree(), _stop_bank())
+    assert controller.stationary.tolist() == [True, False]
+
+
+def test_stop_yields_after_its_duration_and_falls_through():
+    """The absorbing-stop fix: an agent at rest must not be held in stop forever."""
+    controller = BTController(_stop_tree(), _stop_bank(), stop_duration=0.5, stop_refractory=0.5)
+    leaves = _run_leaves(controller, 40)             # 2 s at 50 ms
+
+    first_walk = leaves.index(1)
+    assert leaves[:first_walk] == [0] * first_walk
+    assert first_walk * DT == pytest.approx(0.5, abs=DT)
+    assert controller.stop_yields >= 1
+
+
+def test_refractory_window_then_stop_is_allowed_again():
+    controller = BTController(_stop_tree(), _stop_bank(), stop_duration=0.5, stop_refractory=0.5)
+    leaves = _run_leaves(controller, 40)
+
+    first_walk = leaves.index(1)
+    back_to_stop = leaves.index(0, first_walk)
+    assert (back_to_stop - first_walk) * DT == pytest.approx(0.5, abs=DT)
+
+
+def test_absorbing_stop_is_reproducible():
+    controller = BTController(_stop_tree(), _stop_bank(), finite_stop=False)
+    assert set(_run_leaves(controller, 40)) == {0}
+
+
+def test_state_follows_agent_ids_across_admissions():
+    """A crowd changing size must not wipe the survivors' stop timers."""
+    controller = BTController(_stop_tree(), _stop_bank(), stop_duration=1.0)
+    for _ in range(10):
+        tick = state([[0.0, 0.0], [5.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]], [[3.0, 0.0], [8.0, 0.0]],
+                     features=np.zeros((2, 1)))
+        tick.agent_ids = np.array([7, 9])
+        controller.acceleration(tick)
+    elapsed = controller._elapsed[1]
+
+    # Agent 7 retires, agent 11 is admitted ahead of 9.
+    tick = state([[1.0, 1.0], [5.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]], [[3.0, 1.0], [8.0, 0.0]],
+                 features=np.zeros((2, 1)))
+    tick.agent_ids = np.array([11, 9])
+    controller.acceleration(tick)
+    assert controller._elapsed[1] == pytest.approx(elapsed + DT)
+    assert controller._elapsed[0] == pytest.approx(DT)

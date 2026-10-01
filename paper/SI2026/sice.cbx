@@ -1,0 +1,58 @@
+\ProvidesFile{sice.cbx}
+
+\RequireCitationStyle{numeric-comp}
+
+% memo 区切りはtextasciitilde
+% citeとsuperciteを同じにした
+% みぎかたmkbibsuperscript
+% 名前かえないとだめ
+
+% 通常はすべての引用をまとめて[]で囲むが、今回はラベルの数字ごとに)をつけるため、[]などをつけない
+\newrobustcmd*{\mkbiboneparen}[1]{%
+  \blx@blxinit
+  \blx@setsfcodes
+  #1}
+
+% それぞれの数字の出力に干渉して)をつける
+\renewbibmacro*{cite:print:labelnumber}{%
+  \printtext[bibhyperref]{%
+    \printfield{labelprefix}%
+    \printfield{labelnumber}%
+    )}}
+
+\renewbibmacro*{cite:print:last:labelnumber}{%
+  \printtext[bibhyperref:lastkey]{%
+    \ifdef\cbx@lastprefix
+      {\printtext[labelprefix]{\cbx@lastprefix}}
+      {}%
+    \printtext[labelnumber]{\cbx@lastnumber}\printtext[bibhyperref]{)}}
+}
+
+\DeclareCiteCommand{\cite}[\mkbibsuperscript]
+  {\usebibmacro{cite:init}%
+   \usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+   \usebibmacro{cite:comp}}
+  {}
+  {\usebibmacro{cite:dump}%
+   \usebibmacro{postnote}}
+
+\let\Cite\relax
+\DeclareCiteCommand{\Cite}[\mkbiboneparen]
+  {\usebibmacro{cite:init}%
+   \usebibmacro{prenote}}
+  {\usebibmacro{citeindex}%
+   \usebibmacro{cite:comp}}
+  {}
+  {\usebibmacro{cite:dump}%
+   \usebibmacro{postnote}}
+
+\renewcommand*{\multicitedelim}{\addcomma\space}
+\renewcommand*{\multicitesubentrydelim}{\addcomma\space}
+\renewcommand*{\multiciterangedelim}{\addnbspace --}
+\renewcommand*{\multicitesubentryrangedelim}{\addnbspace --}
+
+
+
+
+\endinput
