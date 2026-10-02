@@ -5,6 +5,16 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **Every induced guard is dominated by the agent's own `speed`.** TTC, d_lat and v_rel carry small weights in every tree induced so far (§4.6).
+> - **Routing fidelity: 71.9% in-sample, 66.8–72.3% held out** (§6.1, §9.2). Routing is the largest single loss in the open-loop distillation: +0.07–0.09 m ADE (§9.2).
+> - **The guards' dependence on speed creates a feedback loop.** At speed ~0 every guard toward `stop` passes, so a stopped agent was held in `stop` forever (§9.5). A finite-duration stop now breaks the deadlock (§9.6), but agents resume into slow leaves and stay slow. A guard feature the leaf cannot drive, e.g. preferred minus current speed, is still needed.
+> - **Clearance mismatch.** Induction computes `clearance` from the environment crop, but the runtime builds features without an SDF (clearance = 0). This changes the routed leaf on 0.4–0.7% of test windows (§9.2).
+> - **TTC as written (‖p‖/‖v_rel‖) reports a finite, alarming value for pairs that will pass each other.** It is implemented as time-to-contact of two discs, capped at 10 s (`src/flow2bt/features.py`).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 Subsystem 3 reveals *where* trajectories diverge into different strategies, but does not provide an online decision rule. When an autonomous agent or simulated pedestrian moves through an environment, it cannot integrate future trajectories to decide which branch to take.

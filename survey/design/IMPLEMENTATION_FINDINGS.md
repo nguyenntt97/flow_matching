@@ -399,12 +399,15 @@ meaningful.
 
 ## 8. Still open
 
-* Scene evaluation with the finite stop leaf (§9.6), and the slow-leaf loop it
-  leaves behind. The §6 row predates the fix, is a **single trial**
-  against CrowdES's 20, and depended on the bug.
-* The `d_min` frontier sweep across {0.2, 0.3, 0.45, 0.6}.
-* `BTController` end-to-end in the runtime (the plumbing is tested; the induced
-  bundle has not yet been run through a full scene).
+* **The CBF-only floor under the current runtime.** The only waypoint + CBF
+  scene runs are single trials with `dense_output=true`, from before the
+  id-keyed state. Without a 5-trial floor, the tree's own contribution in §9.7
+  cannot be separated from the filter's (§10).
+* The slow-leaf loop that the finite stop leaves behind (§9.6, §9.7): a guard
+  feature the leaf does not control, e.g. preferred minus current speed.
+* The `d_min` frontier sweep, re-run after §9.4–§9.6. The only sweep so far
+  (§10) predates all three fixes.
+* 20 trials for any row that goes into the paper, to match CrowdES.
 * Subsystem 7b (BehaVerify / nuXmv). Deliberately not gating anything: nuXmv is
   external and licence-gated. The planned substitute is a bounded falsification
   harness against the real runtime.
@@ -493,14 +496,15 @@ reproduces the old behaviour so the closed-loop numbers in §6 can be compared.
 
 ### 9.5 Closed loop after the fix: the stop leaf is absorbing
 
-`seq_eth`, 5 trials, CBF@0.45, `rotate_forcing=true`:
+`seq_eth`, 5 trials, CBF@0.45, `rotate_forcing=true`. Per-agent controller
+state was still keyed by row in these runs (see §9.6):
 
 | | Collision | raw | Density | Population | Kinematics | DTW | Travel Time | agents / trial |
 |---|---|---|---|---|---|---|---|---|
 | CrowdES (20 trials) | 0.00781 | — | 0.0180 | 0.182 | 0.340 | 1.62 | 0.596 | 277 |
 | BT, GT tree, **pre-fix**, 1 trial (§6) | 0.00249 | 0.00010 | 0.0196 | 0.200 | 0.467 | 2.08 | 0.576 | 282 |
-| BT, GT tree, fixed | 0.00664 ± 0.00834 | 0.0 | 0.0324 | 0.338 | 0.754 | 2.28 | 1.867 | 129 |
-| BT, flow x16 tree, fixed | 0.00112 ± 0.00053 | 0.0 | 0.0513 | 0.549 | 1.487 | 2.58 | 4.616 | 188 |
+| BT, GT tree, fixed | 0.00664 ± 0.00834 | 0.0 | 0.0324 | 0.338 | 0.754 | 2.28 | 1.867 | 188 |
+| BT, flow x16 tree, fixed | 0.00112 ± 0.00053 | 0.0 | 0.0513 | 0.549 | 1.487 | 2.58 | 4.616 | 115 |
 
 Fixing §9.4 made every realism metric worse. The cause is structural, not the fix.
 Every guard is dominated by the agent's own `speed`, and at speed ~0 every
@@ -525,7 +529,7 @@ A resume path needs a feature that the stop leaf does not drive to a fixed
 point: time-in-leaf, preferred minus current speed, or a finite-duration `stop`
 that returns SUCCESS and falls through.
 
-### 9.6 Finite-duration stop leaf (implemented, not yet scene-evaluated)
+### 9.6 Finite-duration stop leaf
 
 `BTController(finite_stop=True)`, the default, and `runtime.finite_stop` in
 `eval_flow2bt.yaml`:
@@ -561,3 +565,116 @@ slow, and the speed-dominated guards keep choosing the slow leaf. It never gets
 back to its 1.3 m/s preferred speed. Expect Travel Time to improve over §9.5 but
 not to reach CrowdES. Closing this last loop needs a guard feature the leaf does
 not control, such as preferred speed minus current speed.
+
+### 9.7 Closed loop with the finite stop
+
+`seq_eth`, 5 trials, CBF@0.45, `rotate_forcing=true`, id-keyed state. Mean ±
+std over trials for Collision; the other columns are means.
+
+| | Collision | raw | Density | Population | Kinematics | DTW | Travel Time | agents / trial | stop yields |
+|---|---|---|---|---|---|---|---|---|---|
+| CrowdES (20 trials) | 0.00781 ± 0.00193 | — | 0.0180 | 0.182 | **0.340** | **1.62** | **0.596** | 277 | — |
+| BT, GT tree, absorbing stop | 0.01639 ± 0.01058 | 0.0 | 0.0341 | 0.357 | 0.926 | 2.45 | 2.516 | 157 | 0 |
+| **BT, GT tree, finite stop** | 0.00272 ± 0.00075 | 0.00029 | **0.0182** | **0.185** | 0.438 | 2.10 | 0.711 | 269 | 367 |
+| BT, flow x4 tree, finite stop | 0.00284 ± 0.00146 | 0.00009 | 0.0221 | 0.225 | 0.517 | 2.15 | 0.883 | 254 | 1576 |
+| BT, flow x16 tree, finite stop | **0.00185 ± 0.00051** | 0.00010 | 0.0229 | 0.235 | 0.550 | 2.19 | 1.014 | 239 | 994 |
+
+Ground truth has 406 agents per trial. `stop yields` is cumulative over the 5
+trials.
+
+* **The finite stop is what makes the tree work in closed loop.** On the same GT
+  tree and code, the only difference between the two GT rows is
+  `finite_stop`. Travel Time EMD drops 2.52 -> 0.71, Kinematics 0.93 -> 0.44,
+  agents finishing 157 -> 269, and collisions 6x.
+* **Id-keyed state alone made the absorbing stop worse.** Compare the absorbing
+  row with §9.5's row-keyed GT run: Collision 0.0066 -> 0.0164, Travel Time 1.87 -> 2.52.
+  Wiping every agent's state on each crowd-size change had been releasing some
+  stuck agents, by accident.
+* **Against CrowdES, the GT tree with finite stop:** 2.9x fewer collisions,
+  matches Density (0.0182 vs 0.0180) and Population (0.185 vs 0.182), and is worse
+  on Kinematics (0.44 vs 0.34), DTW (2.10 vs 1.62) and Travel Time (0.71 vs 0.60).
+* **The flow-induced trees are worse than the GT tree on every realism metric.**
+  This matches open loop (§9.2). They stop more often: 1576 and 994 yields against
+  367, with stop holding 38% of their induction sets. They also finish fewer
+  agents. Their lower collision rate comes with a slower, sparser crowd, so it
+  is not clean evidence for the teacher.
+* **Travel Time stays above CrowdES** for every tree, as §9.6 predicted from the
+  slow-leaf loop.
+* **The reported collision rate stays non-zero while raw stays ~1e-4.** Spawns
+  inside `d_min` rose to 18–30 (from ~10), because more agents are on the
+  scene at once.
+* **The pre-fix 5-trial sweep** (§10, `d_min = 0.45`) gave Collision 0.00334 ±
+  0.00129 and Travel Time 0.683. Table 1's 0.00249 was a single favourable trial.
+
+Still missing: the CBF-only floor under this runtime (§8). Until it exists,
+"2.9x fewer collisions than CrowdES" cannot be attributed to the tree rather
+than to the filter. §6 suggests most of it is the filter.
+
+## 10. Output index and ablation map
+
+All under `outputs/`. Each run directory holds `.hydra/overrides.yaml` (the
+exact command) and the metrics file named below. Dataset eth, seed 0.
+
+### 10.1 Teacher and baselines (agent level, test split)
+
+| what | location |
+|---|---|
+| Flow teacher checkpoint | `flow_eth/20260920-072219/checkpoints/epoch063-minfde0.0529.ckpt` |
+| Teacher vs released CrowdES, K=1 and K=20, seeds 0–2 | `cmp_agent_eth/{s,k1-s}{0,1,2}-{epoch063-minfde0.0529,simulator}/` |
+
+### 10.2 Induction (§9.1). Ablation: induction source, rollouts per state
+
+`<dir>/bundle.pkl` (tree + DMP bank + leaf prototypes), `induction.json`, `tree.txt`.
+
+| source | states x rollouts | location |
+|---|---|---|
+| ground truth, world frame (superseded) | 4096 x 1 | `induce_ground_truth_eth/20260920-073053` |
+| ground truth, navmesh frame (pre-prototype export) | 4096 x 1 | `induce_ground_truth_eth/20260920-073830` |
+| **ground truth** | 4096 x 1 | `induce_ground_truth_eth/20260930-150453` |
+| flow | 4096 x 1 | `induce_flow_r1_eth/20260930-150510` |
+| flow | 4096 x 4 | `induce_flow_r4_eth/20260930-150527` |
+| flow | 1024 x 16 | `induce_flow_r16_eth/20260930-150556` |
+
+The 20260930 ground-truth run reproduces 20260920-073830 exactly; it adds the
+prototypes `evaluate_bt_openloop` needs.
+
+### 10.3 Open-loop tree evaluation (§9.2, §9.4). Ablation: bundle x `rotate_forcing`
+
+`<dir>/metrics.json`, from `python -m src.evaluate_bt_openloop`.
+
+| bundle | `rotate_forcing=true` (fixed) | `false` (pre-fix) |
+|---|---|---|
+| ground truth | `ol_gt_rftrue/20260930-151314` | `ol_gt_rffalse/20260930-151314` |
+| flow 4096 x 1 | `ol_r1_rftrue/20260930-151314` | `ol_r1_rffalse/20260930-151314` |
+| flow 4096 x 4 | `ol_r4_rftrue/20260930-151314` | `ol_r4_rffalse/20260930-151314` |
+| flow 1024 x 16 | `ol_r16_rftrue/20260930-151314` | `ol_r16_rffalse/20260930-151314` |
+
+`eval_bt_openloop_eth/20260930-150706` is a 2,000-window smoke run.
+
+### 10.4 Closed-loop scene evaluation. Ablation: controller, bundle, forcing fix, stop semantics, state keying
+
+`<dir>/flow2bt_<controller>_dmin<d>.json` (metrics, per-trial records, runtime
+diagnostics), `frontier.json`, `evaluate_flow2bt.log`. All CBF@0.45 unless noted.
+
+| § | controller / bundle | forcing | stop | state | trials | location |
+|---|---|---|---|---|---|---|
+| 3 | waypoint, `dense_output=true` | — | — | row | 1 | `eval_flow2bt_eth/20260920-071250`, `-071539`, `-071831` |
+| 6.1 | BT, GT world-frame bundle | pre-fix | absorbing | row | 1 | `eval_flow2bt_eth/20260920-073506` |
+| 6.3 | BT, GT, no action lifecycle | pre-fix | absorbing | row | 1 | `eval_flow2bt_eth/20260920-073910` |
+| 6 | BT, GT (Table 1 row) | pre-fix | absorbing | row | 1 | `eval_flow2bt_eth/20260920-074300` |
+| 9.7 | BT, GT, **`d_min` sweep 0.2/0.3/0.45/0.6** | pre-fix | absorbing | row | 5 | `eval_flow2bt_eth/20260920-074557` |
+| 9.5 | BT, GT | fixed | absorbing | row | 5 | `cl_gt_fixed/20260930-152552` |
+| 9.5 | BT, flow 1024 x 16 | fixed | absorbing | row | 5 | `cl_r16_fixed/20260930-154247` |
+| 9.7 | BT, GT | fixed | absorbing | id | 5 | `cl_gt_absorbing/20261001-152710` |
+| 9.7 | BT, GT | fixed | **finite** | id | 5 | `cl_gt_finitestop/20261001-145646` |
+| 9.7 | BT, flow 4096 x 4 | fixed | **finite** | id | 5 | `cl_r4_finitestop/20261001-150651` |
+| 9.7 | BT, flow 1024 x 16 | fixed | **finite** | id | 5 | `cl_r16_finitestop/20261001-151705` |
+
+The waypoint + CBF row with `dense_output=false` in §6 (0.00259, Kinematics
+0.451) has no surviving run directory.
+
+Directories with only an `evaluate_flow2bt.log` and no metrics JSON are runs
+that were killed. Delete them: `cl_*/20260930-151314` and
+`cl_*/20260930-151858` (including `cl_waypoint`, `cl_gt_prefix`,
+`cl_r4_prefix`, `cl_r16_prefix`, `cl_r4_fixed`).
+

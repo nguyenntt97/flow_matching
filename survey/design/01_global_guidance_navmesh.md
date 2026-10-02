@@ -5,6 +5,14 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **The navmesh waypoint cannot be a DMP goal** (`g = c_{t,nav}`). It recedes as the agent advances, so the spring never relaxes: with K=100, tau=1.8 s and the median waypoint distance of 1.46 m it commands 45 m/s², 15x `a_max`. Each DMP execution instead gets a fixed goal: entry position + the leaf's displacement rotated onto the live navmesh direction (§6.2).
+> - **Leaves must be induced in the navmesh frame**: rotate each future so its waypoint lies along +x before clustering. Without it, leaves encode world direction (three of eight came out as `backstep`); with it, tree routing fidelity rises from 54.1% to 71.9% (§6.1).
+> - **A* once per agent, not per tick.** Planning once and projecting onto the cached polyline cut A* calls 610x. This helps any controller, the CBF-only baseline included, so it is not a contribution of the tree (§5).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 In continuous pedestrian locomotion, agents navigate across non-convex spatial layouts (corridors, intersections, plazas with trees, pillars, and urban structures). A local reactive controller or flow policy cannot plan long-term global paths across U-shaped obstacles without suffering from local minima. 

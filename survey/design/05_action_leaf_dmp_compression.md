@@ -5,6 +5,19 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **Integration step.** Semi-implicit Euler is unstable at the simulator's 0.2 s step (K=100, tau=2 s); the leaves must be sub-stepped (§4.1). The runtime ticks at **50 ms (20 Hz), not 10 ms / 100 Hz** (§9.3).
+> - **Basis count vs. samples.** A 2 s leaf at 5 fps is 11 points. Fitting 20 bases to them made replay error *worse* (2.2 → 8.9 cm), so demonstrations are spline-resampled onto the integration grid first (§4.2).
+> - **`g_ℓ = c_{t,nav}` (section 1.1 below) does not work**: the waypoint recedes. Each execution uses a fixed goal (§6.2).
+> - **The lifecycle is load-bearing.** Without re-entry on SUCCESS / phase timeout, 71 of 406 agents finished and Travel Time EMD was 11.9 (§6.3).
+> - **The forcing term must be evaluated in the fitted (navmesh) frame and rotated out.** Applying fitted-frame weights to world axes (with the `g − x0` clamp) put 0.5 m of error on replays; fixed in `DMPBank.acceleration` (§9.4).
+> - **`||x − g|| ≤ ε → SUCCESS` (section 1.3 below) is degenerate for a stop leaf**: its goal lies within ε of its entry. Stationary leaves now end by time instead: RUNNING for tau, then FAILURE for a refractory tau, so the enclosing Fallback falls through to a walking subtree (§9.6).
+> - **The mode table in section 1.2 below is not what is fitted.** Leaves are regressed from induced clusters, not hand-designed (no `D = 4√K` stop, no 2.5x tau yield).
+> - **Measured replay error vs. each leaf's prototype: 0–7 cm** at the 50 ms tick. Executing a leaf as a DMP adds no measurable open-loop error over its prototype (routed ADE 0.350 vs 0.352) (§9.2).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 In complex continuous control, running a multi-million parameter neural network (e.g. UNet, Transformer, or numerical ODE solver) at every control tick incurs high computational latency ($> 20 - 100\,\text{ms}$) and consumes heavy GPU resources.

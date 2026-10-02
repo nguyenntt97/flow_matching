@@ -41,7 +41,7 @@
 \RequirePackage{setspace} % 行間設定用パッケージ
 \setstretch{0.8} % 行間設定
 \sectiondot{section}
-% \sectionpunct{section}{.} % replaces \sectiondot{section} % sectionの数字の後のドットの有効化
+\sectionpunct{section}{.} % replaces \sectiondot{section} % sectionの数字の後のドットの有効化
 \RequirePackage{caption} % キャプションとサブキャプションのパッケージ
 \RequirePackage{subcaption}
 \RequirePackage{here} % 好きな位置にfigなどを置くためのパッケージ
@@ -159,8 +159,8 @@
 % \ModifyHeading{subsection}{before_space=7pt, after_space=4pt}
 % \ModifyHeading{subsubsection}{before_space=6pt, after_space=3pt}
 
-\ModifyHeading{section}{before_space=8pt, after_space=5pt, after_label_space=0.1em}
-\ModifyHeading{subsection}{before_space=7pt, after_space=4pt}
+\ModifyHeading{section}{before_space=8pt, after_space=5pt, after_label_space=0.5em}
+\ModifyHeading{subsection}{before_space=7pt, after_space=4pt, after_label_space=0.5em}
 \ModifyHeading{subsubsection}{before_space=6pt, after_space=3pt, after_label_space=0.1em}
 
 % セクションが連続する際の行取りを設定

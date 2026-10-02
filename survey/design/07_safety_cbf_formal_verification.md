@@ -5,6 +5,18 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **`d_min = 0.7 m` is refuted.** Real pedestrians are within 0.7 m on 8.7% of agent-frames. The benchmark scores collisions at **0.2 m**, where ground truth is 0.0001. The runtime uses 0.45 m (§1.3).
+> - **CrowdES's collision rate is 0.78%** (0.00781 ± 0.00193 over 20 trials), not 2.5–3.2% (§2).
+> - **C_R = 0 holds on the simulated state, not on the reported metric.** Raw collisions are exactly 0. The reported rate is introduced by upstream's walkable-mask snap after the filter, and agents can spawn inside `d_min`, where a barrier certifies nothing (§3).
+> - **The slack weight is a safety parameter.** At λ=1 separation collapsed to 0.003 m; λ=1e4 is needed (§4.3).
+> - **Eq. (1.1.1) with `u_j` on the right-hand side makes both agents brake fully.** The fix is responsibility sharing at 0.5 (§4.4).
+> - **Eq. (1.1.2) contains no `u`.** The obstacle barrier is relative degree 2 and needs the same higher-order treatment as the pairwise barrier (§4.5).
+> - **Model checking the tree proves properties of action selection, not of the closed loop.** `LTLSPEC G !(distance < 0.7)` is not established that way (§7.1). Bounded falsification found no collision counterexample, plus the predicted deadlock at exactly zero lateral offset with `d_min = 0.45` (8 of 50 head-on episodes) (§7.2).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 Pure machine learning policies—including continuous flow models ([Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)), diffusion models, and neural RL—provide only statistical guarantees. In dense pedestrian crowds, even state-of-the-art flow policies incur non-zero collision rates ($C_R \approx 1.5 - 3.2\%$). Furthermore, deep models cannot be formally audited or certified against safety regulations (e.g., ISO 13482 for mobile robotics, Industry 5.0 human-robot safety standards [Hémono et al., 2026](../13_hemono2026_automatic_bt_generation_hrc.md)).

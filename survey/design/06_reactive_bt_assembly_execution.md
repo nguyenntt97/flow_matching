@@ -5,6 +5,18 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **CrowdES's chunk is 2 s (10 frames), not 4 s.** Its decision rate is 0.5 Hz, and the worst-case mode-switch latency is 2000 ms, not 4000 ms (§1.1).
+> - **The baseline is fast.** The CrowdES simulator is one batched MLP pass, so the gap is in *decision interval*, not compute latency (§1.2).
+> - **The runtime ticks at 50 ms (20 Hz), not 100 Hz / 10 ms** (§9.3). The reactivity gap is therefore 40x, not 400x.
+> - **The induced topology is not the hand-drawn Safety / Progress / Recovery tree above.** It mirrors the dendrogram: `Fallback(Sequence(guard_k, left), right)` at each split, with speed-dominated guards (§4.6).
+> - **Fallback semantics carry the stop fix.** A stationary leaf fails after its duration, and the enclosing Fallback moves to the walking subtree (§9.6). Before that, `stop` was absorbing (§9.5).
+> - **No ROA / Lyapunov certificate has been computed**, so the 'global asymptotic stability' claimed in section 1.3 below is not established.
+> - **Closed loop, almost all of the collision reduction is the CBF, not the tree.** Waypoint + CBF gets 0.00259 against the tree's 0.00249 (§6). The tree's earlier realism numbers depended on a bug (§9.4–§9.5). With the finite stop, the GT tree gets 0.00272 collisions over 5 trials (§9.7). The CBF-only floor under the same runtime is still unmeasured.
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 In baseline continuous flow matching policies (such as [Bae et al., 2025](../14_bae2025_continuous_crowd_locomotion_crowdes.md)), locomotion is generated in fixed chunks ($T_f = 20$ frames / $4\,\text{s}$ at $5\,\text{fps}$). Mode selection is governed by a discrete Markov transition network $\mu_\varphi(b_f \mid b_h, \dots)$ evaluated **only once every 4 seconds**. When sudden dynamic obstacles, oncoming pedestrians, or velocity changes occur within a chunk, the policy is unable to switch behavioral modes, leading to collisions ($C_R > 2.5\%$) or jerky corrective nudges.

@@ -11,6 +11,16 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **Chunk length.** CrowdES chunks are 2 s (10 frames at 5 fps), and its simulator is one MLP pass, not a diffusion or ODE solve (§1.1, §1.2).
+> - **Leaves are not unimodal** (dispersion 0.13–0.50 m RMS), and the induced hierarchy only partly matches CrowdES's B=8 modes (ARI 0.54–0.59) (§4.6, §9.1).
+> - **The guards are dominated by own speed.** Routing fidelity is 66.8–72.3% held out (§9.2).
+> - **Safety: `d_min = 0.7 m` is refuted.** Collisions are scored at 0.2 m, and CrowdES's rate is 0.78%. C_R = 0 holds on raw simulated state only (§1.3, §2, §3).
+> - **Pipeline vs. measurement.** The flow teacher does not yet produce a better tree than ground truth. Open-loop, the distilled tree is ~30% above the teacher's ADE, and constant velocity beats both (§9.2).
+
+---
+
 ## 1. Executive Summary & Design Vision
 
 ### 1.1 The Core Motivation

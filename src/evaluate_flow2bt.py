@@ -3,6 +3,7 @@
     python -m src.evaluate_flow2bt data=eth
     python -m src.evaluate_flow2bt data=eth d_min_sweep=[0.2,0.45] trials=5
     python -m src.evaluate_flow2bt data=eth runtime.use_cbf=false     # ablation
+    python -m src.evaluate_flow2bt data=eth trials=1 viz=true          # scene video
 
 Scored by the same ``src/eval_loop.py`` as the baseline, so the two are
 comparable by construction rather than by care.
@@ -140,6 +141,10 @@ def main(cfg: DictConfig) -> None:
         summary = evaluate_scenes(
             crowdes_cfg, seed=int(cfg.seed), trials=int(cfg.trials),
             framework_factory=factory, scene_limit=cfg.scene_limit, label=label,
+            viz=bool(cfg.viz), viz_trials=int(cfg.viz_trials), viz_fps=int(cfg.viz_fps),
+            viz_max_seconds=cfg.viz_max_seconds,
+            # One folder per d_min, so a sweep does not overwrite its own videos.
+            out_dir=out_dir / f"dmin{cbf_config.d_min:g}",
         )
         framework = holder["framework"]
         summary["runtime"] = {

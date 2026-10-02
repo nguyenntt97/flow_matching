@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html data-mode="sepia" lang="en" data-page-url="https://paper.aislab.org/reviews/a849a11d-8258-4a8e-8e95-42d454084e7d/"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <style type="text/css" id="ftp">html[data-mode="light"] {
+    color-scheme: light;
+    --fg: #222;
+    --bd: #222;
+    --bg: whitesmoke;
+  }
+  html[data-mode="dark"] {
+    color-scheme: dark;
+    --fg: #eee;
+    --bd: #eee;
+    --bg: #333;
+  }
+  html[data-mode="sepia"] {
+    color-scheme: light;
+    --fg: #5b4636;
+    --bd: #5b4636;
+    --bg: #f4ecd8;
+  }
+  html[data-mode="solarized-light"] {
+    color-scheme: light;
+    --fg: #586e75;
+    --bd: #586e75;
+    --bg: #fdf6e3;
+  }
+  html[data-mode="nord-light"] {
+    color-scheme: light;
+    --fg: #2e3440;
+    --bd: #2e3440;
+    --bg: #e5e9f0;
+  }
+  html[data-mode="groove-dark"] {
+    color-scheme: dark;
+    --fg: #cec4ac;
+    --bd: #cec4ac;
+    --bg: #282828
+  }
+  html[data-mode="solarized-dark"] {
+    color-scheme: dark;
+    --fg: #839496;
+    --bd: #839496;
+    --bg: #002b36;
+  }
+  html[data-mode="nord-dark"] {
+    color-scheme: dark;
+    --fg: #e5e9f0;
+    --bd: #e5e9f0;
+    --bg: #2e3440;
+  }
+  html[data-mode="black-dark"] {
+    color-scheme: dark;
+    --fg: #c0c0c0;
+    --bd: #c0c0c0;
+    --bg: #000;
+  }
+  html[data-mode="white-light"] {
+    color-scheme: light;
+    --fg: #000;
+    --bd: #000;
+    --bg: #fff;
+  }</style>
+  <style>
+    /* latin */
+    @font-face {
+      font-family: 'Comic Neue';
+      font-style: normal;
+      font-weight: 400;
+      src: url(fonts/4UaHrEJDsxBrF37olUeD96rp57F2IwM.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    /* latin */
+    @font-face {
+      font-family: 'Lexend Deca';
+      font-style: normal;
+      font-weight: 400;
+      src: url(fonts/K2FifZFYk-dHSE0UPPuwQ7CrD94i-NCKm-U48M1wqxnDirZPl3v-.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    /* latin */
+    @font-face {
+      font-family: 'Poppins';
+      font-style: normal;
+      font-weight: 400;
+      src: url(fonts/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+
+    :root {
+      --fg: #000; /* foreground  */
+      --bg: #fff; /* background  */
+      --bd: #000; /* border  */
+      --lk: #006fa5; /* link */
+      --lkv: #d33bf0; /* link visited */
+      --hg: #ffff81; /* highlight  */
+    }
+    html {
+      overflow: overlay;
+      scrollbar-color: var(--fg) var(--bg);
+    }
+    html[data-mode$="dark"] {
+      --lk: #0096de;
+    }
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 30px auto 0 auto;
+      padding: 10px;
+      position: relative;
+
+      color: var(--fg);
+      border-color: var(--bd);
+      background-color: var(--bg);
+    }
+
+
+    @media print {
+      html[data-mode] {
+        --fg: #000;
+        --bd: #000;
+        --bg: #fff;
+
+        width: unset;
+        padding: 0;
+        margin: 0;
+      }
+    }
+    iframe,
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+    img:not([width])[src$=".svg"] {
+      max-width: 100px;
+    }
+    body[data-images=false] canvas,
+    body[data-images=false] svg,
+    body[data-images=false] img {
+      display: none;
+    }
+    svg:not([width]):not([height]) {
+      max-width: 25vmin;
+    }
+    a {
+      color: var(--lk);
+      text-decoration: none;
+    }
+    a:visited {
+      color: var(--lkv);
+    }
+
+    hr {
+      background-color: var(--bd);
+      height: 1px;
+      border: 0;
+    }
+    #reader-domain {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: Helvetica, Arial, sans-serif;
+      text-decoration: none;
+      border-bottom-color: currentcolor;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      direction: ltr;
+    }
+    #reader-domain > span:nth-of-type(1) {
+      font-size: 1.1em;
+    }
+    #reader-domain > span:nth-of-type(2) {
+      font-size: 0.8em;
+    }
+    #reader-domain[data-mode="compact"] > span:nth-of-type(3) {
+      display: none
+    }
+    #reader-domain:not([data-mode="compact"]) > span:nth-of-type(1),
+    #reader-domain:not([data-mode="compact"]) > span:nth-of-type(2) {
+      display: none;
+    }
+
+    #reader-title {
+      font-size: 1.6em;
+      line-height: 1.25em;
+      width: 100%;
+      margin: 20px 0;
+      padding: 0;
+    }
+    #reader-credits,
+    #doi,
+    #published-time,
+    #reader-estimated-time {
+      font-size: 0.85em;
+      line-height: 1.48em;
+      margin: 0 0 10px 0;
+      padding: 0;
+    }
+    #reader-credits:not(:empty)::after {
+      content: ' ⋮ ';
+    }
+    #published-time:not(:empty)::before {
+      content: ' ⋮ ';
+    }
+    #doi-json {
+      overflow: hidden;
+    }
+    #doi-json code {
+      overflow: auto;
+      max-height: 400px;
+    }
+    #published-time:empty,
+    #reader-credits:empty {
+      display: none;
+    }
+    mark.hghlght {
+      background-color: var(--hg);
+    }
+    body:not([data-columns="1"]) .page :is(h1, h2) {
+      column-span: all;
+      background-color: rgba(125, 125, 125, 0.1);
+      padding: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    .page-separator {
+      background-color: rgba(125, 125, 125, 0.1);
+      padding-block: 2ch;
+      text-align: center;
+      font-size: medium;
+    }
+  </style>
+  <style id="user-css">body {
+  padding-bottom: 64px;
+}
+pre {
+  white-space: pre-wrap;
+}
+pre code {
+  background-color: #eff0f1;
+  color: #393318;
+  font-family: monospace;
+  display: block;
+  padding: 5px 10px;
+  overflow: hidden;
+}
+blockquote {
+  padding: 0;
+  padding-inline-start: 2ch;
+  border-inline-start: 2px solid var(--bd);
+}
+aside {
+  color: color-mix(in srgb, var(--fg), var(--bg) 20%);
+}
+body[data-mode="dark"] pre code {
+  background-color: #eff0f1;
+  color: #393318;
+}
+
+/* CSS for sans-serif fonts */
+body[data-font=sans-serif] {}
+/* CSS for serif fonts */
+body[data-font=serif] {}
+
+/* CSS for "sepia" theme */
+html[data-mode=sepia] body {}
+/* CSS for "light" theme */
+html[data-mode=light] body {}
+/* CSS for "dark" theme */
+html[data-mode=dark] body {}
+/* CSS for "black-dark" theme */
+html[data-mode=black-dark] body {}
+/* CSS for "white-light" theme */
+html[data-mode=white-light] body {}
+
+/* Csutom styling if page includes example.com in the URL */
+html[data-page-url*="example.com"] {
+  a {
+    display: none;
+  }
+}</style>
+<title>AIS Lab. Manuscript Checker</title><title>AIS Lab. Manuscript Checker :: Reader View</title></head>
+<body tabindex="1" data-images="true" data-font="sans-serif" data-columns="1">
+  <span></span> <!-- for IntersectionObserver -->
+  <a id="reader-domain" data-mode="compact" href="https://paper.aislab.org/reviews/a849a11d-8258-4a8e-8e95-42d454084e7d/"><button id="qr-button" style="border-width: medium; border-style: none; border-color: currentcolor; border-image: none; background: transparent; padding: 0px; cursor: pointer;"><svg viewBox="0 0 256 256" style="width: 24px; fill: var(--fg); pointer-events: none;"><rect height="80" rx="16" width="80" x="40" y="40"></rect><rect height="80" rx="16" width="80" x="40" y="136"></rect><rect height="80" rx="16" width="80" x="136" y="40"></rect><path d="M144,184a8,8,0,0,0,8-8V144a8,8,0,0,0-16,0v32A8,8,0,0,0,144,184Z"></path><path d="M208,152H184v-8a8,8,0,0,0-16,0v56H144a8,8,0,0,0,0,16h32a8,8,0,0,0,8-8V168h24a8,8,0,0,0,0-16Z"></path><path d="M208,184a8,8,0,0,0-8,8v16a8,8,0,0,0,16,0V192A8,8,0,0,0,208,184Z"></path></svg></button>
+    <span>paper.aislab.org</span>
+    <span>/reviews/a849a11d-8258-4a8e-8e95-42d454084e7d/</span>
+    <span>https://paper.aislab.org/reviews/a849a11d-8258-4a8e-8e95-42d454084e7d/</span>
+  </a>
+  <h1 dir="auto" id="reader-title">AIS Lab. Manuscript Checker</h1>
+  <span dir="auto" id="reader-credits"></span>
+  <span dir="auto" id="reader-estimated-time">16-20 minutes</span>
+  <span dir="auto" id="published-time"></span>
+  <hr>
+  <div id="readability-page-1" class="page"><div>
+
+<p><a href="https://paper.aislab.org/sessions/d053b517-0863-4010-8d4e-04f25bee76c9/">← SI2026 v1</a></p>
+<h2>Manuscript review</h2>
+<section><p><strong>Status:</strong> Completed</p><p><small>gpt-5.6-terra · prompt 2026-09-20.3 · rubric 2026-09-20.1</small></p>
+
+
+<p><strong>Usage:</strong> 11466 input / 3855 output tokens · cost unknown</p></section>
+<p>There is no previous completed PDF to compare with this first version.</p>
+
+<section><h2>Summary</h2><p>The manuscript presents a clear and timely idea: distilling a continuous crowd-motion policy into a reactive Behavior Tree with DMP leaves. The pipeline, central equations, and main latency motivation are easy to follow, and Table 1 provides promising initial quantitative evidence. The main revision need is reproducibility and claim calibration: the paper does not yet specify the closed-loop simulation protocol sufficiently, the comparison is not statistically balanced, and the evidence for interpretability/reactive behavior is weaker than the strength of the corresponding claims. Address these points while keeping the paper concise.</p></section>
+<section><h2>Top priorities</h2>
+<article><h3>Specify the closed-loop simulation protocol and make trial comparisons comparable</h3><p><small>EXPERIMENT-CONDITIONS · ID 2c42d069-a1bd-455f-9c58-bfc577cbc44e</small></p><p><strong>Insufficient</strong> · Must fix · p.4 Sections 4.1 and Table 1 caption</p><blockquote>The caption reports “20 for CrowdES, 5 for Flow2BT controllers,” but agent count, spawn/goal protocol, initial states, trial duration, random seeds, and the definition of “1024 × 16” are not given.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Add a compact protocol paragraph or table stating the simulator/environment, number of agents, spawn-goal and initialization procedure, simulation horizon, random seeds, Flow2BT rollout/training sampling settings, and the meaning of “1024 × 16.” Evaluate both methods on the same initial conditions and number of trials where feasible; otherwise explicitly justify the unequal counts and report variability (e.g., mean ± standard deviation or confidence interval).</p><p><small>add_existing_information</small></p></article>
+
+<article><h3>Support the claimed reactivity and interpretability with direct evidence</h3><p><small>EXPERIMENT-RESULTS · ID b8c4bbfe-c60b-44f7-a814-336dae52c7d8</small></p><p><strong>Insufficient</strong> · Must fix · p.4 Sections 4.2–4.3 and Fig. 1</p><blockquote>The paper claims “transparent, auditable decision logic” and “response latency to 10 ms,” but reports only BT evaluation time and aggregate EMD metrics; no induced tree/rules or perturbation-based reaction example is shown.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Include one compact qualitative case: show the local state/feature values, the selected condition branch and DMP leaf, and trajectories before and after a nearby-agent or obstacle change. Distinguish the 10 ms control update period from measured computation time and, if available, report the observed time from perturbation to branch/action change. If such a test is not available, limit the claim to a 100 Hz evaluation capability rather than demonstrated reactive response.</p><p><small>figure_edit</small></p></article>
+
+<article><h3>Qualify preservation claims using the observed performance gap</h3><p><small>EXPERIMENT-SCOPE-LIMIT · ID 9748f2c8-a639-4b85-b16c-c731fe2c5e06</small></p><p><strong>Insufficient</strong> · Should fix · p.4 Section 4.2 and Conclusion</p><blockquote>For Flow2BT (Flow), Kinem., DTW, and Time are “0.550, 2.19, 1.014,” versus CrowdES values “0.340, 1.62, 0.596,” while the text says it preserves realism “without sacrificing” macro-level distributions.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>State explicitly that the current results support approximate preservation of the reported macroscopic density/population measures, but show degraded agent-level kinematic, path-alignment, and travel-time similarity relative to CrowdES. Avoid extending the evidence to unreported metrics, and identify this distillation gap as a limitation and future target.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Define safety-filter and simulation constraints needed to reproduce execution</h3><p><small>METHOD-SIMULATION · ID 4a09be82-7954-4a04-863c-b7b1015babca</small></p><p><strong>Insufficient</strong> · Should fix · p.3 Section 3.3, “Decentralized Kinematic Filtering”</p><blockquote>The filter is described with “∥u_i∥∞ ≤ a_max” and “h_ij(s_i,s_j) ≥ 0,” but neither a_max, h_ij, pedestrian radius/separation margin, nor solver/integration details are specified.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Provide the operational definition of the barrier constraint, agent radius or minimum separation, acceleration bound, integration step, and how the filter is solved. A concise equation plus parameter list is sufficient for this short paper. Also state whether the same safety mechanism is used for each baseline, or explain why not.</p><p><small>add_existing_information</small></p></article>
+</section>
+<section><h2>All rubric findings</h2>
+<article><h3>Motivation and societal relevance</h3><p><small>INTRO-SOCIAL-PROBLEM · ID 7b48852a-27a7-4d65-b377-30f3cda84c34</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1, Introduction</p><blockquote>“Simulating realistic multi-agent crowd behaviors is essential for evaluating autonomous vehicles and service robots in urban settings.”</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Keep this application-oriented motivation; it effectively connects crowd simulation to safe robot evaluation.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Required technical direction</h3><p><small>INTRO-NEEDED-TECH · ID f6299d12-5f8b-450a-b07c-6570b0fe646b</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1, Introduction</p><blockquote>The paper identifies closed-loop reactivity and auditable symbolic logic as required capabilities.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No major change is needed; retain the direct connection between the limitations and the required reactive, interpretable controller.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Coverage of representative prior work</h3><p><small>INTRO-EXTERNAL-WORK · ID a7766734-aa0e-45bf-981b-564591cb9c44</small></p><p><strong>Satisfied</strong> · Optional · p.1 Sections 1–2</p><blockquote>SFM [1], ORCA [2], flow matching [3], CrowdES [4], and BT/DMP work [5–7] are introduced with their limitations.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Keep the present concise contrast between classical, generative, and BT-based approaches.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Why the remaining problem is difficult</h3><p><small>INTRO-DIFFICULTY · ID 9c2acf5a-0589-4923-957a-3b9ed7b2a076</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1</p><blockquote>The manuscript identifies “Chunked Decision Latency” and “Black-Box Opacity” as structural limitations of direct generative deployment.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No major revision is needed.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Difference from prior laboratory work</h3><p><small>INTRO-LAB-DIFFERENCE · ID 78e71821-c1e5-4fa0-a34a-23c51c852c4c</small></p><p><strong>Not applicable</strong> · Optional · — Not applicable</p><blockquote>No laboratory prior work is identified in the manuscript.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No revision is required unless the work extends a specific prior laboratory system that readers need to distinguish.</p><p><small>other</small></p></article>
+
+<article><h3>Rationale for feasibility of the proposed idea</h3><p><small>INTRO-IDEA-FEASIBILITY · ID 236d3bd6-bb15-41cc-9d1c-2c50755ad5b7</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1, final paragraph</p><blockquote>The method motivation links “tree-flow duality [6],” SVM condition induction, and DMP action compression.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>The feasibility rationale is adequate for a short paper.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Application method and advantages</h3><p><small>INTRO-APPLICATION-ADVANTAGE · ID 7cb2a421-22b2-4850-9203-281a69fc81c0</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1, contribution list</p><blockquote>The contributions state 100 Hz ticking, reactive preemption, and interpretable symbolic execution.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Retain these advantages, but align the strongest reactivity and interpretability wording with direct evidence added in the experiments.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Concrete proposed contributions</h3><p><small>INTRO-NOVELTY-CONTRIBUTION · ID 3a0ae5c0-c2cd-40ff-b1fe-8fc2101dd1d9</small></p><p><strong>Satisfied</strong> · Optional · p.1 Section 1, “Our key contributions and findings”</p><blockquote>Three concrete elements are listed: neuro-symbolic distillation, realism preservation, and DMP leaves.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>The contribution list is clear; revise only the evidence-dependent wording as noted in the scope issue.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Summary of experimentally verified findings</h3><p><small>INTRO-EXPERIMENT-FINDING · ID 93c7410a-1dcc-40e1-9634-48e9ce903c2a</small></p><p><strong>Insufficient</strong> · Should fix · p.1 Section 1, contribution list</p><blockquote>It states Flow2BT “closely preserves” distributions and “slashing reactive decision latency from 2000 ms down to 10 ms,” before the later evidence distinguishes tick rate from direct response measurement.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Revise the introductory findings to say exactly what Table 1 and runtime measurements establish: reported density/population EMDs, BT evaluation time, and 100 Hz update period. Do not present a measured environmental response time unless that experiment is included.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Simulation scenario and constraints</h3><p><small>METHOD-SIMULATION · ID 60ee8648-f1b2-4a11-a5a3-5d719b7acb13</small></p><p><strong>Insufficient</strong> · Should fix · p.3 Sections 3.1–3.3</p><blockquote>The manuscript specifies ETH seq_eth, NavMesh, a 2 s horizon, and 100 Hz ticking, but does not specify agent numbers, initialization/scenario generation, safety margins, or filter parameters.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Add the minimum reproducibility details requested in the priority issue: scenario construction, population, time horizon, safety/kinematic limits, integration, and filter configuration.</p><p><small>add_existing_information</small></p></article>
+
+<article><h3>Hardware-method reporting</h3><p><small>METHOD-HARDWARE · ID d4e8db2b-baae-429e-9208-b4a64e6917a4</small></p><p><strong>Not applicable</strong> · Optional · — Not applicable</p><blockquote>This is a simulation and software study; no hardware experiment is reported.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No hardware description is required.</p><p><small>other</small></p></article>
+
+<article><h3>Software pipeline and module interfaces</h3><p><small>METHOD-SOFTWARE · ID e6bee053-c63b-4911-94c2-9e1e308cc978</small></p><p><strong>Satisfied</strong> · Optional · p.2 Fig. 1 and Section 3</p><blockquote>Fig. 1 shows the pipeline from NavMesh/teacher policy through topology discovery to BT assembly; Sections 3.1–3.3 define its principal inputs and outputs.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>The flowchart and equations provide an appropriate overview. Add the missing execution/filter parameters, but a separate exhaustive software architecture is unnecessary.</p><p><small>add_existing_information</small></p></article>
+
+<article><h3>Learning data, model, and loss specification</h3><p><small>METHOD-LEARNING · ID b5b5c1ea-b9e7-4372-8b3c-cad0953e8c97</small></p><p><strong>Insufficient</strong> · Should fix · p.2 Section 3.1, “Continuous Locomotion Flow Matching Policy”</p><blockquote>The target and loss are defined in Eqs. (2)–(3), but the neural architecture, training split/procedure, optimizer, and dataset preprocessing are absent.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Add a concise implementation sentence/table with the teacher network architecture, training/validation/test split, optimizer and main training settings, and how ETH tracks are converted into displacement/context examples. This is necessary because the teacher is central to the reported comparison.</p><p><small>add_existing_information</small></p></article>
+
+<article><h3>Measurement-study methodology</h3><p><small>METHOD-MEASUREMENT · ID bb9ae7a9-4dad-436f-9791-f64d175eb59c</small></p><p><strong>Not applicable</strong> · Optional · — Not applicable</p><blockquote>The study evaluates simulation trajectories rather than proposing a physical measurement method.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No revision is required for this item.</p><p><small>other</small></p></article>
+
+<article><h3>Clarity of experimental purpose</h3><p><small>EXPERIMENT-PURPOSE · ID 710998e4-296f-4c35-9c88-886ce02eb20c</small></p><p><strong>Satisfied</strong> · Optional · p.3 Section 4.1</p><blockquote>The evaluation is separated into “Scene-Level Realism” and “Agent-Level Accuracy.”</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Keep this useful division of evaluation goals.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Completeness of experimental conditions</h3><p><small>EXPERIMENT-CONDITIONS · ID 4305999a-f991-433f-853c-6db933395e29</small></p><p><strong>Insufficient</strong> · Must fix · p.4 Section 4.1 and Table 1 caption</p><blockquote>Only the dataset, test-window count, and unequal trial counts are reported; core closed-loop conditions are not described.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Add the protocol details, matched trials/initial states, and variability reporting specified in the priority issue.</p><p><small>add_existing_information</small></p></article>
+
+<article><h3>Evidence-based comparison and discussion</h3><p><small>EXPERIMENT-RESULTS · ID c63cc26f-365e-4996-b280-c11cc675e92e</small></p><p><strong>Insufficient</strong> · Must fix · p.4 Sections 4.2–4.3</p><blockquote>Aggregate metrics are reported, but no direct branch-selection/reaction evidence is provided, and the worse agent-level Flow2BT metrics are not discussed.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Add a compact branch/perturbation example and explain why the DMP/tree approximation increases Kinem., DTW, and Time error relative to CrowdES. Report uncertainty where possible.</p><p><small>figure_edit</small></p></article>
+
+<article><h3>Separation of supported scope and limitations</h3><p><small>EXPERIMENT-SCOPE-LIMIT · ID 76192d6c-c2d9-4177-9d3b-d9febec43426</small></p><p><strong>Insufficient</strong> · Should fix · p.4 Section 4.2 and Section 5</p><blockquote>The conclusion says Flow2BT “closely matches” state-of-the-art realism, despite substantially worse reported Flow2BT (Flow) agent-level metrics.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Constrain the conclusion to the measured macroscopic metrics, acknowledge the agent-level gap, and state that evaluation is currently limited to ETH seq_eth.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Separation of achieved results and future work</h3><p><small>CONCLUSION-ACHIEVED-FUTURE · ID 5ce82365-3e84-4b08-b12e-70d55e5e69d0</small></p><p><strong>Insufficient</strong> · Should fix · p.4 Section 5, Conclusion</p><blockquote>Future work is clearly identified, but the achieved-result sentence does not mention the reported degradation in agent-level metrics.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Keep the future-work sentence, and revise the preceding achievement statement to distinguish demonstrated density/population similarity and high-frequency execution from limitations in agent-level fidelity and evaluation scope.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Figure and table citation in the text</h3><p><small>COMMON-FIGURE-TABLE-CITATION · ID 9d0fe104-a6a2-4b82-8ce2-8622eccf8d4b</small></p><p><strong>Satisfied</strong> · Optional · p.2 Fig. 1; Sections 3 and 4</p><blockquote>The text explicitly refers to “Fig. 1” and “Table 1” when explaining the pipeline and results.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>No revision is required; ensure that any added qualitative reaction figure is likewise cited and interpreted in the text.</p><p><small>figure_edit</small></p></article>
+
+<article><h3>Notation, units, and abbreviation consistency</h3><p><small>COMMON-NOTATION · ID 94a48e76-879c-4519-9e0c-9b2b01a25daf</small></p><p><strong>Insufficient</strong> · Should fix · p.3 Sections 3.2–3.3</p><blockquote>Equation (5) uses “Δξ_ij(T_f)” without definition, and “TTC” divides by “∥v_j − v_i∥” without specifying the zero-relative-speed case.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Define Δξ_ij explicitly, state units for displacement/velocity/acceleration where first used, and specify a numerically safe TTC convention for zero or near-zero relative velocity. Also use one consistent term for tick period, decision latency, and computation time.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Consistency of reported numerical values</h3><p><small>COMMON-NUMERIC-CONSISTENCY · ID 0b792c35-3e9b-494f-821c-c5f50834f20c</small></p><p><strong>Satisfied</strong> · Optional · p.4 Table 1 and Sections 4.2–4.3</p><blockquote>The cited values “0.2727 vs. 0.4550,” “0.0182 vs. 0.0180,” and the 100 Hz/10 ms relation agree with Table 1 and the runtime description.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Maintain this consistency after adding uncertainty and protocol details.</p><p><small>sentence_edit</small></p></article>
+
+<article><h3>Alignment between claims and evidence</h3><p><small>COMMON-CLAIM-EVIDENCE · ID 81ce4dd4-7ab5-4975-b4db-86c964906a1d</small></p><p><strong>Insufficient</strong> · Should fix · p.4 Sections 4.2–5</p><blockquote>The Flow2BT (Flow) row is worse than CrowdES on all three reported agent-level metrics, while the text broadly states that realism is preserved “without sacrificing” distributions and responsiveness.</blockquote><small>The server could not verify this quote in extractable PDF text.</small><p>Tie each claim to its specific metric: claim approximate macroscopic preservation only for Dens./Pop.; report the agent-level trade-off; and describe 10 ms as the update interval unless a direct perturbation-response measurement is added.</p><p><small>sentence_edit</small></p></article>
+</section><section><h2>Strengths</h2><ul><li>The problem statement clearly motivates reactive, interpretable crowd simulation for autonomous-robot evaluation.</li><li>The proposed teacher-flow → hierarchical topology → SVM guards/DMP leaves pipeline is coherent and well illustrated in Fig. 1.</li><li>The paper gives formal definitions for the flow-matching objective, clustering distance, SVM condition nodes, and DMP leaves.</li><li>Table 1 provides a useful separation between offline teacher forecasting and closed-loop scene/agent metrics.</li><li>The manuscript has a concise, professional structure appropriate to a short conference paper.</li></ul><h2>Limitations</h2><ul><li>Closed-loop experimental conditions and safety-filter parameters are not sufficient for reproduction.</li><li>Unequal evaluation trial counts and absent uncertainty estimates limit the strength of the benchmark comparison.</li><li>The reported Flow2BT (Flow) agent-level errors are meaningfully worse than CrowdES but are not discussed as a trade-off.</li><li>Interpretability and reactive preemption are asserted but not directly demonstrated with an induced-tree example or controlled perturbation case.</li><li>The evaluation is limited to one ETH sequence, so broad generalization claims should be avoided.</li></ul></section>
+
+
+</div></div>
+  <span></span> <!-- for IntersectionObserver -->
+  
+  
+  
+  
+
+
+<style id="note-styling">
+    .note {
+      position: absolute;
+      z-index: 10;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: inherit;
+      padding: 5px;
+      min-width: 32px;
+      min-height: 32px;
+    }
+    .note:focus {
+      z-index: 11;
+    }
+    .note[type="0"] {
+      background-color: #fff740;
+      color: #2c2c2d;
+    }
+    .note[type="0"]::placeholder {
+      color: #868226;
+    }
+    .note[type="1"] {
+      background-color: #feff9c;
+      color: #2c2c2d;
+    }
+    .note[type="1"]::placeholder {
+      color: #6d6d3d;
+    }
+    .note[type="2"] {
+      background-color: #ff65a3;
+      color: #2c2c2d;
+    }
+    .note[type="2"]::placeholder {
+      color: #65263f;
+    }
+    .note[type="3"] {
+      background-color: #ff7eb9;
+      color: #2c2c2d;
+    }
+    .note[type="3"]::placeholder {
+      color: #562b3f;
+    }
+    .note[type="4"] {
+      background-color: #7afcff;
+      color: #295c5d;
+    }
+    .note[type="4"]::placeholder {
+      color: #377677;
+    }</style></body><style>body {
+      font-size:  15px;
+      font-family: Helvetica, Arial, sans-serif;
+      width: min(100% - 2rem, 600px);
+    }
+    p {
+      text-align: justify
+    }
+    .page {
+      line-height: 22.5px;
+      column-count: unset;
+    }
+    h1, h2, h3 {
+      line-height: initial;
+    }</style></html>

@@ -5,6 +5,25 @@
 
 ---
 
+> **Status against measurement (2026-10-01).** Sections 1–5 below describe the design as proposed. Several of its headline claims did not survive implementation. The measured picture is summarised here and detailed in [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md); each subsystem document now opens with its own corrections block.
+>
+> | Design claim | Measured (eth, `seq_eth`) | Findings |
+> | :--- | :--- | :--- |
+> | CrowdES chunks are 4 s (20 frames), decision rate 0.25 Hz | **2 s** (10 frames at 5 fps), 0.5 Hz | §1.1 |
+> | CrowdES runs a neural ODE / diffusion per agent, 35–50 ms | Simulator is **one batched MLP pass**; DDIM is the emitter's | §1.2 |
+> | CrowdES collision rate 2.5–3.2% | **0.78%** (0.00781 ± 0.00193, 20 trials) | §2 |
+> | `d_min = 0.7 m` | Refuted: real pedestrians are within 0.7 m on 8.7% of frames. Benchmark scores at **0.2 m**; runtime uses 0.45 m | §1.3 |
+> | C_R = 0.0% | Raw collisions on the simulated state are 0. The reported rate is not, because of upstream post-processing and spawns inside `d_min` | §3 |
+> | BT ticked at 100 Hz (10 ms), 400x reactivity gain | Runtime ticks at **50 ms**; 40x over the 2 s chunk | §9.3 |
+> | Leaves are unimodal; hierarchy recovers the B=8 modes | Dispersion 0.13–0.50 m RMS; ARI 0.54–0.59 vs CrowdES modes; elbow suggests 2 leaves | §4.6, §9.1 |
+> | Guards on TTC / d_lat / v_rel | Every guard is dominated by the agent's own **speed**; routing fidelity 66.8–72.3% held out | §4.6, §9.2 |
+> | Flow teacher yields a better tree | Not yet: the ground-truth-induced tree has lower open-loop error. The tree is ~30% above the teacher's ADE, and constant velocity beats both | §9.1, §9.2 |
+> | Collision reduction comes from the BT | Almost all of it comes from the CBF (waypoint + CBF ≈ BT + CBF) | §6 |
+> | nuXmv proves `G !collision` | Not run (licence-gated). The SMV export proves action-selection properties only. Bounded falsification found no collision but did find the predicted zero-offset deadlock | §7 |
+> | Closed-loop Flow2BT beats CrowdES | With the finite-duration stop (GT tree, 5 trials): 2.9x fewer collisions (0.00272 vs 0.00781), matching Density and Population. Worse Kinematics (0.44 vs 0.34), DTW (2.10 vs 1.62) and Travel Time (0.71 vs 0.60). The flow-induced trees are worse than the GT tree. The CBF-only floor under this runtime is not yet measured | §9.7 |
+
+---
+
 ## 1. Executive Summary & Full System Picture
 
 Continuous Flow Matching policies and diffusion models excel at learning expressive, multi-modal trajectory distributions from human and robot demonstrations. However, when applied to real-time, safety-critical multi-agent systems—such as **continuous pedestrian crowd locomotion**—they suffer from five fundamental structural failures:
@@ -128,6 +147,8 @@ The quantitative superiority of the Flow2BT architecture over the baseline Crowd
 └──────────────────────────────────────┴────────────────────────┴────────────────────────┘
 ```
 
+> **These are design targets, not results.** For measured values, see the status table at the top of this page. In short: CrowdES collides on 0.78% of agent-frames, not 2.5–3.2%. Its decision interval is 2 s, not 4 s, and its simulator is a single batched MLP pass. The Flow2BT runtime ticks at 50 ms. Per-agent latency, agent throughput and nuXmv verification have not been measured or run.
+
 ---
 
 ## 6. How to Navigate this Directory
@@ -141,3 +162,4 @@ For an in-depth exploration of each component, consult the respective subsystem 
 6. [06_reactive_bt_assembly_execution.md](./06_reactive_bt_assembly_execution.md): Sequence/Fallback synthesis, $100\,\text{Hz}$ preemption vs 4s Markov delay, Guarded Fallback ROA, differentiable soft-relaxation.
 7. [07_safety_cbf_formal_verification.md](./07_safety_cbf_formal_verification.md): Pairwise inter-agent and obstacle CBF-QP filters ($C_R = 0.0\%$), BehaVerify DSL compiler, nuXmv SMT proofs.
 8. [08_system_synthesis_pedestrian_locomotion.md](./08_system_synthesis_pedestrian_locomotion.md): End-to-end corridor counter-flow walkthrough, quantitative benchmarks, and comprehensive subsystem interface map.
+9. [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md): What the implementation actually measured, including every correction to documents 01–08.

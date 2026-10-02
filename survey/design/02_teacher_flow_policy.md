@@ -5,6 +5,16 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **The horizon is 2 s, not 4 s**: `future_length: 10` at 5 fps on eth and six of the other seven datasets; gcs alone uses 50 frames (§1.1).
+> - **CrowdES's locomotion simulator is not a diffusion model.** It is one MLP forward pass, batched over the whole scene. The 50-step DDIM belongs to the *emitter* (§1.2). The DDIM row in section 2 below does not describe the baseline.
+> - **Teacher, measured on the eth test split (29,275 windows):** ADE 0.2721 / FDE 0.5321 (argmax latent) vs CrowdES 0.2896 / 0.5659; minADE₂₀ 0.1562 vs 0.2372. It costs 10 decoder evaluations per sample (5 midpoint steps). See `src/README.md`.
+> - **As an induction source the teacher does not yet beat ground truth.** Its rollouts from one state land in the same leaf ~93% of the time at B=8 over 2 s, so its multimodality is only a ~7% effect. The ground-truth-induced tree has the lower open-loop error (§9.1, §9.2).
+> - **Constant-velocity extrapolation beats the teacher** at this horizon on eth: ADE 0.216 vs 0.272 (§9.2).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 In the Flow2BT architecture, the **Teacher Flow Policy** acts as an exploratory expert. It is trained on real-world pedestrian demonstration datasets (e.g. ETH, UCY, Stanford Drone Dataset) to model the continuous probability distribution over footstep velocities conditioned on social interactions and local geometry:

@@ -5,6 +5,15 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **Leaves are not unimodal.** Leaf dispersion is 0.13–0.50 m RMS over a ~2.6 m movement, whether induced from ground truth or the teacher (§4.6, §9.1). The 'guaranteed unimodal' interface claim in section 3 below does not hold.
+> - **The induced hierarchy only partly recovers CrowdES's B=8 modes**: ARI 0.54–0.59 against its KMeans clusters. The merge-height elbow suggests **2** leaves, not 8 (§6.1, §9.1).
+> - **The named modes are not recoverable.** Labelled by measured geometry, the leaves are stop / march / swerve / backstep. There is no yield, overtake or group cohesion, and `stop` holds 35–38% of the induction set (§9.1, §9.5).
+> - **A bifurcation is only reproducible to the extent it is predictable from present state.** Tree routing fidelity is 71.9% in-sample and 66.8–72.3% on the held-out test split (§4.6, §9.2).
+
+---
+
 ## 1. Mathematical Mechanics & Functional Role
 
 A central bottleneck in Behavior Tree synthesis has historically been **topology discovery**: how to structure the hierarchy of Sequence and Fallback control nodes without testing millions of random candidate trees.

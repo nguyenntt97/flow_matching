@@ -5,6 +5,16 @@
 
 ---
 
+> **Measured corrections (2026-10-01).** The design below is kept as originally proposed. Where the implementation in `src/flow2bt/` and `src/runtime/` contradicted it, the measured result is listed here; section numbers (§) refer to [IMPLEMENTATION_FINDINGS.md](./IMPLEMENTATION_FINDINGS.md).
+>
+> - **The numbers in this walkthrough and in the comparison table below are design targets, not measurements.** Measured on eth (`seq_eth`): CrowdES collisions 0.78%, not 2.5–3.2% (§2). The chunk is 2 s, not 4 s, and the runtime ticks at 50 ms, so the reactivity gap is 40x, not 400x (§1.1, §9.3).
+> - **'C_R = 0.0%' holds for raw collisions on the simulated state only.** The reported metric stays non-zero because of upstream post-processing and agents spawned inside `d_min` (§3).
+> - **'> 400x lower latency' compares against a baseline that does not exist.** CrowdES's simulator is one batched MLP pass (§1.2). No per-agent latency has been measured for Flow2BT.
+> - **nuXmv has not been run** (licence-gated). The SMV export proves action-selection properties only (§7.1).
+> - **The previously reported closed-loop row is not valid.** It (collisions 0.00249, DTW 2.08, Kinematics 0.467) was a single trial and depended on the forcing-frame bug, which accidentally released agents from an absorbing `stop` leaf (§9.4, §9.5). With the finite-duration stop, the GT tree over 5 trials gets collisions 0.00272, Kinematics 0.438, DTW 2.10, Travel Time 0.711 (§9.7).
+
+---
+
 ## 1. End-to-End Architecture Pipeline
 
 The Flow2BT framework operates in two distinct phases: **Offline Discovery & Compilation (Stages 1–5 & 7b)** and **Online Real-Time Reactive Control (Stages 6 & 7a)**.

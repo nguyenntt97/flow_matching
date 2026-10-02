@@ -15,6 +15,11 @@ run_dir: ${exp_root_dir}/${name}/${now:%Y%m%d-%H%M%S}
 trials: 20
 scene_limit: null
 
+viz: false                   # export scene videos (.m4v), one folder per d_min
+viz_trials: 1                # trials to render per scene
+viz_fps: 5                   # playback frame rate
+viz_max_seconds: null        # cap video length in simulated seconds (null = full)
+
 runtime:
   controller: waypoint       # waypoint | bt
   substeps: 4                # ticks per simulator frame -> dt = 1/(5*substeps)
