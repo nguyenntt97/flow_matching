@@ -20,6 +20,9 @@ viz_trials: 1                # trials to render per scene
 viz_fps: 5                   # playback frame rate
 viz_max_seconds: null        # cap video length in simulated seconds (null = full)
 
+timing: false                # wall-clock each tick: decision (features+tree+DMP), CBF, total
+timing_warmup: 3
+
 runtime:
   controller: waypoint       # waypoint | bt
   substeps: 4                # ticks per simulator frame -> dt = 1/(5*substeps)

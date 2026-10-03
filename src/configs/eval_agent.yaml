@@ -14,6 +14,9 @@ batch_size: 2048
 num_samples: 20              # K for minADE_K / minFDE_K
 device: cuda
 
+timing: false                # wall-clock every model forward (src/util/timing.py)
+timing_warmup: 3             # calls per label dropped before timing
+
 viz: false                   # whether to export trajectory videos (.mp4)
 viz_limit: 50                # max trajectories per scene (null for all)
 viz_fps: 5                   # frames per second for output videos

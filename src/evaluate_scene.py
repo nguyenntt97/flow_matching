@@ -33,6 +33,7 @@ from omegaconf import DictConfig  # noqa: E402
 from src.data.dotdict_bridge import to_crowdes_config  # noqa: E402
 from src.util.export import resolve_mirror_dir  # noqa: E402
 from src.util.seeding import seed_everything  # noqa: E402
+from src.util.timing import TimedSimulator, maybe_timer, time_method  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -79,9 +80,56 @@ def main(cfg: DictConfig) -> None:
     # Lazy: this pulls POT, dtaidistance, diffusers and pathfinder.pyrvo.
     from src.eval_loop import TRIALS, evaluate_scenes, print_summary, write_summary
 
+    timer = maybe_timer(bool(cfg.get("timing", False)), int(cfg.get("timing_warmup", 3)))
+    simulator_ckpt = cfg.get("simulator_ckpt")
+
+    def factory(config):
+        """CrowdESFramework, optionally with a different simulator and/or timed.
+
+        ``simulator_ckpt`` swaps in any simulator-protocol model ``load_model``
+        accepts -- in practice the flow teacher's Lightning ``.ckpt``. That is
+        not the refused case above: the refusal is for a Flow2BT *head export*
+        loaded through the HF config, which silently runs an untrained decoder.
+        Here the actual trained model runs, behind the same call site.
+        """
+        from CrowdES.inference_model import CrowdESFramework
+
+        framework = CrowdESFramework(config)
+        released = framework.CrowdES_simulator
+        model = released
+        if simulator_ckpt:
+            from src.evaluate_agent import load_model
+
+            model = load_model(str(simulator_ckpt), framework.device)
+            latent = getattr(model, "latent_dim", released.config.latent_dim)
+            if int(latent) != int(released.config.latent_dim):
+                raise ValueError(
+                    f"{simulator_ckpt} has latent_dim {latent}; the framework's "
+                    f"behaviour-state buffers use {released.config.latent_dim}"
+                )
+            logger.info("simulator replaced by %s", simulator_ckpt)
+        if simulator_ckpt or timer is not None:
+            sim = config["crowd_simulator"]["simulator"]
+            chunk_seconds = float(sim["future_length"]) / float(sim["simulator_fps"])
+            # The adapter also supplies .config, which framework code reads.
+            framework.CrowdES_simulator = TimedSimulator(
+                model, timer, "scene/simulator_forward", chunk_seconds, config_source=released
+            )
+        if timer is not None:
+            # End to end per emitter window: preprocessing (neighbours, navmesh
+            # control points, environment crops) + forwards + walkable snap.
+            time_method(
+                framework, "process_simulator", timer, "scene/process_simulator_window",
+                agents_fn=lambda f: len(f.agent_ids_in_current_scene),
+                sim_seconds_fn=lambda f: f.window_frame / f.simulator_fps,
+                cuda=True,
+            )
+        return framework
+
     logger.info("running scene-level evaluation (TRIALS=%d per scene)", TRIALS)
     summary = evaluate_scenes(
         crowdes_cfg,
+        framework_factory=factory,
         seed=int(cfg.seed),
         trials=int(cfg.get("trials", TRIALS)),
         scene_limit=cfg.get("scene_limit"),
@@ -92,6 +140,9 @@ def main(cfg: DictConfig) -> None:
         viz_max_seconds=cfg.get("viz_max_seconds"),
         out_dir=Path(cfg.run_dir),
     )
+    if timer is not None:
+        summary["timing"] = timer.summary()
+        logger.info("\n%s", timer.report(f"INFERENCE TIMING ({cfg.get('label', 'CrowdES')})"))
     print_summary(summary)
 
     logger.info("wrote %s", write_summary(summary, Path(cfg.run_dir)))

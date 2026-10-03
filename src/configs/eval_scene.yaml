@@ -31,3 +31,9 @@ viz_trials: 1                # number of trials to visualize per scene (e.g. 1)
 viz_fps: 5                   # playback frame rate for output videos
 viz_max_seconds: null        # cap output video duration in simulated seconds (null for full)
 
+# Swap the locomotion simulator for another simulator-protocol model, e.g. the
+# flow teacher's .ckpt. Emitter, scene setup and metrics stay CrowdES's.
+simulator_ckpt: null
+timing: false                # wall-clock simulator forwards and windows (src/util/timing.py)
+timing_warmup: 3
+

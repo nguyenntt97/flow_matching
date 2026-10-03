@@ -61,6 +61,8 @@ from utils.homography import image2world, world2image  # noqa: E402
 from utils.navmesh import filter_collinear_polygons, get_control_point  # noqa: E402
 from utils.trajectory import batched_nearest_nonzero_idx_kdtree, preprocess_kdtree  # noqa: E402
 
+from src.util.timing import TimedSimulator, maybe_timer  # noqa: E402
+
 logger = logging.getLogger(__name__)
 
 
@@ -867,6 +869,13 @@ def main(cfg: DictConfig) -> None:
     device = torch.device(cfg.device if torch.cuda.is_available() or cfg.device == "cpu" else "cpu")
     model = load_model(str(cfg.ckpt), device)
 
+    # Optional wall-clock timing of every forward (see src/util/timing.py).
+    timer = maybe_timer(bool(cfg.get("timing", False)), int(cfg.get("timing_warmup", 3)))
+    untimed = model
+    if timer is not None:
+        chunk_seconds = float(simulator_cfg["future_length"]) / float(simulator_cfg["simulator_fps"])
+        model = TimedSimulator(model, timer, "agent", chunk_seconds)
+
     if getattr(model, "needs_endpoint_clusters", False) and not bool(
         getattr(model, "centers_fitted", torch.tensor(False))
     ):
@@ -913,7 +922,13 @@ def main(cfg: DictConfig) -> None:
 
     rollout_cfg = cfg.get("rollout") or {}
     if bool(rollout_cfg.get("enabled", False)):
+        if timer is not None:
+            model._prefix = "agent_rollout"
         payload["rollout"] = evaluate_rollout(model, dataset, cfg, out_dir, device)
+    if timer is not None:
+        payload["timing"] = timer.summary()
+        logger.info("\n%s", timer.report(f"INFERENCE TIMING ({cfg.ckpt})"))
+    model = untimed
     (out_dir / "metrics.json").write_text(json.dumps(payload, indent=2))
     OmegaConf.save(cfg, out_dir / "eval_config.yaml")
     logger.info("wrote %s", out_dir / "metrics.json")

@@ -33,6 +33,7 @@ from omegaconf import DictConfig, OmegaConf  # noqa: E402
 
 from src.data.dotdict_bridge import to_crowdes_config  # noqa: E402
 from src.util.seeding import seed_everything  # noqa: E402
+from src.util.timing import maybe_timer, time_method  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +119,9 @@ def main(cfg: DictConfig) -> None:
         )
 
         holder = {}
+        timer = maybe_timer(bool(cfg.get("timing", False)), int(cfg.get("timing_warmup", 3)))
 
-        def factory(config, _holder=holder, _controller=controller, _cbf=cbf_config):
+        def factory(config, _holder=holder, _controller=controller, _cbf=cbf_config, _timer=timer):
             # One controller serves every trial, and agent ids restart per trial:
             # drop per-agent state so trial k's agent 3 does not inherit trial
             # k-1's agent 3's goal, phase or stop timer.
@@ -133,7 +135,16 @@ def main(cfg: DictConfig) -> None:
                 dense_output=bool(cfg.runtime.dense_output),
                 agent_radius=float(cfg.runtime.agent_radius),
                 feature_fn=feature_fn,
+                timer=_timer,
             )
+            if _timer is not None:
+                # Same window-level measurement as src/evaluate_scene.py, so the
+                # end-to-end cost per simulated second is comparable across models.
+                time_method(
+                    framework, "process_simulator", _timer, "scene/process_simulator_window",
+                    agents_fn=lambda f: len(f.agent_ids_in_current_scene),
+                    sim_seconds_fn=lambda f: f.window_frame / f.simulator_fps,
+                )
             _holder["framework"] = framework
             return framework
 
@@ -166,6 +177,9 @@ def main(cfg: DictConfig) -> None:
             "raw_collision": framework.raw_collision_rate(0.2),
             "raw_collision_at_dmin": framework.raw_collision_rate(cbf_config.d_min),
         }
+        if timer is not None:
+            summary["timing"] = timer.summary()
+            logger.info("\n%s", timer.report(f"INFERENCE TIMING ({label})"))
         print_summary(summary)
         name = f"flow2bt_{cfg.runtime.controller}_dmin{cbf_config.d_min:g}.json"
         write_summary(summary, out_dir, name)

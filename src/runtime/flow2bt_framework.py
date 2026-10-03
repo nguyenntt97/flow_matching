@@ -75,6 +75,7 @@ def make_framework_class():
             feature_fn=None,
             snap_to_walkable: bool = True,
             kalman_smooth: bool = True,
+            timer=None,
         ):
             # Upstream's ORCA branch would explode here; neutralise it and set
             # ORCA up in initialize_scene instead, where navmesh/H exist.
@@ -99,6 +100,8 @@ def make_framework_class():
             self.kalman_smooth = bool(kalman_smooth)
 
             self.tick_dt = 1.0 / (self.simulator_fps * self.substeps)
+            #: Optional ``src.util.timing.InferenceTimer``; see ``_step``.
+            self.timer = timer
             self.diagnostics = {
                 "ticks": 0, "agent_ticks": 0, "relaxed_agent_ticks": 0,
                 "min_separation": np.inf, "cbf_interventions": 0,
@@ -244,6 +247,23 @@ def make_framework_class():
             return neighbor_position, neighbor_velocity, mask, distance
 
         def _step(self, interaction_range, max_neighbors, control_offset) -> None:
+            if self.timer is None:
+                return self._step_impl(interaction_range, max_neighbors, control_offset)
+            with self.timer.measure(
+                f"{self.controller.name}/tick_total", len(self.agent_ids_in_current_scene),
+                self.tick_dt,
+            ):
+                return self._step_impl(interaction_range, max_neighbors, control_offset)
+
+        def _timed(self, label: str, count: int):
+            """Context timing one stage of a tick, or a no-op without a timer."""
+            from contextlib import nullcontext
+
+            if self.timer is None:
+                return nullcontext()
+            return self.timer.measure(f"{self.controller.name}/{label}", count, self.tick_dt)
+
+        def _step_impl(self, interaction_range, max_neighbors, control_offset) -> None:
             ids, position, velocity, goal, speed = self._gather()
             neighbor_position, neighbor_velocity, mask, distance = self._neighbors(
                 position, velocity, max_neighbors, interaction_range
@@ -258,22 +278,25 @@ def make_framework_class():
                 neighbor_position=neighbor_position, neighbor_velocity=neighbor_velocity,
                 neighbor_mask=mask, dt=self.tick_dt, agent_ids=np.asarray(ids),
             )
-            if self.feature_fn is not None:
-                state.features = self.feature_fn(state)
-
-            command = self.controller.acceleration(state)
+            # The decision: guard features, tree tick, DMP step. This is the part
+            # that replaces the CrowdES / flow-teacher forward.
+            with self._timed("decision", len(ids)):
+                if self.feature_fn is not None:
+                    state.features = self.feature_fn(state)
+                command = self.controller.acceleration(state)
 
             if self.cbf is not None:
-                command, info = self.cbf.filter(
-                    u_nominal=command,
-                    position=position, velocity=velocity,
-                    neighbor_position=neighbor_position,
-                    neighbor_velocity=neighbor_velocity,
-                    neighbor_mask=mask,
-                    agent_radius=self.agent_radius,
-                )
-                self.diagnostics["relaxed_agent_ticks"] += int(info["relaxed"].sum())
-                self.diagnostics["cbf_interventions"] += int((info["intervention"] > 1e-6).sum())
+                with self._timed("cbf_filter", len(ids)):
+                    command, info = self.cbf.filter(
+                        u_nominal=command,
+                        position=position, velocity=velocity,
+                        neighbor_position=neighbor_position,
+                        neighbor_velocity=neighbor_velocity,
+                        neighbor_mask=mask,
+                        agent_radius=self.agent_radius,
+                    )
+                    self.diagnostics["relaxed_agent_ticks"] += int(info["relaxed"].sum())
+                    self.diagnostics["cbf_interventions"] += int((info["intervention"] > 1e-6).sum())
 
             # Semi-implicit Euler, same integrator the primitives were fitted against.
             velocity = velocity + command * self.tick_dt
