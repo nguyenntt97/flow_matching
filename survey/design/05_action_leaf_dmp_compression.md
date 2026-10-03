@@ -119,3 +119,16 @@ def tick(self, state: PedestrianState) -> NodeStatus:
 2. **To Subsystem 7 (Safety & Verification):** The DMP commanded acceleration $\mathbf{a}_{\text{DMP}}$ is fed directly into the Control Barrier Function Quadratic Program (CBF-QP) as the reference nominal control input:
    $$\mathbf{u}^\star = \arg\min_{\mathbf{u}} \|\mathbf{u} - \mathbf{u}_{\text{DMP}}\|^2 \quad \text{s.t.} \quad \dot{h}(\mathbf{s}, \mathbf{u}) + \alpha(h(\mathbf{s})) \ge 0$$
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **DMP Attractor System** | [`src/flow2bt/primitives.py`](../../src/flow2bt/primitives.py) | `DynamicMovementPrimitive` | Critically damped 2nd-order ODE ($K=100$, $D=20$) with exponential canonical phase decay $\tau \dot{s} = -\alpha_s s$ ($\alpha_s = 4.0$). |
+| **Forcing Term Fitting** | [`src/flow2bt/primitives.py`](../../src/flow2bt/primitives.py) | `fit_dmp_from_cluster` | Fits nonlinear forcing function $\mathbf{f}(s)$ using $N_{\text{basis}}=10$ Gaussian radial basis kernels via linear ridge regression over each unimodal leaf cluster. |
+| **Goal Anchoring Mechanism** | [`src/flow2bt/primitives.py`](../../src/flow2bt/primitives.py), [`src/runtime/controllers.py`](../../src/runtime/controllers.py) | Goal initialization in `step()` | Sets fixed goal $\mathbf{g}_\ell = \mathbf{p}_i(t_0) + \mathbf{R}_i \Delta\mathbf{p}_\ell^{\text{cluster}}$. Crucial fix: prevents spring acceleration blowup ($> 45\,\text{m/s}^2$) caused by receding waypoints. |
+| **High-Frequency Numerical Integration** | [`src/flow2bt/primitives.py`](../../src/flow2bt/primitives.py) | Semi-implicit Euler integration | Integrates at $\Delta t = 10\,\text{ms}$ ($100\,\text{Hz}$), satisfying $\Delta t < 2/\sqrt{K} = 0.2\,\text{s}$ and providing sub-$1.7\,\text{cm}$ tracking error. |
+| **BT Leaf Action Wrapper** | [`src/flow2bt/bt.py`](../../src/flow2bt/bt.py), [`src/flow2bt/primitives.py`](../../src/flow2bt/primitives.py) | `DMPActionNode` | Manages node lifecycle: returns `RUNNING` while phase $s > 0.05$ and distance $> \epsilon$, and `SUCCESS` upon goal arrival, prompting root re-evaluation. |
+
+

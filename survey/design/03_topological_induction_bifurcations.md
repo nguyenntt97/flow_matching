@@ -75,3 +75,15 @@ Under the continuum limit of hierarchical partitions proved by Ramachandran & Sr
 2. **To Subsystem 5 (DMP Action Leaves):** Provides the terminal leaf clusters $\Xi_\ell$. Each leaf cluster $\ell$ is guaranteed to be unimodal and low-curvature, providing clean trajectory bundles for fitting individual DMPs.
 3. **To Subsystem 6 (Reactive BT Assembly):** Defines the hierarchical parent-child relationships and identifies alternative branches for Fallback ($?$) node composition.
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Hierarchical Ward Clustering** | [`src/flow2bt/clustering.py`](../../src/flow2bt/clustering.py) | `build_ward_tree` | Implements agglomerative Ward clustering over trajectory metrics with configurable weights ($\lambda_{\text{term}} = 2.0$, $\lambda_{\text{vel}} = 1.0$) to produce a binary bifurcation dendrogram partitioned into $B=8$ leaves. |
+| **NavMesh Frame Transformation** | [`src/flow2bt/clustering.py`](../../src/flow2bt/clustering.py) | `navmesh_frame_transform` | Rotates all futures onto the ego-centric NavMesh polyline (+x along waypoint). Essential fix: eliminates world-frame bias and raises routing fidelity from $54.1\%$ to $71.9\%$. |
+| **Bifurcation Point Extraction** | [`src/flow2bt/clustering.py`](../../src/flow2bt/clustering.py) | `extract_bifurcation_splits` | Recursively walks the linkage matrix, identifying internal split nodes and assigning binary routing targets ($y_i \in \{+1, -1\}$) for condition guard training. |
+| **Offline Pipeline Orchestration** | [`src/induce_flow2bt.py`](../../src/induce_flow2bt.py) | `main` | Orchestrates trajectory collection ($1024 \times 16$ or GT trajectories), hierarchical clustering, guard training, and DMP fitting into a unified `bundle.pkl`. |
+
+

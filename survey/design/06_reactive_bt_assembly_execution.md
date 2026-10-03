@@ -122,3 +122,15 @@ This formulation allows gradient $\nabla_{\mathbf{w}} \mathcal{L}_{\text{task}}$
    - The Control Barrier Function Quadratic Program (CBF-QP) for hard collision-free filtering.
    - The BehaVerify / nuXmv pipeline for formal model checking of safety invariants.
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **BT Assembly Compiler** | [`src/flow2bt/assembly.py`](../../src/flow2bt/assembly.py) | `assemble_flow2bt` | Recursively traverses the clustering dendrogram, constructing nested Fallback ($?$) recovery blocks guarding Sequence ($\to$) branches chained with condition guards and DMP leaves. |
+| **Execution Engine & Node Semantics** | [`src/flow2bt/bt.py`](../../src/flow2bt/bt.py) | `BehaviorTree`, `FallbackNode`, `SequenceNode` | Core tri-state reactive tick execution engine. Evaluates full 8-leaf hierarchy in **$< 0.05\,\text{ms}$** on CPU, enabling $100\,\text{Hz}$ ($\Delta t = 10\,\text{ms}$) update capability. |
+| **Multi-Agent Runtime Controller** | [`src/runtime/controllers.py`](../../src/runtime/controllers.py) | `Flow2BTController` | Manages per-agent state tracking, feature extraction, goal assignment, and Behavior Tree ticking across multi-agent simulation steps. |
+| **Finite-Stop Deadlock Recovery** | [`src/runtime/controllers.py`](../../src/runtime/controllers.py) | Finite-stop logic in `step()` | Overcomes absorbing zero-velocity traps (`runtime.finite_stop=true`): detects stopped state ($v < 0.05\,\text{m/s}$) and re-seeds canonical phase to resume forward locomotion at $0.52\,\text{m/s}$. |
+
+

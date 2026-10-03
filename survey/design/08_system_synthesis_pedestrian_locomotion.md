@@ -167,3 +167,15 @@ The table below contrasts the Flow2BT architecture against the continuous crowd 
 | **07: Safety & Verification**| BT command $\mathbf{u}_{\text{nominal}}$ + Tree $\mathcal{T}$ | Actuators / Simulator | Online CBF-QP filter ($C_R = 0.0\%$) + Offline BehaVerify/nuXmv SMT proofs |
 | **08: System Synthesis** | Subsystems 1 through 7 | Benchmark Environment | Complete closed-loop continuous crowd locomotion |
 
+---
+
+## 5. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Closed-Loop Benchmark Runner** | [`src/evaluate_flow2bt.py`](../../src/evaluate_flow2bt.py) | `main` | Top-level entry point orchestrating closed-loop crowd evaluation across 5 randomized seeds (0–4) on ETH `seq_eth` (406 agents, 1,000 frames at $5\,\text{fps}$). |
+| **Simulation Evaluation Loop** | [`src/eval_loop.py`](../../src/eval_loop.py) | `run_evaluation_loop` | Executes simulation timesteps, dynamic agent spawning, controller step calls, trajectory logging, and multi-trial statistics aggregation. |
+| **CrowdES Metric Suite Integration** | [`src/evaluate_scene.py`](../../src/evaluate_scene.py), [`src/evaluate_agent.py`](../../src/evaluate_agent.py) | `compute_metrics` | Integrates [`third_party/crowdes/utils/metrics.py`](../../third_party/crowdes/utils/metrics.py) to compute scene-level realism (Density, Population) and agent-level accuracy (Kinematics, DTW, Travel Time). |
+| **Multi-Controller Comparison** | [`src/configs/eval_flow2bt.yaml`](../../src/configs/eval_flow2bt.yaml) | Hydra configuration | Supports comparing GT Tree (`cl_gt_finitestop`), Flow Tree (`cl_r16_finitestop`), absorbing stop ablation (`cl_gt_absorbing`), and baseline controllers. |
+
+

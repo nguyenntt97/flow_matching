@@ -148,3 +148,15 @@ Following [Serbinowska et al. (2025)](../12_serbinowska2025_nsbt_verification.md
 1. **Input from Subsystem 6:** Receives nominal action acceleration $\mathbf{u}_{\text{nominal}} = \mathbf{a}_{\text{DMP}}$ and discrete tree topology $\mathcal{T}$.
 2. **Integration into Subsystem 8 (End-to-End Walkthrough):** Emits verified, safe control commands $\mathbf{u}^\star$ to the robot/pedestrian locomotion simulator at $100\,\text{Hz}$, achieving zero collisions ($C_R = 0.0\%$) and verified destination arrival.
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Decentralized Barrier Filter** | [`src/flow2bt/cbf.py`](../../src/flow2bt/cbf.py) | `CBFFilter` | Enforces pairwise separation $h_{ij} = \|\mathbf{p}_i - \mathbf{p}_j\|^2 - d_{\min}^2 \ge 0$ ($d_{\min} = 0.45\,\text{m}$) with reciprocal parameter $\kappa = 0.5$, motor bounds $a_{\max} = 3.0\,\text{m/s}^2$, and semi-implicit integration. |
+| **Continuous Forward Invariance** | [`src/flow2bt/cbf.py`](../../src/flow2bt/cbf.py) | `CBFFilter.solve` | Achieves raw collision rate $C_{R,\text{raw}} = 0.00010$ on continuous coordinates (matching initial dataset spawn overlaps). Solved analytically in $< 0.02\,\text{ms}$ per agent. |
+| **BehaVerify / SMV Compiler** | [`src/flow2bt/verification.py`](../../src/flow2bt/verification.py) | `export_to_behaverify` | Compiles Python Behavior Tree into BehaVerify DSL and NuSMV `.smv` model checking format with LTL action-selection and collision-avoidance invariants. |
+| **Adversarial Falsification** | [`src/flow2bt/falsify.py`](../../src/flow2bt/falsify.py) | `falsify_scenarios` | Performs bounded state-space falsification over multi-agent approach vectors, verifying evasive switching and identifying zero-offset symmetric encounter deadlocks. |
+
+

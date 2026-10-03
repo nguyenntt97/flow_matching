@@ -72,7 +72,18 @@ Subsystem 1 exposes a clean functional interface to the rest of the Learnable Be
 
 1. **To Subsystem 2 (Teacher Flow Policy):** Provides the conditioning waypoint $\mathbf{c}_{t, \text{nav}}$ and local traversability mask $\mathcal{M}_W$, ensuring that sampled trajectories flow along valid corridors.
 2. **To Subsystem 4 (Condition Nodes):** Provides distance-to-waypoint and corridor clearance signals (`IsWaypointReachable?`, `IsNavMeshValid?`) that serve as boolean condition checks in Sequence nodes.
-3. **To Subsystem 5 (DMP Action Leaves):** Directly sets the attractor goal position:
-   $$\mathbf{g}_\ell = \mathbf{c}_{t, \text{nav}}$$
-   allowing the DMP second-order dynamics to pull the pedestrian smoothly toward the NavMesh polyline.
+3. **To Subsystem 5 (DMP Action Leaves):** Provides the local orientation $\mathbf{R}_i$ aligning the cluster offset to the polyline heading, anchoring the goal $\mathbf{g}_\ell = \mathbf{p}_i(t_{\text{start}}) + \mathbf{R}_i \Delta\mathbf{p}_\ell^{\text{cluster}}$ rather than directly using the receding waypoint.
+
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Polyline Tracking & Projection** | [`src/runtime/pathfollow.py`](../../src/runtime/pathfollow.py) | `PolylineGuidance` | Projects agent position $\mathbf{p}_i$ onto the polyline, advances active segments monotonically, and extracts lookahead waypoint $\mathbf{c}_{i, \text{nav}}$ at nominal horizon $\Delta t_{\text{horizon}} = 1.0\,\text{s}$ ($\nu \approx 1.2\,\text{m/s}$). |
+| **A\* Pathfinding & Polyline Caching** | [`src/runtime/pathfollow.py`](../../src/runtime/pathfollow.py) | `PolylineCache` | Caches global A* polylines at agent spawn. Eliminates redundant per-tick graph replanning, reducing A* queries by **$610\times$** ($164,980$ queries served with only 2 dynamic replans across 1,000 frames). |
+| **Geometric Point-to-Segment Projection** | [`src/runtime/pathfollow.py`](../../src/runtime/pathfollow.py) | `project_to_polyline(pos, polyline)` | Vectorized orthogonal projection computing minimum distance to line segments, segment indices, and projection coordinates. |
+| **NavMesh Geometry & Obstacle Masks** | [`src/data/simulator_dataset.py`](../../src/data/simulator_dataset.py) | `SimulatorDataset` | Loads polygonal walkable meshes ($\mathcal{M}_W$), destination zones, and homography coordinate transformations from image pixels to metric world coordinates. |
+| **NavMesh Frame Alignment** | [`src/flow2bt/clustering.py`](../../src/flow2bt/clustering.py) | `navmesh_frame_transform` | Rotates each trajectory so the NavMesh waypoint vector aligns with $+x$. Crucial for induction: increases tree routing fidelity from $54.1\%$ to $71.9\%$. |
+
 

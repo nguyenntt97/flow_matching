@@ -78,3 +78,15 @@ where $y_i = +1$ for trajectories taking the left branch and $y_i = -1$ for traj
 1. **To Subsystem 6 (Reactive BT Assembly):** Instantiates the terminal Condition leaves ($C \in V_T$) placed as guards inside Sequence and Fallback subtrees.
 2. **To Subsystem 7 (Formal Verification):** The linear hyperplane $\mathbf{w}_k^\top \phi(\mathbf{s}) + b_k = 0$ translates into linear constraints easily ingested by SMT solvers (Z3 / MathSAT) and the BehaVerify model checker.
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Ego-Centric Perceptual Features** | [`src/flow2bt/features.py`](../../src/flow2bt/features.py) | `extract_egocentric_features` | Computes $\phi(\mathbf{s}_i)$ containing obstacle clearance, relative velocity $\mathbf{v}_{\text{rel}}$, heading deviation $\theta_{\text{nav}}$, boundary clearance, and $\text{TTC}$ with $\epsilon = 10^{-4}\,\text{m/s}$ stabilization. |
+| **Linear SVM Guard Induction** | [`src/flow2bt/conditions.py`](../../src/flow2bt/conditions.py) | `fit_condition_guards` | Fits soft-margin LinearSVC hyperplanes ($\mathbf{w}_k^\top \phi(\mathbf{s}) + b_k \ge 0$) at each bifurcation node, achieving $84.4\% - 91.2\%$ split accuracy. |
+| **Runtime Condition Predicate** | [`src/flow2bt/conditions.py`](../../src/flow2bt/conditions.py) | `LinearGuardNode` | Evaluates linear decision boundary in $< 1\,\mu\text{s}$, returning `SUCCESS` if $\mathbf{w}_k^\top \phi(\mathbf{s}) + b_k \ge 0$ and `FAILURE` otherwise. |
+| **Discovered Symbolic Hyperplanes** | `tree.txt` (generated artifact) | Root Guard 0, Guards 4 & 6 | Root Guard 0 separates yielding from walking with $92.7\%$ accuracy: $-2.12 v_i - 0.358 d_{\text{nav}} + 0.091 v_{\text{close}} + 1.79 \ge 0$. Guards 4 & 6 evaluate $\theta_{\text{nav}}$ (weights $+1.34$, $+1.62$) routing to swerve vs march leaves. |
+
+

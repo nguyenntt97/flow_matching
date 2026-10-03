@@ -73,3 +73,16 @@ This generates a rich bundle of continuous trajectories capturing all navigation
 1. **To Subsystem 3 (Topological Induction):** Outputs the trajectory bundle $\Xi = \{\xi_i(\tau)\}_{i=1}^M$ whose phase-space geometry contains the bifurcations.
 2. **To Subsystem 5 (DMP Action Leaves):** Provides the training data for fitting Dynamical Movement Primitive shape weights $\mathbf{w}_{\text{DMP}}$ and attractor velocities.
 
+---
+
+## 4. Codebase Implementation & Correspondences
+
+| Architectural Component | Implementation File | Key Class / Function | Operational Mechanics & Settings |
+| :--- | :--- | :--- | :--- |
+| **Neural Flow Vector Field** | [`src/models/flow_teacher.py`](../../src/models/flow_teacher.py) | `FlowTeacher` | 4-layer MLP $[256, 512, 512, 256]$ with 128-dim sinusoidal temporal embeddings. Maps $(x_t, t, \mathbf{C}_s) \mapsto \dot{x}_t \in \mathbb{R}^2$. |
+| **Crowd Context Encoder** | [`src/models/flow_teacher.py`](../../src/models/flow_teacher.py) | `ContextEncoder` (CrowdES parity) | Encodes 8 historical observation frames ($1.6\,\text{s}$) into a 256-dim latent vector $\mathbf{C}_s$ with 2048 hidden dimensions. |
+| **Training & Optimization Loop** | [`src/systems/simulator_system.py`](../../src/systems/simulator_system.py), [`src/train.py`](../../src/train.py) | `SimulatorSystem` | Trains with AdamW ($\text{lr} = 10^{-4}$) minimizing CFM mean-squared regression loss $\mathcal{L}_{\text{CFM}}$ on ETH training split (`configs/experiment/flow_eth.yaml`). |
+| **Midpoint ODE Integration** | [`src/models/flow_teacher.py`](../../src/models/flow_teacher.py) | `FlowTeacher.rollout` | 5-step midpoint numerical solver ($10$ velocity vector evaluations per trajectory chunk), yielding test $\text{minADE}_{20} = 0.1562$ vs CrowdES $0.2372$. |
+| **Ensemble Rollout Generation** | [`src/induce_flow2bt.py`](../../src/induce_flow2bt.py) | `sample_rollout_ensemble` | Generates $M = 16,384$ paths by evaluating $S = 1,024$ context states with $R = 16$ stochastic rollouts per state over $T_f = 2.0\,\text{s}$ (10 frames at $5\,\text{fps}$). |
+
+
