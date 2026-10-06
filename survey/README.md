@@ -78,6 +78,7 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 *Focus: Control Barrier Functions (CBFs), Quadratic Programming safety filters, and formal verification of neural Behavior Trees using symbolic model checkers.*
 - [11_ozkahraman2020_cbf_bt.md](./11_ozkahraman2020_cbf_bt.md): Control Barrier Function Behavior Trees (CBF-BT) resolving conflicting multi-agent mission objectives while guaranteeing forward invariance.
 - [12_serbinowska2025_nsbt_verification.md](./12_serbinowska2025_nsbt_verification.md): BehaVerify framework for formal verification of Neuro-Symbolic Behavior Trees with deep neural network leaves using nuXmv and SMT solvers.
+- [31_huang2026_neuro_symbolic_hierarchical_learning.md](./31_huang2026_neuro_symbolic_hierarchical_learning.md): Closed-loop framework unifying LLM-based planning, SMT-based formal verification (Guess-Check-Critique CEGIS loop), and differentiable Behavior Tree synthesis for long-horizon robotic tasks (PLDI 2026).
 
 ### Pillar 5: Flow Matching & Continuous-Discrete Hybrid Trajectory Forecasting
 *Focus: Conditional flow matching (CFM), optimal transport displacement paths, one-step distillation (IMLE), discrete goal point conditioning, and physical barrier guidance for agent-level trajectory prediction.*
@@ -97,6 +98,7 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Ramachandran & Sra (2026)**<br>*Trees to Flows and Back* | Differentiable BT (Anchor) | **Yes** (Continuous limit via SDE/ODE) | Learned (GTSM boosting & tree distillation) | Continuous score fields $\nabla_{\mathbf{x}} \log p_t$, neural vector fields | UCI/OpenML tabular classification, synthetic densities, generative modeling |
 | **Huang et al. (2025)**<br>*Differentiable Synthesis of BTs* | Differentiable BT | **Yes** (Soft t-norms & Gumbel-Softmax) | Learned (End-to-end grammar relaxation) | Continuous neural policies $\pi_\theta(a \mid s)$, parameterized thresholds | Robot navigation, multi-stage robotic manipulation (MuJoCo/Isaac Sim) |
+| **Huang et al. (2026)**<br>*Neuro-symbolic Hierarchical Learning* | Differentiable / Verifiable BT (PLDI 2026) | **Yes** (Differentiable BT subnets) | Learned (LLM PDDL + SMT CEGIS + BT compilation) | Neural sub-policies $\pi_\theta(a \mid s)$, parameterized termination leaves | Long-horizon multi-step robot manipulation (RLBench, Franka, VirtualHome) |
 | **Kontschieder et al. (2015)**<br>*Deep Neural Decision Forests* | Differentiable BT (Antecedent) | **Yes** (Stochastic routing via sigmoid) | Fixed (Predefined tree depth/structure) | Categorical class probability distributions $\boldsymbol{\pi}_\ell \in \Delta^Y$ | Computer vision classification (ImageNet, CIFAR-10, MNIST) |
 | **Frosst & Hinton (2017)**<br>*Soft Decision Trees* | Differentiable BT (Antecedent) | **Yes** (Continuous logistic gating) | Fixed (Predefined binary tree depth) | Static class probability logits $\mathbf{Q}_\ell$ | MNIST digit recognition, Connect-4 game outcome prediction |
 | **Sprague & Ögren (2022)**<br>*Adding NN Controllers to BTs* | Neuro-Symbolic Hybrid | **No** (Discrete tick execution) | Fixed (Guarded Fallback composition) | Continuous deep RL policies $\pi_\theta(\mathbf{x})$, nominal model-based LQR/MPC | Inverted pendulum, 2D mobile robot obstacle avoidance, spacecraft docking |
@@ -194,10 +196,13 @@ Third, **bidirectional neural-symbolic distillation under non-stationary reactiv
 - [28_silva2020_differentiable_decision_trees_rl.md](./28_silva2020_differentiable_decision_trees_rl.md) — *Optimization Methods for Interpretable Differentiable Decision Trees in Reinforcement Learning (AISTATS 2020)*
 - [29_wathieu2022_re_bt_espresso.md](./29_wathieu2022_re_bt_espresso.md) — *RE:BT-Espresso: Improving Interpretability and Expressivity of Behavior Trees Learned from Robot Demonstrations (ICRA 2022)*
 - [30_kipf2019_compile_program_induction.md](./30_kipf2019_compile_program_induction.md) — *Compiling Programs from Demonstrations without Supervision (COMPILE, ICLR 2019)*
+- [31_huang2026_neuro_symbolic_hierarchical_learning.md](./31_huang2026_neuro_symbolic_hierarchical_learning.md) — *Neuro-symbolic Hierarchical Learning for Long-Horizon Robotic Tasks (PACMPL / PLDI 2026)*
 
 ### Technical Reports & Deep Dives
+- [discuss/README.md](./discuss/README.md) — *Comparative Analysis & Discussion: Huang et al. (2025), BT-Espresso (2019/2022), and Flow2BT (Our Method)*
 - [design/README.md](./design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
 - [TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md](./TREEFLOW_AND_FLOW_TO_BT_DISTILLATION.md) — *Deep Dive: TreeFlow and the Distillation of Continuous Flows into Learnable Behavior Trees*
 - [SURVEY_SYNTHESIS_AND_COMPENDIUM.md](./SURVEY_SYNTHESIS_AND_COMPENDIUM.md) — *Comprehensive Monolithic Compendium of All Survey Dossiers & Matrices*
+
 
 
