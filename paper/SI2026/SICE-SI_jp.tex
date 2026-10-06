@@ -1,5 +1,7 @@
 % !TEX program = lualatex
 % !TEX recipe = latexmk (lualatex)
+\pdfvariable minorversion = 4
+\pdfvariable objcompresslevel = 0
 \documentclass{sice-si}
 
 \def\LuaLaTeX{Lua\LaTeX}
@@ -20,9 +22,9 @@
 
 % タイトルと著者名
 \title{シミュレーション環境における生成的群衆行動のための蒸留ビヘイビアツリーに基づくモデリング} % 和文タイトル
-\name{○NGUYEN TRI TUNG NGUYEN（計測自動制御学会），細田侑也（計測自動制御学会），李俊浩（計測自動制御学会）} % 著者名
+\name{○NGUYEN TRI TUNG NGUYEN，細田侑也，李俊浩（立命館大学）} % 著者名
 \etitle{Distilled Behavior Tree-Based Modeling For Generative Crowd Behavior in Simulation Environment.} % 英文タイトル
-\ename{○NGUYEN TRI TUNG NGUYEN (SICE), HOSODA YUYA (SICE), and LEE JOO-HO (SICE)}	%著者名（英）
+\ename{○Tri Tung Nguyen NGUYEN, Yuya HOSODA, and Joo-Ho LEE (Ritsumeikan University)}	%著者名（英）
 
 \begin{document}
 % アブストラクト
@@ -50,7 +52,7 @@
 
 近年では，CrowdES~\cite{bae2025crowdes}のように，フローマッチング（Flow Matching）\cite{lipman2023flow}により実測データから連続的な速度場を学習する深層生成モデルが提案されている．しかし，これらを閉ループシミュレーションに組み込むと，二つの課題が生じる．第一に，モードは開ループの時間チャンク（$T_f = 2\,\text{s}$）ごとに一度しか予測されないため，その間エージェントは周囲の変化に反応できない（意思決定遅延）．第二に，ニューラルデコーダは記号的な論理を持たないため，道を譲る，回避する，停止するといった判断の根拠を検証できない（ブラックボックス性）．
 
-本稿では，連続的な生成群衆方策を解釈可能なビヘイビアツリー（Behavior Tree; BT）\cite{colledanchise2018behavior}へ蒸留するフレームワーク\textbf{Flow2BT}を提案する．Flow2BTは，木とフローの双対性\cite{ramachandran2026trees}に基づき，生成フローモデルを教師としてナビゲーションメッシュ（NavMesh）座標系で分岐構造を抽出する．各分岐は，線形の条件ノードと2次の動的運動プリミティブ（Dynamical Movement Primitives; DMP）\cite{chatzilygeroudis2021behavior}に変換される．得られたBTは$100\,\text{Hz}$でtickされ，Fallbackノードによるプリエンプションを伴う$10\,\text{ms}$周期の制御更新を実現する．本研究の主な貢献は以下の3点である．(1) 連続的な群衆方策を，閉形式のDMPを葉に持つ解釈可能なBTへ蒸留できることを示し，$2000\,\text{ms}$の開ループチャンクに対して$100\,\text{Hz}$での反応的な評価を可能にする．(2) 微視的な運動学の精度とのトレードオフはあるものの，巨視的な空間密度と人数分布を概ね保持できることを示す．(3) 単峰的なアクションノードを閉形式のDMPとしてパラメータ化し，開ループチャンクによる遅延なしに滑らかな移動を実現する．
+本稿では，連続的な生成群衆方策を解釈可能なビヘイビアツリー（Behavior Tree; BT）\cite{colledanchise2018behavior}へ蒸留するフレームワーク\textbf{Flow2BT}を提案する．Flow2BTは，木とフローの双対性\cite{ramachandran2026trees}に基づき，生成フローモデルを教師としてナビゲーションメッシュ（NavMesh）座標系で分岐構造を抽出する．各分岐は，線形の条件ノードと2次の動的運動プリミティブ（Dynamical Movement Primitives; DMP）\cite{chatzilygeroudis2021behavior}に変換される．得られたBTは$100\,\text{Hz}$でtickされ，Fallbackノードによるプリエンプションを伴う$10\,\text{ms}$周期の制御更新を実現する．本研究の主な貢献は以下の3点である．(1) 連続的な群衆方策を，閉形式のDMPを葉に持つ解釈可能なBTへ蒸留できることを示し，$2000\,\text{ms}$の開ループチャンクに対して$100\,\text{Hz}$での反応的な評価を可能にする．(2) 正解軌道から導出したBTがCrowdESの巨視的な空間密度と人数分布を保持することを20回の対応のある試行により示し，フロー教師から蒸留した場合に残る現実性の差を定量化する．(3) 単峰的なアクションノードを閉形式のDMPとしてパラメータ化し，開ループチャンクによる遅延なしに滑らかな移動を実現する．
 
 \section{関連研究}
 \subsection{歩行者移動の生成モデル}
@@ -149,7 +151,7 @@ NavMesh座標系において，交差検証による分類精度は$84.4\% - 91.
 
 \begin{table*}[t]
 \centering
-\caption{Benchmark results on the ETH crowd dataset. Left: Offline trajectory forecasting on held-out test split (29,275 windows). Right: Closed-loop multi-agent simulation benchmark (mean $\pm$ std across 5 evaluation trials for Flow2BT; 20 trials for CrowdES~\cite{bae2025crowdes}) structured into scene-level realism and agent-level accuracy following CrowdES.}
+\caption{Benchmark results on the ETH crowd dataset. Left: Offline trajectory forecasting on held-out test split (29,275 windows). Right: Closed-loop simulation on \texttt{seq\_eth} (mean $\pm$ std over the same 20 trials, seeds 0--19), following CrowdES's metrics. All closed-loop variants except CrowdES use the same CBF safety filter.}
 \label{tab:benchmark}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
@@ -158,11 +160,11 @@ NavMesh座標系において，交差検証による分類精度は$84.4\% - 91.
 & \multicolumn{4}{c|}{\textbf{Offline Forecasting}} & \multicolumn{2}{c|}{\textbf{Scene-Level Realism}} & \multicolumn{3}{c}{\textbf{Agent-Level Accuracy (Closed-Loop)}} \\
 \textbf{Method} & \textbf{ADE $\downarrow$} & \textbf{FDE $\downarrow$} & \textbf{minADE$_{20} \downarrow$} & \textbf{minFDE$_{20} \downarrow$} & \textbf{Dens. $\downarrow$} & \textbf{Pop. $\downarrow$} & \textbf{Kinem. $\downarrow$} & \textbf{DTW $\downarrow$} & \textbf{Time $\downarrow$} \\
 \hline
-CrowdES~\cite{bae2025crowdes} & 0.2896 & 0.5659 & 0.2372 & 0.4550 & \textbf{0.0180} & \textbf{0.182} & \textbf{0.340} & \textbf{1.62} & \textbf{0.596} \\
+CrowdES~\cite{bae2025crowdes} & 0.2896 & 0.5659 & 0.2372 & 0.4550 & $\mathbf{0.0180} \pm 0.0028$ & $\mathbf{0.182} \pm 0.034$ & $\mathbf{0.340} \pm 0.022$ & $\mathbf{1.62} \pm 0.07$ & $\mathbf{0.596} \pm 0.076$ \\
 Flow Policy (Teacher) & \textbf{0.2721} & \textbf{0.5321} & \textbf{0.1562} & \textbf{0.2727} & — & — & — & — & — \\
 \hline
-Flow2BT (GT Tree) & — & — & — & — & $0.0182 \pm 0.0017$ & $0.185 \pm 0.018$ & $0.438 \pm 0.044$ & $2.10 \pm 0.065$ & $0.711 \pm 0.061$ \\
-\textbf{Flow2BT (Flow, $1024 \times 16$)} & — & — & — & — & $0.0229 \pm 0.0019$ & $0.235 \pm 0.019$ & $0.550 \pm 0.041$ & $2.19 \pm 0.064$ & $1.014 \pm 0.058$ \\
+Flow2BT (GT Tree) & — & — & — & — & $0.0190 \pm 0.0019$ & $0.190 \pm 0.021$ & $0.447 \pm 0.038$ & $2.12 \pm 0.07$ & $0.708 \pm 0.050$ \\
+\textbf{Flow2BT (Flow, $1024 \times 16$)} & — & — & — & — & $0.0228 \pm 0.0032$ & $0.231 \pm 0.035$ & $0.559 \pm 0.023$ & $2.22 \pm 0.11$ & $1.030 \pm 0.076$ \\
 \hline
 \end{tabular}
 \end{table*}
@@ -173,14 +175,14 @@ $100\,\text{Hz}$の各実行tick（$\Delta t = 10\,\text{ms}$）において動�
 \section{実験}
 \subsection{実験設定}
 実環境のETH群衆ベンチマーク（\texttt{seq\_eth}，歩行者エージェント計406名）\cite{bae2025crowdes}を用いて，閉ループシミュレーションを評価する．歩行者エージェントは，記録された実際のタイムスタンプと初期座標に従って動的に生成され，1,000フレーム（$5\,\text{fps}$で$200\,\text{s}$）のシミュレーションホライズンにわたり，NavMesh経路に沿って目的地の境界へ向かう．CrowdES~\cite{bae2025crowdes}に従い，評価指標は二つの階層からなる．\textbf{シーンレベルの現実性}では，巨視的な時空間の群衆分布について，正解データとの類似度を評価する．指標には，空間密度（Dens.）および動的なアクティブ人数（Pop.）に関するEarth Mover's Distance（EMD）を用いる．\textbf{エージェントレベルの精度}では，微視的な軌道の品質を評価する．具体的には，運動学（Kinem.：速度，加速度，所要時間に関するEMD），動的時間伸縮法（Dynamic Time Warping; DTW）による経路の整合度，および移動時間（Time）のEMDを用いる．
-Flow2BTについては5回の試行（シード0--4）の平均と標準偏差を報告し，公開されているCrowdESの20試行のベンチマーク結果，および連続フロー方策の教師モデルと比較する．
+閉ループの各手法は，CrowdESの評価手順に従い20回の試行（シード0--19）で評価する．各試行では全手法に同一のエミッタのシードを用いるため，対応のあるWilcoxonの符号付順位検定で比較する．CrowdES以外の手法では，公称加速度を同一の制御バリア関数（CBF）による安全フィルタ（最小離隔$0.45\,\text{m}$）に通す．BTを用いない基準として，NavMeshの経由点を希望速度で追従するNavMesh追従器も評価する．
 
 \subsection{性能比較}
 \Table{tab:benchmark}（左）に示すように，連続フロー方策の教師モデルは，オフラインの軌道予測において全指標でCrowdESを上回った（例えば，$\text{minFDE}_{20}$は$0.4550$から$0.2727$へ$40.1\%$減少）．
 
-閉ループシミュレーション（\Table{tab:benchmark}右）では，Flow2BTは$100\,\text{Hz}$で動作しながら，シーンレベルの巨視的な群衆分布を概ね保持した．正解軌道から導出した場合，Flow2BTは空間密度（$0.0182 \pm 0.0017$，CrowdESは$0.0180$）および動的な人数分布（$0.185 \pm 0.018$，同$0.182$）においてCrowdESとほぼ同等であった．生成的なフロー方策の教師モデル（$1024 \times 16$）から蒸留した場合も，Flow2BTは同程度の空間密度（$0.0229 \pm 0.0019$）を示した．
+閉ループシミュレーション（\Table{tab:benchmark}右）では，正解軌道から導出したBTは空間密度（$0.0190$，CrowdESは$0.0180$，$p = 0.45$）と人数分布（$0.190$，同$0.182$，$p = 0.62$）でCrowdESと有意差を示さなかった．また，NavMesh追従器に対して運動学，DTW，移動時間をいずれも改善した（$p < 10^{-3}$）．一方，フロー教師から蒸留した$1024 \times 16$のBTは，空間密度（$0.0228$）と人数分布（$0.231$）がCrowdESより悪化し（$p < 10^{-4}$），運動学と移動時間ではNavMesh追従器を下回った（$p < 10^{-5}$）．$4096 \times 4$のBTは両者の中間であった．
 
-一方，エージェントレベルの精度には，CrowdESと比べて明確なトレードオフが見られた．運動学のEMDは$0.550 \pm 0.041$（CrowdESは$0.340$），DTWによる経路偏差は$2.19 \pm 0.064$（同$1.62$），移動時間のEMDは$1.014 \pm 0.058$（同$0.596$）に増加した．この性能差は，次の二つの構造的要因に起因する．第一の要因は，多峰的な軌道を$B=8$個の単峰的なDMPプリミティブへ離散的に圧縮していることである．第二の要因は，有限時間の停止回復機構において，静止状態から再開したエージェントがより低速なアトラクタモードに入ることである．CrowdESが$2\,\text{s}$の開ループチャンクに依存するのに対し，Flow2BTは$10\,\text{ms}$のtickごとに連続的なフィードバックを与える．すなわち，Flow2BTは微視的な滑らかさと引き換えに，反応的な実行と記号的な検証可能性を得ている．
+エージェントレベルの精度には，すべての閉ループ手法でCrowdESとのトレードオフが見られた．運動学，DTW，移動時間の誤差は，20回の対応のある試行のうち少なくとも19回でCrowdESより大きかった（$p < 10^{-4}$）．この差は，多峰的な軌道を$B=8$個の単峰的なDMPへ離散的に圧縮すること，および有限時間の停止回復機構において静止状態から再開したエージェントが低速なアトラクタモードに入ることに起因する．実際，フロー教師から蒸留したBTの停止ノード離脱回数（20試行で$3{,}957$回）は正解軌道由来のBT（$1{,}443$回）を大きく上回り，移動時間の増加と整合する．$2\,\text{s}$の開ループチャンクに依存するCrowdESに対し，Flow2BTは制御tickごとにフィードバックを与え，微視的な滑らかさと引き換えに反応的な実行と記号的な検証可能性を得ている．
 
 \subsection{実行時の反応性と計算効率}
 \textbf{反応性の評価：}
@@ -190,7 +192,7 @@ CrowdESなどの既存のチャンク型シミュレータは開ループ軌道�
 さらに，折れ線への射影に基づくキャッシュにより，オンラインでの$A^*$によるNavMeshクエリを$610\times$削減した（シーケンス全体で$164,980$件のクエリに対し，再計画は2回のみ）．これにより，高スループットな対話型の群衆シミュレーションが可能となる．
 
 \section{結言}
-本稿では，連続的なフローマッチングによる群衆方策を，閉形式のDMPアクションプリミティブを持つ解釈可能かつ反応的なBTへ蒸留するフレームワークFlow2BTを提案した．ETHベンチマークにおいて，Flow2BTが巨視的な空間密度と人数分布を概ね保持しつつ，人間が検証可能な意思決定論理のもとで$100\,\text{Hz}$（制御周期$10\,\text{ms}$）の高頻度実行を実現することを示した．ただし，現在の評価はETH歩行者ベンチマークに限られており，エージェントレベルの運動学には離散的な葉クラスタリングに起因するトレードオフが存在する．今後の課題として，より豊富な特徴量やマルチモーダルな感覚入力を検討し，複雑な3次元環境における微視的な忠実度の差を縮小することが挙げられる．
+本稿では，連続的なフローマッチングによる群衆方策を，閉形式のDMPアクションプリミティブを持つ解釈可能かつ反応的なBTへ蒸留するフレームワークFlow2BTを提案した．ETHベンチマークにおける20回の対応のある試行により，本手法で導出したBTがCrowdESの巨視的な空間密度と人数分布を保持し，BTを用いない基準手法を上回ることを確認した．ただし，フロー教師から蒸留したBTでは，この現実性はまだ保持されていない．ただし，現在の評価はETH歩行者ベンチマークに限られており，エージェントレベルの運動学には離散的な葉クラスタリングに起因するトレードオフが存在する．今後の課題として，より豊富な特徴量やマルチモーダルな感覚入力を検討し，複雑な3次元環境における微視的な忠実度の差を縮小することが挙げられる．
 
 \bibliographystyle{IEEEtran} % Use IEEEtranN with natbib, or unsrtnat
 \bibliography{reference}    % Points to your references.bib file

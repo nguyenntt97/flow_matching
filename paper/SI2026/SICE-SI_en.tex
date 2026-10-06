@@ -59,7 +59,7 @@ To resolve decision latency and black-box opacity while preserving generative re
 Our key contributions and findings are as follows:
 \begin{itemize}[noitemsep, topsep=1pt]
     \item \textbf{Neuro-Symbolic Distillation:} We show that continuous crowd policies can be distilled into interpretable Behavior Trees with closed-form DMP leaves, enabling a $100\,\text{Hz}$ ($\Delta t = 10\,\text{ms}$) reactive evaluation rate compared to $2000\,\text{ms}$ open-loop chunking.
-    \item \textbf{Generative Realism Preservation:} We demonstrate that Flow2BT approximately preserves macroscopic spatial density and dynamic population distributions while providing interpretable symbolic execution, despite an inherent microscopic kinematic trade-off.
+    \item \textbf{Generative Realism Preservation:} We show over 20 paired trials that the tree structure preserves CrowdES's macroscopic spatial density and population distributions when induced from ground truth, and quantify the realism gap that remains when the tree is distilled from the flow teacher.
     \item \textbf{Reactive Locomotion Primitives:} We parameterize unimodal action leaves into closed-form Dynamical Movement Primitives (DMPs), maintaining smooth navigation without open-loop chunk latency.
 \end{itemize}
 
@@ -160,7 +160,7 @@ As detailed in \Fig{fig:overview} (right), condition guards and action leaves ar
 
 \begin{table*}[t]
 \centering
-\caption{Benchmark results on the ETH crowd dataset. Left: Offline trajectory forecasting on held-out test split (29,275 windows). Right: Closed-loop multi-agent simulation benchmark (mean $\pm$ std across 5 evaluation trials for Flow2BT; 20 trials for CrowdES~\cite{bae2025crowdes}) structured into scene-level realism and agent-level accuracy following CrowdES.}
+\caption{Benchmark results on the ETH crowd dataset. Left: Offline trajectory forecasting on held-out test split (29,275 windows). Right: Closed-loop simulation on \texttt{seq\_eth} (mean $\pm$ std over the same 20 trials, seeds 0--19), following CrowdES's metrics. All closed-loop variants except CrowdES use the same CBF safety filter.}
 \label{tab:benchmark}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
@@ -169,11 +169,13 @@ As detailed in \Fig{fig:overview} (right), condition guards and action leaves ar
 & \multicolumn{4}{c|}{\textbf{Offline Forecasting}} & \multicolumn{2}{c|}{\textbf{Scene-Level Realism}} & \multicolumn{3}{c}{\textbf{Agent-Level Accuracy (Closed-Loop)}} \\
 \textbf{Method} & \textbf{ADE $\downarrow$} & \textbf{FDE $\downarrow$} & \textbf{minADE$_{20} \downarrow$} & \textbf{minFDE$_{20} \downarrow$} & \textbf{Dens. $\downarrow$} & \textbf{Pop. $\downarrow$} & \textbf{Kinem. $\downarrow$} & \textbf{DTW $\downarrow$} & \textbf{Time $\downarrow$} \\
 \hline
-CrowdES~\cite{bae2025crowdes} & 0.2896 & 0.5659 & 0.2372 & 0.4550 & \textbf{0.0180} & \textbf{0.182} & \textbf{0.340} & \textbf{1.62} & \textbf{0.596} \\
+CrowdES~\cite{bae2025crowdes} & 0.2896 & 0.5659 & 0.2372 & 0.4550 & $\mathbf{0.0180} \pm 0.0028$ & $\mathbf{0.182} \pm 0.034$ & $\mathbf{0.340} \pm 0.022$ & $\mathbf{1.62} \pm 0.07$ & $\mathbf{0.596} \pm 0.076$ \\
 Flow Policy (Teacher) & \textbf{0.2721} & \textbf{0.5321} & \textbf{0.1562} & \textbf{0.2727} & — & — & — & — & — \\
 \hline
-Flow2BT (GT Tree) & — & — & — & — & $0.0182 \pm 0.0017$ & $0.185 \pm 0.018$ & $0.438 \pm 0.044$ & $2.10 \pm 0.065$ & $0.711 \pm 0.061$ \\
-\textbf{Flow2BT (Flow, $1024 \times 16$)} & — & — & — & — & $0.0229 \pm 0.0019$ & $0.235 \pm 0.019$ & $0.550 \pm 0.041$ & $2.19 \pm 0.064$ & $1.014 \pm 0.058$ \\
+NavMesh follower (no tree) & — & — & — & — & $0.0211 \pm 0.0032$ & $0.213 \pm 0.034$ & $0.494 \pm 0.031$ & $2.23 \pm 0.09$ & $0.857 \pm 0.068$ \\
+Flow2BT (GT Tree) & — & — & — & — & $0.0190 \pm 0.0019$ & $0.190 \pm 0.021$ & $0.447 \pm 0.038$ & $2.12 \pm 0.07$ & $0.708 \pm 0.050$ \\
+Flow2BT (Flow, $4096 \times 4$) & — & — & — & — & $0.0221 \pm 0.0026$ & $0.224 \pm 0.028$ & $0.516 \pm 0.024$ & $2.18 \pm 0.09$ & $0.901 \pm 0.079$ \\
+\textbf{Flow2BT (Flow, $1024 \times 16$)} & — & — & — & — & $0.0228 \pm 0.0032$ & $0.231 \pm 0.035$ & $0.559 \pm 0.023$ & $2.22 \pm 0.11$ & $1.030 \pm 0.076$ \\
 \hline
 \end{tabular}
 \end{table*}
@@ -184,14 +186,14 @@ To ensure dynamically bounded locomotion across $100\,\text{Hz}$ execution ticks
 \section{Experiments and Results}
 \subsection{Experimental Setup}
 We evaluate closed-loop simulation on the real-world ETH crowd benchmark (\texttt{seq\_eth}, 406 total pedestrian agents)~\cite{bae2025crowdes}. Pedestrian agents spawn dynamically according to recorded empirical timestamps and initial coordinates, tracking NavMesh paths toward destination boundaries over a 1,000-frame simulation horizon ($200\,\text{s}$ at $5\,\text{fps}$). Following CrowdES~\cite{bae2025crowdes}, evaluation spans two tiers: \textbf{Scene-Level Realism} evaluates macroscopic spatial-temporal crowd distribution similarity against ground truth via Earth Mover's Distance (EMD) over spatial Density (Dens.) and dynamic active Population (Pop.) count; \textbf{Agent-Level Accuracy} evaluates microscopic trajectory quality, including Kinematics (Kinem., EMD over speed, acceleration, and duration), path alignment via Dynamic Time Warping (DTW), and Travel Time (Time) EMD.
-We report the mean and standard deviation across 5 randomized trials (seeds 0--4) for Flow2BT, and compare against the released 20-trial CrowdES benchmark and the continuous Flow Policy teacher.
+Every closed-loop method is run for 20 trials (seeds 0--19), the CrowdES protocol. Trial $k$ uses the same emitter seed for every method, so we compare methods per trial with a paired Wilcoxon signed-rank test. All variants other than CrowdES pass their nominal accelerations through the same control barrier function (CBF) safety filter (minimum separation $0.45\,\text{m}$). As a tree-free reference, a NavMesh follower tracks the waypoint at the agent's preferred speed through this filter.
 
 \subsection{Benchmark Performance Comparison}
 As summarized in \Table{tab:benchmark} (left), the continuous Flow Policy teacher improves offline trajectory forecasting over CrowdES across all metrics (e.g., $\text{minFDE}_{20}$ drops $40.1\%$, $0.2727$ vs. $0.4550$). 
 
-In closed-loop simulation (\Table{tab:benchmark}, right), Flow2BT approximately preserves macroscopic scene-level crowd distributions while operating at $100\,\text{Hz}$. When induced from ground-truth trajectories, Flow2BT closely matches CrowdES in spatial Density ($0.0182 \pm 0.0017$ vs. $0.0180$) and dynamic Population distribution ($0.185 \pm 0.018$ vs. $0.182$). When distilled from the generative Flow Policy teacher ($1024 \times 16$), Flow2BT demonstrates comparable structural density ($0.0229 \pm 0.0019$).
+In closed-loop simulation (\Table{tab:benchmark}, right), the tree induced from ground-truth trajectories matches CrowdES in spatial Density ($0.0190 \pm 0.0019$ vs. $0.0180 \pm 0.0028$, $p = 0.45$) and Population ($0.190 \pm 0.021$ vs. $0.182 \pm 0.034$, $p = 0.62$). Against the tree-free NavMesh follower behind the same safety filter, it improves Kinematics ($0.447$ vs. $0.494$), DTW ($2.12$ vs. $2.23$) and Travel Time ($0.708$ vs. $0.857$; all $p < 10^{-3}$), which isolates the contribution of the tree itself. Trees distilled from the Flow Policy teacher do not yet retain this benefit: the $1024 \times 16$ tree raises Density to $0.0228 \pm 0.0032$ and Population to $0.231 \pm 0.035$ ($p < 10^{-4}$ against CrowdES), and is worse than the tree-free follower in Kinematics ($0.559$ vs. $0.494$) and Travel Time ($1.030$ vs. $0.857$; both $p < 10^{-5}$). The $4096 \times 4$ tree lies between the two.
 
-However, agent-level accuracy exhibits a noticeable trade-off relative to CrowdES: Kinematics EMD increases to $0.550 \pm 0.041$ (vs. $0.340$), DTW path deviation rises to $2.19 \pm 0.064$ (vs. $1.62$), and Travel Time EMD increases to $1.014 \pm 0.058$ (vs. $0.596$). This performance gap stems structurally from two factors: (1) the discrete compression of multimodal trajectories into $B=8$ unimodal DMP primitives, and (2) the finite-duration stop recovery mechanism, where agents resuming from stationary states enter slower attractor modes. While CrowdES relies on open-loop $2\,\text{s}$ chunking, Flow2BT provides continuous feedback at each $10\,\text{ms}$ tick, trading microscopic smoothness for reactive execution and symbolic auditability.
+Agent-level accuracy shows a trade-off relative to CrowdES for every closed-loop variant: Kinematics, DTW and Travel Time are higher in at least 19 of the 20 paired trials ($p < 10^{-4}$). This gap stems structurally from two factors: (1) the discrete compression of multimodal trajectories into $B=8$ unimodal DMP primitives, and (2) the finite-duration stop recovery mechanism, where agents resuming from stationary states enter slower attractor modes. The flow-distilled tree leaves its stop leaf $3{,}957$ times over the 20 trials against $1{,}443$ for the ground-truth tree, consistent with its higher Travel Time. While CrowdES relies on open-loop $2\,\text{s}$ chunking, Flow2BT provides feedback at every control tick, trading microscopic smoothness for reactive execution and symbolic auditability.
 
 \subsection{Runtime Reactivity and Computational Efficiency}
 \textbf{Reactivity Boost:} 
@@ -201,7 +203,7 @@ Existing chunked simulators such as CrowdES execute open-loop trajectories ($T_f
 In addition, polyline projection caching slashes online $A^*$ NavMesh queries by $610\times$ ($164,980$ queries served with only 2 replans across the entire sequence), enabling high-throughput interactive crowd simulation.
 
 \section{Conclusion}
-We presented Flow2BT, a framework that distills continuous Flow Matching crowd policies into interpretable, reactive Behavior Trees with closed-form DMP action primitives. On the ETH benchmark, Flow2BT demonstrates approximate preservation of macroscopic spatial density and population distributions while enabling high-frequency $100\,\text{Hz}$ execution ($10\,\text{ms}$ control cycles) with human-auditable decision logic. Current evaluation is limited to the ETH pedestrian benchmark, and agent-level kinematics reflect a trade-off inherent in discrete leaf clustering. Future work will investigate richer feature sets and multi-modal sensory inputs to bridge the microscopic fidelity gap in complex 3D environments.
+We presented Flow2BT, a framework that distills continuous Flow Matching crowd policies into interpretable, reactive Behavior Trees with closed-form DMP action primitives. On the ETH benchmark over 20 paired trials, a tree induced with this pipeline matches CrowdES's macroscopic density and population distributions and improves on a tree-free baseline, with human-auditable decision logic. Trees distilled from the flow teacher do not yet retain this realism. Current evaluation is limited to the ETH pedestrian benchmark, and agent-level kinematics reflect a trade-off inherent in discrete leaf clustering. Future work will investigate richer feature sets and multi-modal sensory inputs to bridge the microscopic fidelity gap in complex 3D environments.
 
 \bibliographystyle{IEEEtran} % Use IEEEtranN with natbib, or unsrtnat
 \bibliography{reference}    % Points to your references.bib file

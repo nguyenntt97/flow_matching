@@ -14,10 +14,16 @@ TRIALS=${TRIALS:-20}
 SECTION=${1:-all}
 
 CROWDES=checkpoints/eth/simulator
-TEACHER=outputs/flow_eth/20260920-072219/checkpoints/epoch063-minfde0.0529.ckpt
-GT=outputs/induce_ground_truth_eth/20260930-150453/bundle.pkl      # no teacher (ablation)
-R4=outputs/induce_flow_r4_eth/20260930-150527/bundle.pkl           # Flow2BT, 4096 states x 4
-R16=outputs/induce_flow_r16_eth/20260930-150556/bundle.pkl         # Flow2BT, 1024 states x 16
+# Newest run of each, as written by scripts/build_flow2bt_eth.sh. Override any of
+# them from the environment to pin a specific run.
+newest() { ls -td $1 2>/dev/null | head -1; }
+TEACHER=${TEACHER:-$(ls -t "$(newest 'outputs/flow_eth/*/')"checkpoints/epoch*-minfde*.ckpt 2>/dev/null | head -1)}
+GT=${GT:-$(newest 'outputs/induce_ground_truth_eth/*/')bundle.pkl}    # no teacher (ablation)
+R4=${R4:-$(newest 'outputs/induce_flow_r4_eth/*/')bundle.pkl}         # Flow2BT, 4096 states x 4
+R16=${R16:-$(newest 'outputs/induce_flow_r16_eth/*/')bundle.pkl}      # Flow2BT, 1024 states x 16
+for f in "$TEACHER" "$GT" "$R4" "$R16"; do
+  [[ -f $f ]] || echo "warning: missing $f -- run scripts/build_flow2bt_eth.sh" >&2
+done
 
 run() { echo; echo ">>> $*"; "$@"; }
 

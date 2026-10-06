@@ -51,19 +51,28 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 - [02_huang2025_differentiable_bt_synthesis.md](./02_huang2025_differentiable_bt_synthesis.md): Continuous relaxation of formal grammar derivation graphs and tri-state execution status vectors via smooth t-norms and Gumbel-Softmax routing.
 - [03_kontschieder2015_deep_neural_decision_forests.md](./03_kontschieder2015_deep_neural_decision_forests.md): Foundational antecedent unifying deep CNN feature representations with stochastic tree routing functions.
 - [04_frosst2017_soft_decision_trees.md](./04_frosst2017_soft_decision_trees.md): Distilling continuous neural networks into soft, differentiable hierarchical decision trees.
+- [28_silva2020_differentiable_decision_trees_rl.md](./28_silva2020_differentiable_decision_trees_rl.md): Soft oblique routing and policy-gradient / Q-learning updates over differentiable decision trees in RL.
+- [30_kipf2019_compile_program_induction.md](./30_kipf2019_compile_program_induction.md): Unsupervised variational program compilation discovering discrete latent sub-programs and execution boundaries from continuous trajectories via differentiable attention and Gumbel-Softmax.
 
 ### Pillar 2: Neuro-Symbolic BT Architectures
 *Focus: Symbolic tree topologies with neural network leaf nodes (action policies and perceptual condition evaluators), HRL Options framework mapped to BT semantics, and guarded execution.*
 - [05_sprague2022_neural_controllers_bt.md](./05_sprague2022_neural_controllers_bt.md): Fallback composition embedding black-box continuous deep RL controllers under formal region-of-attraction invariant sets.
 - [06_chatzilygeroudis2021_bt_movement_skills.md](./06_chatzilygeroudis2021_bt_movement_skills.md): Parameterized Behavior Trees wrapping Dynamical Movement Primitives (DMPs) optimized via constrained policy search for physical robot assembly.
 - [07_pereira2015_options_learning_nodes_bt.md](./07_pereira2015_options_learning_nodes_bt.md): Formal mapping establishing equivalence between Behavior Tree subtrees and SMDP Options, introducing adaptive Learning Nodes with internal Q-learning.
+- [24_pezzato2023_active_inference_behavior_trees.md](./24_pezzato2023_active_inference_behavior_trees.md): Active inference combining Behavior Trees with free-energy minimization and continuous attractor dynamics for adaptive robotic manipulation.
 
 ### Pillar 3: Evolutionary & Hybrid Structure Learning
-*Focus: Genetic Programming (GP), Monte Carlo DAG Search (MCDAGS), and Quality-Diversity (MAP-Elites) searching for BT topology while optimizing execution primitives.*
+*Focus: Genetic Programming (GP), Monte Carlo DAG Search (MCDAGS), Quality-Diversity (MAP-Elites), and Policy Distillation searching for tree topology while optimizing execution primitives.*
 - [08_iovino2021_gp_bt_unpredictable.md](./08_iovino2021_gp_bt_unpredictable.md): Genetic Programming evolving reactive Behavior Trees under stochastic environmental perturbations and parsimony pressure.
 - [09_scheide2021_mcdags_grammar_bt.md](./09_scheide2021_mcdags_grammar_bt.md): Synthesizing Behavior Trees through Monte Carlo Directed Acyclic Graph Search over formal grammars with simulated annealing.
 - [10_anne2023_game_map_elites_bt.md](./10_anne2023_game_map_elites_bt.md): Generational Adversarial MAP-Elites co-evolving diverse competitive Behavior Trees using deep vision embedding models.
 - [13_hemono2026_automatic_bt_generation_hrc.md](./13_hemono2026_automatic_bt_generation_hrc.md): Systematic review of automatic BT generation across classical planning, evolutionary metaheuristics, and LLMs for collaborative task planning in Industry 5.0.
+- [22_pettit2024_generative_decision_tree_policies.md](./22_pettit2024_generative_decision_tree_policies.md): DisCo-DSO coupling autoregressive RNN tree generation with continuous parameter optimization for interpretable RL policies.
+- [23_guidotti2024_generative_model_decision_trees.md](./23_guidotti2024_generative_model_decision_trees.md): Latent-space generative modeling (TreeVAE) sampling synthetic decision trees.
+- [25_bastani2018_viper_policy_extraction.md](./25_bastani2018_viper_policy_extraction.md): VIPER distilling deep neural network policies into verifiable decision trees via Q-weighted imitation learning (DAgger).
+- [26_verma2018_pirl_ndps.md](./26_verma2018_pirl_ndps.md): Programmatically Interpretable Reinforcement Learning (PIRL) synthesizing human-readable programs via Neurally Directed Program Search (NDPS).
+- [27_trivedi2021_leaps_program_synthesis.md](./27_trivedi2021_leaps_program_synthesis.md): LEAPS learning a continuous latent program embedding space searched via the Cross-Entropy Method.
+- [29_wathieu2022_re_bt_espresso.md](./29_wathieu2022_re_bt_espresso.md): RE:BT-Espresso synthesizing compact, interpretable Behavior Trees from demonstration trajectories using C4.5 decision tree induction and Espresso two-level boolean logic minimization.
 
 ### Pillar 4: Verifiable & Safe Neural BTs
 *Focus: Control Barrier Functions (CBFs), Quadratic Programming safety filters, and formal verification of neural Behavior Trees using symbolic model checkers.*
@@ -107,6 +116,15 @@ Applied to Autonomous Decision Systems and Learnable Behavior Trees (LBTs), this
 | **Zhu et al. (2025)**<br>*Motion-Reg Flow (AAAI 2025)* | Feasible Flow Matching | **Yes** (Continuous ODE + SDF gradient) | Fixed (Motion field regularized) | Obstacle-avoidant pedestrian paths | Complex human navigation (SDD, Edinburgh Forum) |
 | **Tan et al. (2025)**<br>*Flow Planner (NeurIPS 2025)* | Interactive Guided Flow | **Yes** (CFG velocity blending) | Fixed (Tokenized interactive transformer) | Multi-agent interactive trajectories | Closed-loop autonomous driving (nuPlan) |
 | **Mao et al. (2026)**<br>*LR-SFM (KDD 2026)* | Spectral Flow Matching | **Yes** (Continuous spectral ODE) | Fixed (DCT low-rank projection) | Truncated DCT frequency coefficients | Human trajectory prediction (ETH-UCY, SDD, NBA) |
+| **Pettit et al. (2024)**<br>*DisCo-DSO (ICML/AAAI)* | Generative Policy Design | **Partial** (Discrete RNN + continuous gradient) | Learned (Autoregressive grammar search) | Discrete action logits, continuous linear controllers | Classic control (Gym), continuous MuJoCo control |
+| **Guidotti et al. (2024)**<br>*Generative Decision Trees (AAAI)* | Generative Tree Modeling | **Yes** (Continuous latent VAE) | Learned (Latent tree embedding decoding) | Categorical class distribution leaves | Tabular classification datasets (OpenML) |
+| **Pezzato et al. (2023)**<br>*Active Inference BTs (T-RO)* | Neuro-Symbolic Hybrid | **Partial** (Continuous free-energy minimization) | Fixed (Modular expert hierarchy) | Continuous active inference attractor controllers | Physical robotic manipulation (Franka Emika, UR5) |
+| **Bastani et al. (2018)**<br>*VIPER (NeurIPS 2018)* | Policy Distillation | **No** (Sample-weighted CART) | Learned (Q-criticality weighted DAgger) | Discrete atomic actions | CartPole, Pong, TORCS autonomous highway driving |
+| **Verma et al. (2018)**<br>*PIRL / NDPS (ICML 2018)* | Programmatic Distillation | **No** (Local neighborhood search) | Learned (Neurally Directed Program Search) | Programmatic primitive expressions | TORCS car racing, classic control |
+| **Trivedi et al. (2021)**<br>*LEAPS (NeurIPS 2021)* | Generative Program Synthesis | **Partial** (Continuous VAE + CEM search) | Learned (Latent program manifold decoding) | Discrete DSL atomic actions | Karel gridworld, multi-task program suites |
+| **Silva et al. (2020)**<br>*Differentiable Decision Trees (AISTATS)* | Differentiable Tree Policy | **Yes** (Soft oblique logistic routing) | Learned (Policy-gradient split optimization) | Discrete action logits or leaf Q-distributions | CartPole, MountainCar, LunarLander |
+| **Wathieu et al. (2022)**<br>*RE:BT-Espresso (ICRA 2022)* | Demonstration-to-BT Induction | **No** (CART + Espresso logic minimization) | Learned (Two-level boolean minimization) | Discrete robot action primitives, parameterized DMPs | Fetch robot tabletop manipulation, kitchen tasks |
+| **Kipf et al. (2019)**<br>*COMPILE (ICLR 2019)* | Differentiable Program Compilation | **Yes** (Continuous boundary gating & Gumbel-Softmax) | Learned (Unsupervised latent sequence segmentation) | Continuous neural sub-routine decoders | Multi-task GridWorld, 2D particle dynamics |
 
 ---
 
@@ -167,6 +185,15 @@ Third, **bidirectional neural-symbolic distillation under non-stationary reactiv
 - [19_zhu2025_motion_field_regularized_flow_matching.md](./19_zhu2025_motion_field_regularized_flow_matching.md) — *Plausible and Feasible Long-Term Human Trajectory Prediction via Motion Field-Regularized Flow Matching (AAAI 2025)*
 - [20_tan2025_flow_planner_interactive_behavior.md](./20_tan2025_flow_planner_interactive_behavior.md) — *Flow Matching-Based Autonomous Driving Planning with Advanced Interactive Behavior Modeling (NeurIPS 2025)*
 - [21_mao2026_low_rank_spectral_flow_matching.md](./21_mao2026_low_rank_spectral_flow_matching.md) — *Low-Rank Spectral Flow Matching for Human Trajectory Prediction (KDD 2026)*
+- [22_pettit2024_generative_decision_tree_policies.md](./22_pettit2024_generative_decision_tree_policies.md) — *Generative Design of Decision Tree Policies for Reinforcement Learning (DisCo-DSO, ICML 2024 SPIGM / AAAI 2025)*
+- [23_guidotti2024_generative_model_decision_trees.md](./23_guidotti2024_generative_model_decision_trees.md) — *Generative Model for Decision Trees (AAAI-24)*
+- [24_pezzato2023_active_inference_behavior_trees.md](./24_pezzato2023_active_inference_behavior_trees.md) — *Active Inference and Behavior Trees for Reactive Action Planning and Execution in Robotics (T-RO 2023)*
+- [25_bastani2018_viper_policy_extraction.md](./25_bastani2018_viper_policy_extraction.md) — *Verifiable Reinforcement Learning via Policy Extraction (VIPER, NeurIPS 2018)*
+- [26_verma2018_pirl_ndps.md](./26_verma2018_pirl_ndps.md) — *Programmatically Interpretable Reinforcement Learning (PIRL / NDPS, ICML 2018)*
+- [27_trivedi2021_leaps_program_synthesis.md](./27_trivedi2021_leaps_program_synthesis.md) — *Learning to Synthesize Programs as Interpretable and Generalizable Policies (LEAPS, NeurIPS 2021)*
+- [28_silva2020_differentiable_decision_trees_rl.md](./28_silva2020_differentiable_decision_trees_rl.md) — *Optimization Methods for Interpretable Differentiable Decision Trees in Reinforcement Learning (AISTATS 2020)*
+- [29_wathieu2022_re_bt_espresso.md](./29_wathieu2022_re_bt_espresso.md) — *RE:BT-Espresso: Improving Interpretability and Expressivity of Behavior Trees Learned from Robot Demonstrations (ICRA 2022)*
+- [30_kipf2019_compile_program_induction.md](./30_kipf2019_compile_program_induction.md) — *Compiling Programs from Demonstrations without Supervision (COMPILE, ICLR 2019)*
 
 ### Technical Reports & Deep Dives
 - [design/README.md](./design/README.md) — *Mechanics-Based Architecture & Design Hub: Learnable Behavior Trees from Continuous Flow Models (Flow2BT)*
